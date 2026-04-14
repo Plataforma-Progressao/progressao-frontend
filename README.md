@@ -1,59 +1,48 @@
-# PlataformaProgressaoFront
+# Plataforma Progressão Docente - Digital Curator
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.3.
+Este projeto foi gerado com [Angular CLI](https://github.com/angular/angular-cli) versão 21.2.3.
+O design system adotado é **Digital Curator**, utilizando Angular Material 3 e Tailwind CSS v4 para garantir produtividade, alta fidelidade e acessibilidade.
+
+## Stack de UI e Acessibilidade
+
+- **Angular 21 Standalone Components:** O projeto foi atualizado para não usar `standalone: true` de forma redundante (padrão v21).
+- **Tailwind CSS v4:** Para posicionamento e espaçamento ágeis integrados aos design tokens.
+- **Angular Material 3:** Para formulários robustos, elevações e componentes padronizados baseados no Material Design 3.
+- **Tokens Semânticos Globais:** Definidos em `src/styles/tokens.css` e referenciados via Tailwind em `theme`.
+- **Tipografia:** Adota a fonte **Manrope** definida em `src/styles/typography.css`.
+- **Acessibilidade AA:** Formulários sempre com rótulos semânticos, gestão nativa de contraste e estados de foco bem definidos.
 
 ## Development server
 
-To start a local development server, run:
+Para subir localmente:
 
 ```bash
-ng serve
+npm start
 ```
+Após executar, abra [http://localhost:4200/](http://localhost:4200/). 
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## Rodando testes
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+Tests automatizados utilizam o [Karma/Jasmine](https://karma-runner.github.io/):
 
 ```bash
-ng generate component component-name
+npm test
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## Estrutura do Roteamento
+
+O roteamento já nasce utilizando *lazy loading*.
+A rota default (que é `/login`) carrega a _feature_ de `Auth` (código em `src/app/features/auth/`).
+
+## Adicionando componentes (scaffolding)
 
 ```bash
-ng generate --help
+ng generate component components/nome-do-componente
 ```
 
-## Building
-
-To build the project run:
+## Build de Produção
 
 ```bash
-ng build
+npm run build
 ```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+O diretório compilado é o `dist/`. O angular.json contém os budgets adequados.
