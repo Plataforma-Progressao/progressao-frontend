@@ -1,0 +1,8 @@
+:host {
+  display: block;
+
+  mat-checkbox {
+    color: var(--color-text-primary, #1a1c1d);
+    font-size: 0.95rem;
+  }
+}

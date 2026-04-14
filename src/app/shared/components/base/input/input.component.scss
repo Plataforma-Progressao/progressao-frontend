@@ -1,0 +1,48 @@
+@use '@angular/material' as mat;
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+.app-input-field {
+  width: 100%;
+
+  @include mat.form-field-overrides((
+    filled-container-shape: 0.5rem,
+    filled-container-color: #f3f3f5,
+    filled-active-indicator-color: #c6c5d4,
+    filled-focus-active-indicator-color: var(--color-primary, #1a237e),
+    filled-input-text-color: var(--color-text-primary, #1a1c1d),
+    filled-label-text-color: var(--color-text-secondary, #6b7280),
+    filled-focus-label-text-color: var(--color-primary, #1a237e),
+
+    outlined-container-shape: 0.5rem,
+    outlined-outline-color: var(--color-outline, #e2e8f0),
+    outlined-focus-outline-color: var(--color-primary, #1a237e),
+    outlined-input-text-color: var(--color-text-primary, #1a1c1d),
+    outlined-label-text-color: var(--color-text-secondary, #6b7280),
+    outlined-focus-label-text-color: var(--color-primary, #1a237e),
+  ));
+
+  // O SCSS não suporta var() diretamente nas chaves dos mixins se o Material rejeitar as variáveis locais
+  // mas o mixin do Angular Material normalmente repassa para vars CSS.
+
+  .mat-icon {
+    color: var(--color-text-primary, #1a1c1d);
+  }
+
+  button[mat-icon-button][matSuffix],
+  button[matIconButton][matSuffix] {
+    --mdc-icon-button-state-layer-size: 2rem;
+    --mat-icon-button-ripple-color: rgb(26 35 126 / 22%);
+    --mat-icon-button-state-layer-color: rgb(26 35 126 / 22%);
+    align-items: center;
+    color: var(--color-text-primary, #1a1c1d);
+    display: inline-flex;
+    height: 2rem;
+    justify-content: center;
+    margin-right: 0.125rem;
+    width: 2rem;
+  }
+}

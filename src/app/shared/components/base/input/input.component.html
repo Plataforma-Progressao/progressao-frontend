@@ -1,0 +1,41 @@
+<mat-form-field [appearance]="appearance()" class="app-input-field">
+  @if (label()) {
+    <mat-label>{{ label() }}</mat-label>
+  }
+
+  @if (prefixIcon()) {
+    <mat-icon matPrefix aria-hidden="true">{{ prefixIcon() }}</mat-icon>
+  }
+
+  <input
+    matInput
+    [type]="type()"
+    [placeholder]="placeholder()"
+    [value]="value"
+    [disabled]="isDisabled"
+    [attr.aria-label]="label() || placeholder()"
+    [attr.aria-invalid]="hasError"
+    (input)="onInput($event)"
+    (blur)="onBlur($event)"
+  />
+
+  @if (suffixIcon()) {
+    <button
+      mat-icon-button
+      matSuffix
+      type="button"
+      [attr.aria-label]="suffixIconAriaLabel()"
+      (click)="onSuffixClick()"
+    >
+      <mat-icon aria-hidden="true">{{ suffixIcon() }}</mat-icon>
+    </button>
+  }
+
+  @if (hasError && errorMessage()) {
+    <mat-error>{{ errorMessage() }}</mat-error>
+  }
+
+  @if (hint() && !hasError) {
+    <mat-hint>{{ hint() }}</mat-hint>
+  }
+</mat-form-field>

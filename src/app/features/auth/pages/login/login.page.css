@@ -1,0 +1,215 @@
+:host {
+  display: block;
+  min-height: 100dvh;
+}
+
+.login-screen {
+  align-items: center;
+  background: linear-gradient(135deg, #f9f9fb 0%, #eeeeef 100%);
+  display: flex;
+  justify-content: center;
+  min-height: 100dvh;
+  padding: clamp(1rem, 4vw, 3rem);
+  position: relative;
+}
+
+.decorative-shell {
+  background: radial-gradient(circle at 100% 50%, rgb(26 35 126 / 8%) 0%, transparent 60%);
+  inset: 0;
+  position: absolute;
+}
+
+.login-card {
+  border: 1px solid var(--color-outline);
+  border-radius: 1.25rem;
+  box-shadow: 0 24px 44px -12px rgb(26 28 29 / 8%);
+  display: grid;
+  max-width: 72rem;
+  overflow: hidden;
+  position: relative;
+  width: min(100%, 72rem);
+  z-index: 1;
+}
+
+.brand-panel {
+  background: linear-gradient(135deg, #000666 0%, #1a237e 100%);
+  color: var(--color-on-primary);
+  display: flex;
+  min-height: 24rem;
+  padding: clamp(1.5rem, 4vw, 3rem);
+  position: relative;
+}
+
+.brand-overlay {
+  background: radial-gradient(circle at 30% 40%, rgb(163 246 156 / 14%) 0%, transparent 45%);
+  inset: 0;
+  position: absolute;
+}
+
+.brand-content {
+  display: grid;
+  gap: 1.25rem;
+  max-width: 28rem;
+  position: relative;
+}
+
+.brand-title {
+  font-size: clamp(1.75rem, 3vw, 2.25rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  margin: 0;
+}
+
+.brand-description {
+  color: #95a0ff;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.feature-list {
+  display: grid;
+  gap: 1rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.feature-item {
+  align-items: flex-start;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.feature-icon {
+  align-items: center;
+  background: rgb(255 255 255 / 14%);
+  border: 1px solid rgb(255 255 255 / 18%);
+  border-radius: 0.625rem;
+  display: inline-flex;
+  height: 2.25rem;
+  justify-content: center;
+  width: 2.25rem;
+}
+
+.feature-icon .mat-icon {
+  font-size: 1rem;
+  height: 1rem;
+  width: 1rem;
+}
+
+.progress-track {
+  background: rgb(255 255 255 / 20%);
+  border-radius: 999px;
+  bottom: clamp(1.5rem, 3vw, 3rem);
+  height: 0.25rem;
+  left: clamp(1.5rem, 4vw, 3rem);
+  overflow: hidden;
+  position: absolute;
+  right: clamp(1.5rem, 4vw, 3rem);
+}
+
+.progress-value {
+  background: var(--color-success);
+  border-radius: 999px;
+  display: block;
+  height: 100%;
+  width: 26%;
+}
+
+.form-panel {
+  background: var(--color-surface-container);
+  display: grid;
+  gap: 2rem;
+  padding: clamp(1.5rem, 4vw, 3rem);
+}
+
+.form-header h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.form-header p {
+  color: var(--color-text-secondary);
+  margin: 0.5rem 0 0;
+}
+
+.login-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.password-header {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+.password-header span {
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.forgot-link {
+  color: var(--color-primary);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.forgot-link:hover,
+.forgot-link:focus-visible {
+  text-decoration: underline;
+}
+
+.form-footer p {
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+  margin: 0;
+  text-align: center;
+}
+
+.form-footer {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.form-footer a {
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.security-caption {
+  align-items: center;
+  display: flex;
+  gap: 1rem;
+  opacity: 0.4;
+}
+
+.security-caption span {
+  background: var(--color-outline);
+  flex: 1;
+  height: 1px;
+}
+
+.security-caption small {
+  color: var(--color-text-primary);
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+@media (min-width: 64rem) {
+  .login-card {
+    grid-template-columns: 1.2fr 1fr;
+  }
+}
+
+@media (max-width: 63.99rem) {
+  .brand-panel {
+    display: none;
+  }
+}

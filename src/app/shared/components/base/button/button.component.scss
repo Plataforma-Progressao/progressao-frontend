@@ -1,0 +1,71 @@
+:host {
+  display: inline-flex;
+}
+
+.app-btn {
+  align-items: center;
+  border-radius: var(--radius-full, 999px);
+  display: inline-flex;
+  gap: 0.5rem;
+  justify-content: center;
+  min-height: 2.75rem;
+  min-width: 8rem;
+  white-space: nowrap;
+
+  .mat-icon {
+    font-size: 1rem;
+    height: 1rem;
+    line-height: 1rem;
+    width: 1rem;
+  }
+
+  .app-btn__label {
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  &.app-btn--small {
+    min-height: 2.25rem;
+    font-size: 0.875rem;
+  }
+
+  &.app-btn--medium {
+    font-size: 1rem;
+  }
+
+  &.app-btn--large {
+    min-height: 3rem;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  &.app-btn--primary {
+    --mdc-filled-button-container-color: var(--color-primary, #1a237e);
+    --mdc-filled-button-label-text-color: var(--color-on-primary, #ffffff);
+    --mdc-filled-button-disabled-container-color: #d4d4d8;
+    --mdc-filled-button-disabled-label-text-color: #6b7280;
+    --mdc-filled-button-container-shape: 999px;
+    --mdc-protected-button-container-elevation-shadow:
+      0 10px 15px -3px rgb(0 6 102 / 20%), 0 4px 6px -4px rgb(0 6 102 / 20%);
+  }
+
+  &.app-btn--secondary {
+    --mdc-outlined-button-outline-color: var(--color-primary, #1a237e);
+    --mdc-outlined-button-label-text-color: var(--color-primary, #1a237e);
+  }
+
+  &.app-btn--tertiary {
+    --mdc-text-button-label-text-color: var(--color-primary, #1a237e);
+  }
+
+  &.app-btn--danger {
+    --mdc-filled-button-container-color: var(--color-error, #b00020);
+    --mdc-filled-button-label-text-color: #ffffff;
+  }
+
+  &.app-btn--block {
+    width: 100%;
+  }
+}

@@ -1,0 +1,106 @@
+<main class="login-screen" aria-label="Acesso ao portal do docente">
+  <section class="decorative-shell" aria-hidden="true"></section>
+
+  <mat-card class="login-card" appearance="outlined">
+    <section class="brand-panel" aria-label="Apresentacao da plataforma">
+      <div class="brand-overlay"></div>
+
+      <div class="brand-content">
+        <h1 class="brand-title">Plataforma Progressao</h1>
+        <p class="brand-description">
+          Transformando a trajetoria academica em um arquivo vivo de excelencia e progresso
+          institucional.
+        </p>
+
+        <ul class="feature-list" aria-label="Beneficios da plataforma">
+          <li class="feature-item">
+            <span class="feature-icon" aria-hidden="true">
+              <mat-icon>auto_awesome</mat-icon>
+            </span>
+            <span>
+              <strong>Gestao Inteligente</strong>
+              <small>Curadoria automatizada de producoes e titulos.</small>
+            </span>
+          </li>
+
+          <li class="feature-item">
+            <span class="feature-icon" aria-hidden="true">
+              <mat-icon>trending_up</mat-icon>
+            </span>
+            <span>
+              <strong>Progresso Continuo</strong>
+              <small>Acompanhamento em tempo real da sua evolucao docente.</small>
+            </span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="progress-track" aria-hidden="true">
+        <span class="progress-value"></span>
+      </div>
+    </section>
+
+    <section class="form-panel" aria-label="Formulario de autenticacao">
+      <header class="form-header">
+        <h2>Portal do Docente</h2>
+        <p>Insira suas credenciais institucionais para acessar.</p>
+      </header>
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form" novalidate>
+        <app-input
+          formControlName="email"
+          label="E-mail institucional"
+          placeholder="nome.sobrenome@universidade.br"
+          prefixIcon="mail_outline"
+          [control]="loginForm.controls.email"
+          errorMessage="Digite um e-mail valido."
+        />
+
+        <div class="password-header">
+          <span>Senha</span>
+          <a routerLink="/recuperar-senha" class="forgot-link" aria-label="Recuperar senha"
+            >Esqueceu a senha?</a
+          >
+        </div>
+
+        <app-input
+          formControlName="password"
+          label="Senha"
+          [type]="hidePassword() ? 'password' : 'text'"
+          placeholder="••••••••"
+          prefixIcon="lock_outline"
+          [suffixIcon]="hidePassword() ? 'visibility' : 'visibility_off'"
+          [suffixIconAriaLabel]="hidePassword() ? 'Mostrar senha' : 'Ocultar senha'"
+          [suffixAction]="true"
+          (suffixClicked)="togglePasswordVisibility()"
+          [control]="loginForm.controls.password"
+          errorMessage="A senha deve ter pelo menos 8 caracteres."
+        />
+
+        <app-checkbox formControlName="rememberMe" label="Manter-me conectado" />
+
+        <app-button
+          variant="primary"
+          size="large"
+          [fullWidth]="true"
+          type="submit"
+          label="ENTRAR NA PLATAFORMA"
+          icon="arrow_forward"
+        />
+      </form>
+
+      <footer class="form-footer">
+        <p>
+          Ainda nao tem conta?
+          <a routerLink="/cadastro" aria-label="Criar nova conta">Criar conta</a>
+        </p>
+
+        <div class="security-caption" aria-hidden="true">
+          <span></span>
+          <small>Institutional Security</small>
+          <span></span>
+        </div>
+      </footer>
+    </section>
+  </mat-card>
+</main>

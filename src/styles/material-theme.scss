@@ -1,0 +1,34 @@
+@use '@angular/material' as mat;
+
+@include mat.core();
+
+$plataforma-theme: mat.define-theme((
+  color: (
+    theme-type: light,
+    primary: mat.$azure-palette,
+    tertiary: mat.$blue-palette,
+    use-system-variables: true,
+  ),
+  typography: (
+    use-system-variables: true,
+    brand-family: 'Manrope, sans-serif',
+    plain-family: 'Manrope, sans-serif',
+  ),
+  density: (
+    scale: 0,
+  ),
+));
+
+:root {
+  @include mat.all-component-themes($plataforma-theme);
+  @include mat.typography-hierarchy($plataforma-theme);
+
+  --mat-sys-primary: #1a237e;
+  --mat-sys-on-primary: #ffffff;
+  --mat-sys-secondary: #3f51b5;
+  --mat-sys-surface: #f9f9fb;
+  --mat-sys-surface-container: #ffffff;
+  --mat-sys-error: #b00020;
+  --mat-sys-outline: #e2e8f0;
+  --mat-sys-on-surface: #1a1c1d;
+}

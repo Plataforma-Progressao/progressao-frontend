@@ -1,0 +1,9 @@
+<mat-checkbox
+  [checked]="checked"
+  [disabled]="isDisabled"
+  [indeterminate]="indeterminate()"
+  [attr.aria-label]="label()"
+  (change)="onCheckboxChange($event)"
+>
+  {{ label() }}
+</mat-checkbox>
