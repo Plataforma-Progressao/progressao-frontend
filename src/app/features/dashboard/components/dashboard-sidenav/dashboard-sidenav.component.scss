@@ -10,9 +10,14 @@
   grid-template-rows: auto 1fr auto;
   gap: 1rem;
   height: 100dvh;
+  overflow-x: hidden;
   overflow-y: auto;
   padding: 1rem;
   width: 17.5rem;
+}
+
+.dashboard-sidenav--collapsed {
+  width: 6rem;
 }
 
 .dashboard-sidenav__top {
@@ -21,6 +26,7 @@
 }
 
 .dashboard-sidenav__close-button {
+  --mat-icon-button-ripple-color: rgb(26 35 126 / 24%);
   align-items: center;
   align-self: end;
   background: transparent;
@@ -47,6 +53,11 @@
   gap: 0.875rem;
   padding: 0.875rem;
   transition: all 200ms ease;
+}
+
+.dashboard-sidenav--collapsed .dashboard-sidenav__user {
+  justify-content: center;
+  padding: 0.75rem;
 }
 
 .dashboard-sidenav__avatar {
@@ -85,6 +96,10 @@
   min-height: 0;
 }
 
+.dashboard-sidenav--collapsed .dashboard-sidenav__nav {
+  justify-items: center;
+}
+
 .dashboard-sidenav__logout {
   align-items: center;
   background: transparent;
@@ -104,6 +119,11 @@
   background: rgb(229 57 53 / 8%);
 }
 
+.dashboard-sidenav--collapsed .dashboard-sidenav__logout {
+  justify-self: center;
+  padding: 0.75rem;
+}
+
 @media (max-width: 63.99rem) {
   :host {
     inset: 0;
@@ -119,6 +139,10 @@
     transform: translateX(-102%);
     transition: transform 220ms ease;
     width: min(88vw, 20rem);
+
+    &.dashboard-sidenav--collapsed {
+      width: min(88vw, 20rem);
+    }
 
     &.dashboard-sidenav--open {
       pointer-events: auto;

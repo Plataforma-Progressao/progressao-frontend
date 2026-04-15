@@ -50,7 +50,7 @@ describe('LoginPage', () => {
 
     const toggleButton = fixture.nativeElement
       .querySelectorAll('app-input')[1]
-      .querySelector('button[mat-icon-button][matSuffix]') as HTMLButtonElement;
+      .querySelector('button[matIconButton][matSuffix]') as HTMLButtonElement;
     toggleButton.click();
     fixture.detectChanges();
 

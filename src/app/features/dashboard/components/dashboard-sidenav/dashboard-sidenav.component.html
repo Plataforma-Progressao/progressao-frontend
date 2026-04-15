@@ -1,8 +1,12 @@
-<aside class="dashboard-sidenav" [class.dashboard-sidenav--open]="opened()">
+<aside
+  class="dashboard-sidenav"
+  [class.dashboard-sidenav--open]="opened()"
+  [class.dashboard-sidenav--collapsed]="collapsed()"
+>
   <div class="dashboard-sidenav__top">
     <button
       type="button"
-      mat-icon-button
+      matIconButton
       class="dashboard-sidenav__close-button"
       (click)="onClose()"
       aria-label="Fechar menu lateral"
@@ -12,21 +16,30 @@
 
     <div class="dashboard-sidenav__user">
       <div class="dashboard-sidenav__avatar">{{ user()?.avatarInitials ?? 'PD' }}</div>
-      <div>
-        <strong>{{ user()?.name ?? 'Docente' }}</strong>
-        <span>{{ user()?.title ?? 'Perfil institucional' }}</span>
-      </div>
+      @if (!collapsed()) {
+        <div>
+          <strong>{{ user()?.name ?? 'Docente' }}</strong>
+          <span>{{ user()?.title ?? 'Perfil institucional' }}</span>
+        </div>
+      }
     </div>
   </div>
 
   <nav class="dashboard-sidenav__nav" aria-label="Navegação principal">
     @for (item of navigationItems(); track item.route) {
-      <app-dashboard-nav-item [item]="item" [exact]="item.route === '/dashboard'" (click)="onNavigate()" />
+      <app-dashboard-nav-item
+        [item]="item"
+        [exact]="item.route === '/dashboard'"
+        [collapsed]="collapsed()"
+        (click)="onNavigate()"
+      />
     }
   </nav>
 
   <button type="button" class="dashboard-sidenav__logout" (click)="onLogout()" aria-label="Sair do sistema">
     <mat-icon>logout</mat-icon>
-    <span>Sair</span>
+    @if (!collapsed()) {
+      <span>Sair</span>
+    }
   </button>
 </aside>

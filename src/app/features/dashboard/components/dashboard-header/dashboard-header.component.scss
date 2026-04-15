@@ -23,7 +23,16 @@
 }
 
 .dashboard-header__menu-button {
+  --mat-icon-button-ripple-color: rgb(26 35 126 / 24%);
   color: #1a237e;
+}
+
+.dashboard-header__menu-button.mat-mdc-icon-button,
+.dashboard-header__search-clear.mat-mdc-icon-button,
+.dashboard-header__notification-button.mat-mdc-icon-button {
+  border-radius: 999px;
+  height: 2.5rem;
+  width: 2.5rem;
 }
 
 .dashboard-header__brand-label {
@@ -95,7 +104,12 @@
 }
 
 .dashboard-header__notification-button {
+  --mat-icon-button-ripple-color: rgb(26 35 126 / 24%);
   color: #1a237e;
+}
+
+.dashboard-header__search-clear {
+  --mat-icon-button-ripple-color: rgb(26 35 126 / 20%);
 }
 
 .dashboard-header__profile {

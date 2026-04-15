@@ -109,11 +109,11 @@
           <mat-step [stepControl]="formGroups.personal">
             <app-step-personal [form]="formGroups.personal"></app-step-personal>
             <div class="stepper-actions">
-              <button mat-button type="button" (click)="goToLogin()">
+              <button matButton type="button" (click)="goToLogin()">
                 Já é cadastrado? Fazer login
               </button>
               <button
-                mat-flat-button
+                matFlatButton
                 color="primary"
                 matStepperNext
                 [disabled]="formGroups.personal.invalid"
@@ -126,11 +126,11 @@
           <mat-step [stepControl]="formGroups.institution">
             <app-step-institution [form]="formGroups.institution"></app-step-institution>
             <div class="stepper-actions">
-              <button mat-button matStepperPrevious type="button">
+              <button matButton matStepperPrevious type="button">
                 <mat-icon>arrow_back</mat-icon> Voltar
               </button>
               <button
-                mat-flat-button
+                matFlatButton
                 color="primary"
                 matStepperNext
                 [disabled]="formGroups.institution.invalid"
@@ -143,11 +143,11 @@
           <mat-step [stepControl]="formGroups.career">
             <app-step-career [form]="formGroups.career"></app-step-career>
             <div class="stepper-actions">
-              <button mat-button matStepperPrevious type="button">
+              <button matButton matStepperPrevious type="button">
                 <mat-icon>arrow_back</mat-icon> Voltar
               </button>
               <button
-                mat-flat-button
+                matFlatButton
                 color="primary"
                 matStepperNext
                 [disabled]="formGroups.career.invalid"
@@ -163,11 +163,11 @@
               <p class="signup-error" role="alert">{{ submitError() }}</p>
             }
             <div class="stepper-actions">
-              <button mat-button matStepperPrevious type="button">
+              <button matButton matStepperPrevious type="button">
                 <mat-icon>arrow_back</mat-icon> Voltar
               </button>
               <button
-                mat-flat-button
+                matFlatButton
                 color="primary"
                 (click)="submitForm()"
                 [disabled]="formGroups.security.invalid || submitting()"

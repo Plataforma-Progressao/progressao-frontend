@@ -13,4 +13,5 @@ import { DashboardNavItem } from '../../dashboard.constants';
 export class DashboardNavItemComponent {
   readonly item = input.required<DashboardNavItem>();
   readonly exact = input(false);
+  readonly collapsed = input(false);
 }

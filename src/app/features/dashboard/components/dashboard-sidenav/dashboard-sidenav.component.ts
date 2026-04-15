@@ -15,6 +15,7 @@ import { DashboardNavItemComponent } from '../dashboard-nav-item/dashboard-nav-i
 export class DashboardSidenavComponent {
   readonly user = input<DashboardUser | null>(null);
   readonly opened = input(false);
+  readonly collapsed = input(false);
   readonly navigationItems = input<readonly DashboardNavItem[]>(DASHBOARD_NAV_ITEMS);
 
   readonly closeRequested = output<void>();

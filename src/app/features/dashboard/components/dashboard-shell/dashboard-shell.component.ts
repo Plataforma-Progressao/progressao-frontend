@@ -17,11 +17,17 @@ export class DashboardShellComponent {
   private readonly router = inject(Router);
 
   protected readonly mobileMenuOpened = signal(false);
+  protected readonly desktopSidenavCollapsed = signal(false);
   protected readonly currentUser = computed(() => this.authStateService.currentUser());
   protected readonly navigationItems = DASHBOARD_NAV_ITEMS;
 
   protected toggleMobileMenu(): void {
-    this.mobileMenuOpened.update((current) => !current);
+    if (this.isMobileViewport()) {
+      this.mobileMenuOpened.update((current) => !current);
+      return;
+    }
+
+    this.desktopSidenavCollapsed.update((current) => !current);
   }
 
   protected closeMobileMenu(): void {
@@ -39,5 +45,9 @@ export class DashboardShellComponent {
   private async performLogout(): Promise<void> {
     await this.authStateService.logout();
     await this.router.navigateByUrl('/login');
+  }
+
+  private isMobileViewport(): boolean {
+    return window.matchMedia('(max-width: 63.99rem)').matches;
   }
 }

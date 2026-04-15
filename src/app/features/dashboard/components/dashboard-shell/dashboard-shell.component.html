@@ -1,6 +1,9 @@
 <div class="dashboard-shell">
   <app-dashboard-sidenav
+    class="dashboard-shell__sidenav"
+    [class.dashboard-shell__sidenav--desktop-collapsed]="desktopSidenavCollapsed()"
     [opened]="mobileMenuOpened()"
+    [collapsed]="desktopSidenavCollapsed()"
     [user]="currentUser()"
     [navigationItems]="navigationItems"
     (closeRequested)="closeMobileMenu()"
@@ -8,7 +11,10 @@
     (logoutRequested)="logout()"
   />
 
-  <div class="dashboard-shell__content">
+  <div
+    class="dashboard-shell__content"
+    [class.dashboard-shell__content--desktop-collapsed]="desktopSidenavCollapsed()"
+  >
     <app-dashboard-header
       [user]="currentUser()"
       [mobileMenuOpened]="mobileMenuOpened()"

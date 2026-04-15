@@ -68,7 +68,7 @@ describe('InputComponent', () => {
     });
 
     const suffixButton = fixture.nativeElement.querySelector(
-      'button[mat-icon-button][matSuffix]',
+      'button[matIconButton][matSuffix]',
     ) as HTMLButtonElement;
 
     suffixButton.click();
