@@ -17,7 +17,8 @@ import { RouterLink } from '@angular/router';
       min-height: 100dvh;
       display: grid;
       place-items: center;
-      padding: 1.5rem;
+      padding: max(1.5rem, env(safe-area-inset-top)) max(1.5rem, env(safe-area-inset-right))
+        max(1.5rem, env(safe-area-inset-bottom)) max(1.5rem, env(safe-area-inset-left));
     }
 
     .placeholder-card {

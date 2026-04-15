@@ -9,7 +9,10 @@
   display: flex;
   justify-content: center;
   min-height: 100dvh;
-  padding: clamp(1rem, 4vw, 3rem);
+  padding: max(clamp(1rem, 4vw, 3rem), env(safe-area-inset-top))
+    max(clamp(1rem, 4vw, 3rem), env(safe-area-inset-right))
+    max(clamp(1rem, 4vw, 3rem), env(safe-area-inset-bottom))
+    max(clamp(1rem, 4vw, 3rem), env(safe-area-inset-left));
   position: relative;
 }
 

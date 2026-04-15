@@ -13,6 +13,7 @@ import { MatIconModule } from '@angular/material/icon';
       display: grid;
       grid-template-columns: 1fr 300px;
       gap: 2rem;
+      min-width: 0;
     }
 
     .overline {
@@ -144,7 +145,7 @@ import { MatIconModule } from '@angular/material/icon';
       line-height: 1.5;
     }
 
-    @media (max-width: 1023px) {
+    @media (max-width: 63.99rem) {
       .step-layout {
         grid-template-columns: 1fr;
       }
@@ -156,7 +157,10 @@ import { MatIconModule } from '@angular/material/icon';
         flex: 1;
       }
     }
-    @media (max-width: 639px) {
+    @media (max-width: 39.99rem) {
+      .title {
+        font-size: clamp(1.35rem, 6vw, 2rem);
+      }
       .form-grid {
         grid-template-columns: 1fr;
       }

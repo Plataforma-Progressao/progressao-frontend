@@ -23,6 +23,8 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
       flex-direction: column;
       gap: 2rem;
       max-width: 680px;
+      width: 100%;
+      min-width: 0;
     }
     .header-block .title {
       font-size: 2rem;
@@ -94,7 +96,10 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
       color: var(--color-text-secondary);
     }
 
-    @media (max-width: 639px) {
+    @media (max-width: 39.99rem) {
+      .header-block .title {
+        font-size: clamp(1.35rem, 6vw, 2rem);
+      }
       .form-grid {
         grid-template-columns: 1fr;
       }

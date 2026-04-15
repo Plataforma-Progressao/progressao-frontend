@@ -22,6 +22,7 @@ import { MatIconModule } from '@angular/material/icon';
       display: grid;
       grid-template-columns: 1fr 340px;
       gap: 2rem;
+      min-width: 0;
     }
     .title {
       font-size: 2rem;
@@ -221,12 +222,15 @@ import { MatIconModule } from '@angular/material/icon';
       text-decoration: none;
     }
 
-    @media (max-width: 1023px) {
+    @media (max-width: 63.99rem) {
       .step-layout {
         grid-template-columns: 1fr;
       }
     }
-    @media (max-width: 639px) {
+    @media (max-width: 39.99rem) {
+      .title {
+        font-size: clamp(1.35rem, 6vw, 2rem);
+      }
       .form-grid {
         grid-template-columns: 1fr;
       }

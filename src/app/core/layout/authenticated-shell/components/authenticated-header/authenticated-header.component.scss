@@ -10,7 +10,10 @@
   display: grid;
   gap: 1rem;
   grid-template-columns: auto minmax(0, 1fr) auto auto;
-  padding: 1rem clamp(1rem, 2vw, 1.5rem);
+  padding-top: max(1rem, env(safe-area-inset-top));
+  padding-bottom: 1rem;
+  padding-left: max(clamp(1rem, 2vw, 1.5rem), env(safe-area-inset-left));
+  padding-right: max(clamp(1rem, 2vw, 1.5rem), env(safe-area-inset-right));
   position: sticky;
   top: 0;
   z-index: 20;
@@ -31,8 +34,8 @@
 .dashboard-header__search-clear.mat-mdc-icon-button,
 .dashboard-header__notification-button.mat-mdc-icon-button {
   border-radius: 999px;
-  height: 2.5rem;
-  width: 2.5rem;
+  height: 2.75rem;
+  width: 2.75rem;
 }
 
 .dashboard-header__brand-label {
@@ -126,10 +129,10 @@
   display: inline-flex;
   font-size: 0.75rem;
   font-weight: 700;
-  height: 2.5rem;
+  height: 2.75rem;
   justify-content: center;
   letter-spacing: 0.04em;
-  width: 2.5rem;
+  width: 2.75rem;
 }
 
 .dashboard-header__profile strong,

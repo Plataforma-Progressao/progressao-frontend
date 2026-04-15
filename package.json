@@ -7,7 +7,8 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "lint": "ng lint"
+    "lint": "ng lint",
+    "icons": "bash scripts/generate-app-icons.sh"
   },
   "private": true,
   "packageManager": "npm@10.9.3",
@@ -21,6 +22,7 @@
     "@angular/material": "^21.2.6",
     "@angular/platform-browser": "^21.2.0",
     "@angular/router": "^21.2.0",
+    "@angular/service-worker": "21.2.8",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
   },

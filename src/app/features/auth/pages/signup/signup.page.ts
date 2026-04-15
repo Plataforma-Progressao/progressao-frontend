@@ -45,11 +45,13 @@ import { AuthStateService } from '../../../../core/auth/auth-state.service';
     }
 
     .top-nav {
-      height: 64px;
+      min-height: 64px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 2rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      padding: max(0.5rem, env(safe-area-inset-top)) clamp(0.75rem, 4vw, 2rem) 0.5rem;
       background: white;
       border-bottom: 1px solid #e2e8f0;
     }
@@ -78,15 +80,21 @@ import { AuthStateService } from '../../../../core/auth/auth-state.service';
       flex: 1;
       display: flex;
       justify-content: center;
-      padding: 3rem 1.5rem;
+      padding: clamp(1rem, 5vw, 3rem) clamp(0.75rem, 4vw, 1.5rem);
+      padding-bottom: max(clamp(1rem, 5vw, 3rem), env(safe-area-inset-bottom));
     }
 
     .layout-grid {
       display: grid;
       grid-template-columns: 280px 1fr;
-      gap: 3rem;
+      gap: clamp(1.25rem, 4vw, 3rem);
       width: 100%;
       max-width: 1200px;
+      min-width: 0;
+    }
+
+    .main-form-area {
+      min-width: 0;
     }
 
     /* Sidebar Styles */
@@ -208,6 +216,7 @@ import { AuthStateService } from '../../../../core/auth/auth-state.service';
     .stepper-actions {
       display: flex;
       justify-content: flex-end;
+      flex-wrap: wrap;
       gap: 1rem;
       margin-top: 3rem;
       padding-top: 1.5rem;
@@ -233,15 +242,17 @@ import { AuthStateService } from '../../../../core/auth/auth-state.service';
     .bottom-footer {
       display: flex;
       justify-content: center;
-      gap: 2rem;
-      padding: 2rem;
+      flex-wrap: wrap;
+      gap: 1rem 2rem;
+      padding: max(1.25rem, env(safe-area-inset-bottom)) clamp(1rem, 4vw, 2rem);
       color: #94a3b8;
       font-size: 0.75rem;
       font-weight: 600;
       letter-spacing: 0.05em;
+      text-align: center;
     }
 
-    @media (max-width: 1024px) {
+    @media (max-width: 63.99rem) {
       .layout-grid {
         grid-template-columns: 1fr;
       }
@@ -251,6 +262,16 @@ import { AuthStateService } from '../../../../core/auth/auth-state.service';
       ::ng-deep .custom-stepper .mat-horizontal-stepper-header-container {
         display: flex !important;
         margin-bottom: 2rem;
+      }
+    }
+
+    @media (max-width: 39.99rem) {
+      .stepper-actions {
+        flex-direction: column-reverse;
+        align-items: stretch;
+      }
+      .stepper-actions button {
+        width: 100%;
       }
     }
   `,
