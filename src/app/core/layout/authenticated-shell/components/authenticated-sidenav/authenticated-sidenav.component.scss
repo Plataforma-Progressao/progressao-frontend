@@ -101,17 +101,27 @@
 }
 
 .dashboard-sidenav__logout {
+  --mat-button-text-label-text-color: #e53935;
   align-items: center;
+  align-self: stretch;
   background: transparent;
   border: 0;
   border-radius: 1rem;
+  box-sizing: border-box;
   color: #e53935;
   cursor: pointer;
-  display: inline-flex;
+  display: flex;
   gap: 0.6rem;
-  justify-self: start;
+  justify-content: flex-start;
+  min-width: 0;
   padding: 0.75rem 0.95rem;
   transition: background-color 160ms ease;
+  width: 100%;
+
+  mat-icon {
+    color: #e53935;
+    margin: 0;
+  }
 }
 
 .dashboard-sidenav__logout:hover,
@@ -120,8 +130,20 @@
 }
 
 .dashboard-sidenav--collapsed .dashboard-sidenav__logout {
-  justify-self: center;
-  padding: 0.75rem;
+  gap: 0;
+  justify-content: center;
+  padding-left: 0;
+  padding-right: 0;
+
+  .mdc-button__label {
+    display: inline-flex;
+    justify-content: center;
+    width: 100%;
+  }
+
+  mat-icon {
+    margin-inline: 0;
+  }
 }
 
 @media (max-width: 63.99rem) {

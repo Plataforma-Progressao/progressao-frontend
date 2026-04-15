@@ -38,3 +38,67 @@ body {
 	--mdc-outlined-text-field-label-text-color: var(--color-text-secondary);
 	--mdc-outlined-text-field-focus-label-text-color: var(--color-primary);
 }
+
+.app-toast {
+	--mdc-snackbar-container-shape: 0.75rem;
+	--mdc-snackbar-supporting-text-size: 0.875rem;
+	--mdc-snackbar-supporting-text-line-height: 1.25rem;
+}
+
+.mat-mdc-snack-bar-container.app-toast {
+	box-shadow: 0 12px 28px -14px rgb(15 23 42 / 55%);
+}
+
+.mat-mdc-snack-bar-container.app-toast .mdc-snackbar__surface {
+	border-radius: 0.75rem;
+	padding-inline: 0.85rem;
+}
+
+.app-toast .mat-mdc-snack-bar-label,
+.app-toast .mat-mdc-snack-bar-label .mdc-snackbar__label {
+	font-weight: 600;
+}
+
+.mat-mdc-snack-bar-container.app-toast .mat-mdc-button.mat-mdc-snack-bar-action {
+	border-radius: 999px;
+	font-weight: 700;
+	letter-spacing: 0.01em;
+}
+
+.mat-mdc-snack-bar-container.app-toast--error .mdc-snackbar__surface {
+	background: linear-gradient(135deg, #7f1d3f 0%, #9f1239 100%);
+}
+
+.mat-mdc-snack-bar-container.app-toast--error .mat-mdc-snack-bar-label,
+.mat-mdc-snack-bar-container.app-toast--error .mdc-snackbar__label {
+	color: #fff1f2;
+}
+
+.mat-mdc-snack-bar-container.app-toast--error .mat-mdc-button.mat-mdc-snack-bar-action {
+	background: rgb(255 255 255 / 16%);
+	color: #ffe4e6;
+}
+
+.mat-mdc-snack-bar-container.app-toast--error .mat-mdc-button.mat-mdc-snack-bar-action:hover {
+	background: rgb(255 255 255 / 24%);
+}
+
+.mat-mdc-snack-bar-container.app-toast--success .mdc-snackbar__surface {
+	background: linear-gradient(135deg, #166534 0%, #15803d 100%);
+}
+
+.mat-mdc-snack-bar-container.app-toast--success .mat-mdc-snack-bar-label,
+.mat-mdc-snack-bar-container.app-toast--success .mdc-snackbar__label,
+.mat-mdc-snack-bar-container.app-toast--success .mat-mdc-button.mat-mdc-snack-bar-action {
+	color: #ecfdf5;
+}
+
+.mat-mdc-snack-bar-container.app-toast--info .mdc-snackbar__surface {
+	background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+}
+
+.mat-mdc-snack-bar-container.app-toast--info .mat-mdc-snack-bar-label,
+.mat-mdc-snack-bar-container.app-toast--info .mdc-snackbar__label,
+.mat-mdc-snack-bar-container.app-toast--info .mat-mdc-button.mat-mdc-snack-bar-action {
+	color: #eef2ff;
+}

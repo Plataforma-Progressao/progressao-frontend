@@ -1,22 +1,22 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { DashboardUser } from '../../../../core/auth/auth.models';
-import { DASHBOARD_NAV_ITEMS, DashboardNavItem } from '../../dashboard.constants';
-import { DashboardNavItemComponent } from '../dashboard-nav-item/dashboard-nav-item.component';
+import { DashboardUser } from '../../../../auth/auth.models';
+import { AUTHENTICATED_NAV_ITEMS, AuthenticatedNavItem } from '../../authenticated-shell.constants';
+import { AuthenticatedNavItemComponent } from '../authenticated-nav-item/authenticated-nav-item.component';
 
 @Component({
-  selector: 'app-dashboard-sidenav',
-  imports: [MatIconModule, MatButtonModule, DashboardNavItemComponent],
-  templateUrl: './dashboard-sidenav.component.html',
-  styleUrl: './dashboard-sidenav.component.scss',
+  selector: 'app-authenticated-sidenav',
+  imports: [MatIconModule, MatButtonModule, AuthenticatedNavItemComponent],
+  templateUrl: './authenticated-sidenav.component.html',
+  styleUrl: './authenticated-sidenav.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DashboardSidenavComponent {
+export class AuthenticatedSidenavComponent {
   readonly user = input<DashboardUser | null>(null);
   readonly opened = input(false);
   readonly collapsed = input(false);
-  readonly navigationItems = input<readonly DashboardNavItem[]>(DASHBOARD_NAV_ITEMS);
+  readonly navigationItems = input<readonly AuthenticatedNavItem[]>(AUTHENTICATED_NAV_ITEMS);
 
   readonly closeRequested = output<void>();
   readonly logoutRequested = output<void>();

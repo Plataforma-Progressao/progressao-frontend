@@ -6,7 +6,7 @@
   <div class="dashboard-sidenav__top">
     <button
       type="button"
-      matIconButton
+      mat-icon-button
       class="dashboard-sidenav__close-button"
       (click)="onClose()"
       aria-label="Fechar menu lateral"
@@ -27,7 +27,7 @@
 
   <nav class="dashboard-sidenav__nav" aria-label="Navegação principal">
     @for (item of navigationItems(); track item.route) {
-      <app-dashboard-nav-item
+      <app-authenticated-nav-item
         [item]="item"
         [exact]="item.route === '/dashboard'"
         [collapsed]="collapsed()"
@@ -36,7 +36,7 @@
     }
   </nav>
 
-  <button type="button" class="dashboard-sidenav__logout" (click)="onLogout()" aria-label="Sair do sistema">
+  <button type="button" mat-button class="dashboard-sidenav__logout" (click)="onLogout()" aria-label="Sair do sistema">
     <mat-icon>logout</mat-icon>
     @if (!collapsed()) {
       <span>Sair</span>

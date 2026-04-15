@@ -2,6 +2,7 @@
   [routerLink]="item().route"
   routerLinkActive="is-active"
   [routerLinkActiveOptions]="{ exact: exact() }"
+  matRipple
   class="dashboard-nav-item"
   [class.dashboard-nav-item--collapsed]="collapsed()"
   [attr.aria-label]="collapsed() ? item().label : null"

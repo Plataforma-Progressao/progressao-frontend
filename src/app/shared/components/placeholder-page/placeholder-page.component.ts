@@ -3,13 +3,13 @@ import { ActivatedRoute } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
-  selector: 'app-dashboard-placeholder-page',
+  selector: 'app-placeholder-page',
   imports: [MatIconModule],
-  templateUrl: './dashboard-placeholder.page.html',
-  styleUrl: './dashboard-placeholder.page.scss',
+  templateUrl: './placeholder-page.component.html',
+  styleUrl: './placeholder-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DashboardPlaceholderPage {
+export class PlaceholderPageComponent {
   private readonly route = inject(ActivatedRoute);
 
   protected readonly title = computed(() => this.route.snapshot.data['title'] ?? 'Em breve');

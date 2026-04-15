@@ -4,8 +4,8 @@ export const routes: Routes = [
   {
     path: '',
     loadComponent: () =>
-      import('../dashboard/pages/dashboard-placeholder/dashboard-placeholder.page').then(
-        (m) => m.DashboardPlaceholderPage,
+      import('../../shared/components/placeholder-page/placeholder-page.component').then(
+        (m) => m.PlaceholderPageComponent,
       ),
     data: {
       title: 'Atividades',

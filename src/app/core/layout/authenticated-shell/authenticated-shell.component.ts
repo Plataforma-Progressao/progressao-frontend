@@ -1,25 +1,25 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
-import { AuthStateService } from '../../../../core/auth/auth-state.service';
-import { DASHBOARD_NAV_ITEMS } from '../../dashboard.constants';
-import { DashboardHeaderComponent } from '../dashboard-header/dashboard-header.component';
-import { DashboardSidenavComponent } from '../dashboard-sidenav/dashboard-sidenav.component';
+import { AuthStateService } from '../../auth/auth-state.service';
+import { AUTHENTICATED_NAV_ITEMS } from './authenticated-shell.constants';
+import { AuthenticatedHeaderComponent } from './components/authenticated-header/authenticated-header.component';
+import { AuthenticatedSidenavComponent } from './components/authenticated-sidenav/authenticated-sidenav.component';
 
 @Component({
-  selector: 'app-dashboard-shell',
-  imports: [RouterOutlet, DashboardHeaderComponent, DashboardSidenavComponent],
-  templateUrl: './dashboard-shell.component.html',
-  styleUrl: './dashboard-shell.component.scss',
+  selector: 'app-authenticated-shell',
+  imports: [RouterOutlet, AuthenticatedHeaderComponent, AuthenticatedSidenavComponent],
+  templateUrl: './authenticated-shell.component.html',
+  styleUrl: './authenticated-shell.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DashboardShellComponent {
+export class AuthenticatedShellComponent {
   private readonly authStateService = inject(AuthStateService);
   private readonly router = inject(Router);
 
   protected readonly mobileMenuOpened = signal(false);
   protected readonly desktopSidenavCollapsed = signal(false);
   protected readonly currentUser = computed(() => this.authStateService.currentUser());
-  protected readonly navigationItems = DASHBOARD_NAV_ITEMS;
+  protected readonly navigationItems = AUTHENTICATED_NAV_ITEMS;
 
   protected toggleMobileMenu(): void {
     if (this.isMobileViewport()) {
@@ -39,7 +39,7 @@ export class DashboardShellComponent {
   }
 
   protected openCreateActivity(): void {
-    void this.router.navigateByUrl('/dashboard/atividades');
+    void this.router.navigateByUrl('/atividades');
   }
 
   private async performLogout(): Promise<void> {

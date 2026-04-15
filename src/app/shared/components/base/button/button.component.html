@@ -1,6 +1,6 @@
 @if (variant() === 'icon') {
   <button
-    matIconButton
+    mat-icon-button
     [type]="type()"
     [disabled]="isDisabled"
     [class]="buttonClass"
@@ -11,7 +11,7 @@
   </button>
 } @else if (variant() === 'primary' || variant() === 'danger') {
   <button
-    matFlatButton
+    mat-flat-button
     [type]="type()"
     [disabled]="isDisabled"
     [class]="buttonClass"
@@ -28,7 +28,7 @@
   </button>
 } @else if (variant() === 'secondary') {
   <button
-    matStrokedButton
+    mat-stroked-button
     [type]="type()"
     [disabled]="isDisabled"
     [class]="buttonClass"
@@ -45,7 +45,7 @@
   </button>
 } @else {
   <button
-    matButton
+    mat-button
     [type]="type()"
     [disabled]="isDisabled"
     [class]="buttonClass"

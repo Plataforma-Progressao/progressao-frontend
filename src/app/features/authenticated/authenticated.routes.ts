@@ -4,8 +4,8 @@ export const routes: Routes = [
   {
     path: '',
     loadComponent: () =>
-      import('../dashboard/components/dashboard-shell/dashboard-shell.component').then(
-        (m) => m.DashboardShellComponent,
+      import('../../core/layout/authenticated-shell/authenticated-shell.component').then(
+        (m) => m.AuthenticatedShellComponent,
       ),
     children: [
       {

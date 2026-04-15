@@ -1,23 +1,23 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
-import { DashboardSidenavComponent } from './dashboard-sidenav.component';
+import { AuthenticatedSidenavComponent } from './authenticated-sidenav.component';
 
-describe('DashboardSidenavComponent', () => {
-  let fixture: ComponentFixture<DashboardSidenavComponent>;
+describe('AuthenticatedSidenavComponent', () => {
+  let fixture: ComponentFixture<AuthenticatedSidenavComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [DashboardSidenavComponent, RouterTestingModule],
+      imports: [AuthenticatedSidenavComponent, RouterTestingModule],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(DashboardSidenavComponent);
+    fixture = TestBed.createComponent(AuthenticatedSidenavComponent);
     fixture.detectChanges();
   });
 
   it('renders the navigation menu and logout action', () => {
     const compiled = fixture.nativeElement as HTMLElement;
 
-    expect(compiled.querySelectorAll('app-dashboard-nav-item').length).toBeGreaterThan(0);
+    expect(compiled.querySelectorAll('app-authenticated-nav-item').length).toBeGreaterThan(0);
     expect(compiled.textContent).toContain('Sair');
   });
 });

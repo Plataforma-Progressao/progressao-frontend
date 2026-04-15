@@ -7,8 +7,8 @@ export const routes: Routes = [
     loadChildren: () => import('./features/auth/auth.routes').then((m) => m.routes),
   },
   {
-    path: 'dashboard',
+    path: '',
     canMatch: [authGuard],
-    loadChildren: () => import('./features/dashboard/dashboard.routes').then((m) => m.routes),
+    loadChildren: () => import('./features/authenticated/authenticated.routes').then((m) => m.routes),
   },
 ];

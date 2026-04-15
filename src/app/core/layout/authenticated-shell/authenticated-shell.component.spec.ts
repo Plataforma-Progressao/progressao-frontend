@@ -2,15 +2,15 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
-import { DashboardShellComponent } from './dashboard-shell.component';
+import { AuthenticatedShellComponent } from './authenticated-shell.component';
 import { AuthStateService } from '../../../../core/auth/auth-state.service';
 
-describe('DashboardShellComponent', () => {
-  let fixture: ComponentFixture<DashboardShellComponent>;
+describe('AuthenticatedShellComponent', () => {
+  let fixture: ComponentFixture<AuthenticatedShellComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [DashboardShellComponent],
+      imports: [AuthenticatedShellComponent],
       providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting()],
     }).compileComponents();
 
@@ -41,15 +41,15 @@ describe('DashboardShellComponent', () => {
 
     await loginPromise;
 
-    fixture = TestBed.createComponent(DashboardShellComponent);
+    fixture = TestBed.createComponent(AuthenticatedShellComponent);
     fixture.detectChanges();
   });
 
   it('renders the protected shell chrome', () => {
     const compiled = fixture.nativeElement as HTMLElement;
 
-    expect(compiled.querySelector('app-dashboard-header')).toBeTruthy();
-    expect(compiled.querySelector('app-dashboard-sidenav')).toBeTruthy();
+    expect(compiled.querySelector('app-authenticated-header')).toBeTruthy();
+    expect(compiled.querySelector('app-authenticated-sidenav')).toBeTruthy();
     expect(compiled.querySelector('router-outlet')).toBeTruthy();
   });
 });

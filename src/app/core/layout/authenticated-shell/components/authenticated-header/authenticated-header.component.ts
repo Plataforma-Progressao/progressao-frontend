@@ -1,17 +1,17 @@
 import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { ButtonComponent } from '../../../../shared';
-import { DashboardUser } from '../../../../core/auth/auth.models';
+import { ButtonComponent } from '../../../../../shared';
+import { DashboardUser } from '../../../../auth/auth.models';
 
 @Component({
-  selector: 'app-dashboard-header',
+  selector: 'app-authenticated-header',
   imports: [MatIconModule, MatButtonModule, ButtonComponent],
-  templateUrl: './dashboard-header.component.html',
-  styleUrl: './dashboard-header.component.scss',
+  templateUrl: './authenticated-header.component.html',
+  styleUrl: './authenticated-header.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DashboardHeaderComponent {
+export class AuthenticatedHeaderComponent {
   readonly user = input<DashboardUser | null>(null);
   readonly mobileMenuOpened = input(false);
 
