@@ -12,6 +12,26 @@ O design system adotado é **Digital Curator**, utilizando Angular Material 3 e 
 - **Tipografia:** Adota a fonte **Manrope** definida em `src/styles/typography.css`.
 - **Acessibilidade AA:** Formulários sempre com rótulos semânticos, gestão nativa de contraste e estados de foco bem definidos.
 
+## Ambiente hospedado (Vercel)
+
+O front-end está em deploy na **Vercel**:
+
+- **Aplicação:** [https://progressao-frontend.vercel.app/](https://progressao-frontend.vercel.app/)
+
+Em produção, o arquivo `src/environments/environment.production.ts` define a URL base da API como [https://progressao-backend.vercel.app/](https://progressao-backend.vercel.app/). O código acrescenta o prefixo `/api` a todas as requisições (por exemplo, autenticação em `/api/auth/login`).
+
+O back-end correspondente está no repositório **plataforma-progressao-backend**. Na Vercel, essa API usa **PostgreSQL no Supabase**: a connection string fica em `DATABASE_URL` nas variáveis de ambiente do projeto da API (não no front).
+
+### Usuário padrão para testes
+
+Se o seed da API foi executado no banco (local ou Supabase), o acesso de administrador de demonstração costuma ser:
+
+- **E-mail:** `admin@progressao.uf.br`
+- **Senha:** `Admin@123456`
+- **Papel:** `ADMIN`
+
+Os valores vêm de `ADMIN_EMAIL`, `ADMIN_PASSWORD` e `ADMIN_NAME` no ambiente da API. **Não use essas credenciais padrão em produção real** sem trocar senhas e segredos; veja o README do back-end.
+
 ## Development server
 
 Para subir localmente:
