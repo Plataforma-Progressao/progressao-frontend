@@ -1,0 +1,11 @@
+<a
+  [routerLink]="item().route"
+  routerLinkActive="is-active"
+  [routerLinkActiveOptions]="{ exact: exact() }"
+  class="dashboard-nav-item"
+>
+  <span class="dashboard-nav-item__icon" aria-hidden="true">
+    <mat-icon>{{ item().icon }}</mat-icon>
+  </span>
+  <span class="dashboard-nav-item__label">{{ item().label }}</span>
+</a>

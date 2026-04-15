@@ -6,7 +6,7 @@
       <div class="brand-overlay"></div>
 
       <div class="brand-content">
-        <h1 class="brand-title">Plataforma Progressao</h1>
+        <h1 class="brand-title">Plataforma Progressão</h1>
         <p class="brand-description">
           Transformando a trajetoria academica em um arquivo vivo de excelencia e progresso
           institucional.
@@ -45,6 +45,12 @@
         <h2>Portal do Docente</h2>
         <p>Insira suas credenciais institucionais para acessar.</p>
       </header>
+
+      @if (loginError()) {
+        <div class="login-error" role="alert">
+          {{ loginError() }}
+        </div>
+      }
 
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form" novalidate>
         <app-input
@@ -86,6 +92,8 @@
           type="submit"
           label="ENTRAR NA PLATAFORMA"
           icon="arrow_forward"
+          [loading]="loading()"
+          [disabled]="loading()"
         />
       </form>
 

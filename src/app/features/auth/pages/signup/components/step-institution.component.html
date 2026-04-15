@@ -1,0 +1,71 @@
+<div class="step-layout" [formGroup]="form()">
+  <div class="main-content">
+    <h5 class="overline">ETAPA 02 DE 04</h5>
+    <h2 class="title">Onde você atua hoje?</h2>
+    <p class="subtitle">
+      Vincule seu perfil à sua unidade acadêmica para habilitar as ferramentas de progressão
+      docente.
+    </p>
+
+    <div class="form-grid">
+      <mat-form-field appearance="fill" class="col-span-full">
+        <mat-label>Selecione a instituição</mat-label>
+        <mat-select formControlName="university">
+          <mat-option value="ufmg">Universidade Federal de Minas Gerais (UFMG)</mat-option>
+          <mat-option value="ufrj">Universidade Federal do Rio de Janeiro (UFRJ)</mat-option>
+          <mat-option value="unifesp">Universidade Federal de São Paulo (UNIFESP)</mat-option>
+          <mat-option value="ufsc">Universidade Federal de Santa Catarina (UFSC)</mat-option>
+        </mat-select>
+        <mat-icon matSuffix>account_balance</mat-icon>
+        @if (form().get('university')?.hasError('required') && form().get('university')?.touched) {
+          <mat-error>A instituição é obrigatória.</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Escolha o Centro</mat-label>
+        <mat-select formControlName="center">
+          <mat-option value="icex">Instituto de Ciências Exatas</mat-option>
+          <mat-option value="face">Faculdade de Economia</mat-option>
+          <mat-option value="letras">Faculdade de Letras</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Selecione o Depto.</mat-label>
+        <mat-select formControlName="department">
+          <mat-option value="dcc">Dep. Ciência da Computação</mat-option>
+          <mat-option value="dmat">Dep. de Matemática</mat-option>
+          <mat-option value="dfis">Dep. de Física</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="validation-card">
+      <mat-icon class="success-icon">verified_user</mat-icon>
+      <div class="validation-text">
+        <h4>Validado automaticamente</h4>
+        <p>
+          Ao selecionar uma instituição federativa, seus dados serão pré-validados com a base do MEC
+          e do portal da transparência.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="side-content">
+    <div class="image-card">
+      <div class="image-overlay">
+        <span class="badge">EXCELÊNCIA</span>
+        <h3>Sua carreira conectada à rede federal.</h3>
+      </div>
+    </div>
+    <div class="stats-card">
+      <h2>94%</h2>
+      <span class="stats-title">SINCRONIZAÇÃO</span>
+      <p>
+        Docentes que vinculam sua instituição reduzem o tempo de preenchimento do Barema em até 40%.
+      </p>
+    </div>
+  </div>
+</div>

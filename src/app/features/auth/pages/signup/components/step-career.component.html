@@ -1,0 +1,101 @@
+<div class="step-layout" [formGroup]="form()">
+  <div class="main-content">
+    <h2 class="title">Perfil Profissional</h2>
+    <p class="subtitle">
+      Configure os detalhes da sua jornada acadêmica para que possamos curar as melhores
+      oportunidades de progressão para sua carreira.
+    </p>
+
+    <div class="form-wrapper">
+      <div class="form-grid">
+        <mat-form-field appearance="fill" class="col-span-full">
+          <mat-label>Área de Atuação</mat-label>
+          <mat-select formControlName="practiceAreas" multiple>
+            <mat-option value="ai">Inteligência Artificial</mat-option>
+            <mat-option value="bio">Bioinformática</mat-option>
+            <mat-option value="sys">Sistemas Distribuídos</mat-option>
+            <mat-option value="data">Ciência de Dados</mat-option>
+          </mat-select>
+          <mat-icon matSuffix>school</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Classe de Carreira</mat-label>
+          <mat-select formControlName="careerClass">
+            <mat-option value="auxiliar">Auxiliar</mat-option>
+            <mat-option value="assistente">Assistente</mat-option>
+            <mat-option value="adjunto">Adjunto</mat-option>
+            <mat-option value="associado">Associado</mat-option>
+            <mat-option value="titular">Titular</mat-option>
+          </mat-select>
+          <mat-icon matSuffix>emoji_events</mat-icon>
+        </mat-form-field>
+
+        <div class="toggle-group-wrapper">
+          <span class="input-label">Nível Atual</span>
+          <mat-button-toggle-group
+            formControlName="currentLevel"
+            aria-label="Nível Atual"
+            class="custom-toggle-group"
+          >
+            <mat-button-toggle value="I">I</mat-button-toggle>
+            <mat-button-toggle value="II">II</mat-button-toggle>
+            <mat-button-toggle value="III">III</mat-button-toggle>
+            <mat-button-toggle value="IV">IV</mat-button-toggle>
+          </mat-button-toggle-group>
+        </div>
+
+        <mat-form-field appearance="fill" class="col-span-full">
+          <mat-label>Data da última progressão</mat-label>
+          <input matInput type="date" formControlName="lastProgressionDate" />
+        </mat-form-field>
+      </div>
+    </div>
+  </div>
+
+  <div class="side-content">
+    <div class="chart-card">
+      <div class="chart-header">
+        <mat-icon>trending_up</mat-icon>
+        <h4>Previsão de Progressão</h4>
+      </div>
+      <div class="chart-placeholder">
+        <div class="bar-container">
+          <div class="bar bar-1"></div>
+          <span class="year">2022</span>
+        </div>
+        <div class="bar-container">
+          <div class="bar bar-2"></div>
+          <span class="year">2023</span>
+        </div>
+        <div class="bar-container">
+          <div class="bar bar-3">
+            <span class="goal-badge">Meta 2024</span>
+          </div>
+          <span class="year">2024</span>
+        </div>
+        <div class="bar-container">
+          <div class="bar bar-4"></div>
+          <span class="year">2025</span>
+        </div>
+      </div>
+      <div class="chart-footer">
+        <div class="success-icon-bg"><mat-icon class="success-icon">stars</mat-icon></div>
+        <p>
+          Você está no caminho certo para o nível <strong>Adjunto III</strong> em <br /><strong
+            >Agosto de 2024</strong
+          >
+        </p>
+      </div>
+    </div>
+
+    <div class="curation-card">
+      <h4>Curadoria de Carreira</h4>
+      <p>
+        Docentes da classe <strong>Adjunto II</strong> costumam focar em publicações em periódicos
+        Q1 para acelerar a progressão para Associado.
+      </p>
+      <a href="#" class="link-action">Ver critérios de produtividade ↗</a>
+    </div>
+  </div>
+</div>

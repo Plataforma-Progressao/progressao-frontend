@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { StepperSelectionEvent } from '@angular/cdk/stepper';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -9,6 +10,12 @@ import { StepPersonalComponent } from './components/step-personal.component';
 import { StepInstitutionComponent } from './components/step-institution.component';
 import { StepCareerComponent } from './components/step-career.component';
 import { StepSecurityComponent } from './components/step-security.component';
+import {
+  cpfValidator,
+  passwordMatchValidator,
+  phoneValidator,
+} from '../../../../shared/forms/br-form.utils';
+import { AuthStateService } from '../../../../core/auth/auth-state.service';
 
 @Component({
   selector: 'app-signup-page',
@@ -20,127 +27,14 @@ import { StepSecurityComponent } from './components/step-security.component';
     StepPersonalComponent,
     StepInstitutionComponent,
     StepCareerComponent,
-    StepSecurityComponent
+    StepSecurityComponent,
   ],
-  template: `
-    <div class="page-layout">
-      <!-- Main Header -->
-      <header class="top-nav">
-        <div class="logo">Plataforma Progressão</div>
-        <div class="nav-actions">
-          <a href="#">Ajuda</a>
-          <a href="#">Segurança</a>
-        </div>
-      </header>
-
-      <main class="content-wrapper">
-        <div class="layout-grid">
-          
-          <div class="stepper-sidebar">
-            <div class="sidebar-card">
-              <h2 class="sidebar-title">Cadastro Docente</h2>
-              <div class="sidebar-steps">
-                <div class="step-item" [class.active]="currentStep() === 0" [class.completed]="currentStep() > 0">
-                  <div class="step-icon">
-                    @if (currentStep() > 0) { <mat-icon>check</mat-icon> } @else { <span>1</span> }
-                  </div>
-                  <div class="step-text">
-                    <span class="step-overline">PASSO 1</span>
-                    <span class="step-name">Pessoal</span>
-                  </div>
-                </div>
-                <div class="step-item" [class.active]="currentStep() === 1" [class.completed]="currentStep() > 1">
-                  <div class="step-icon">
-                    @if (currentStep() > 1) { <mat-icon>check</mat-icon> } @else { <span>2</span> }
-                  </div>
-                  <div class="step-text">
-                    <span class="step-overline">PASSO 2</span>
-                    <span class="step-name">Instituição</span>
-                  </div>
-                </div>
-                <div class="step-item" [class.active]="currentStep() === 2" [class.completed]="currentStep() > 2">
-                  <div class="step-icon">
-                    @if (currentStep() > 2) { <mat-icon>check</mat-icon> } @else { <span>3</span> }
-                  </div>
-                  <div class="step-text">
-                    <span class="step-overline">PASSO 3</span>
-                    <span class="step-name">Carreira</span>
-                  </div>
-                </div>
-                <div class="step-item" [class.active]="currentStep() === 3" [class.completed]="currentStep() > 3">
-                  <div class="step-icon">
-                    @if (currentStep() > 3) { <mat-icon>lock</mat-icon> } @else { <mat-icon>lock</mat-icon> }
-                  </div>
-                  <div class="step-text">
-                    <span class="step-overline">PASSO 4</span>
-                    <span class="step-name">Segurança</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="support-card">
-              <mat-icon>verified_user</mat-icon>
-              <p>"A segurança dos seus dados acadêmicos é nossa prioridade. Utilizamos criptografia de ponta a ponta para proteger seu portfólio."</p>
-              <span class="support-footer"><mat-icon inline>shield</mat-icon> PROTOCOLO DE CURADORIA DIGITAL</span>
-            </div>
-          </div>
-
-          <div class="main-form-area">
-             <!-- We use mat-stepper horizontally but hidden headers to utilize its logic 
-                  or we can just use vertical stepper for mobile. Here we will use an invisible header stepper on desktop 
-                  and link it to our custom sidebar, or just use css to hide stepper headers. -->
-             <mat-stepper [linear]="true" #stepper class="custom-stepper" (selectionChange)="onStepChange($event)">
-                
-                <mat-step [stepControl]="formGroups.personal">
-                   <app-step-personal [form]="formGroups.personal"></app-step-personal>
-                   <div class="stepper-actions">
-                      <button mat-button type="button" (click)="goToLogin()">Já é cadastrado? Fazer login</button>
-                      <button mat-flat-button color="primary" matStepperNext [disabled]="formGroups.personal.invalid">Próximo Passo <mat-icon>arrow_forward</mat-icon></button>
-                   </div>
-                </mat-step>
-
-                <mat-step [stepControl]="formGroups.institution">
-                   <app-step-institution [form]="formGroups.institution"></app-step-institution>
-                   <div class="stepper-actions">
-                      <button mat-button matStepperPrevious type="button"><mat-icon>arrow_back</mat-icon> Voltar</button>
-                      <button mat-flat-button color="primary" matStepperNext [disabled]="formGroups.institution.invalid">Próximo Passo <mat-icon>arrow_forward</mat-icon></button>
-                   </div>
-                </mat-step>
-
-                <mat-step [stepControl]="formGroups.career">
-                   <app-step-career [form]="formGroups.career"></app-step-career>
-                   <div class="stepper-actions">
-                      <button mat-button matStepperPrevious type="button"><mat-icon>arrow_back</mat-icon> Voltar</button>
-                      <button mat-flat-button color="primary" matStepperNext [disabled]="formGroups.career.invalid">Próximo Passo <mat-icon>arrow_forward</mat-icon></button>
-                   </div>
-                </mat-step>
-
-                <mat-step [stepControl]="formGroups.security">
-                   <app-step-security [form]="formGroups.security"></app-step-security>
-                   <div class="stepper-actions">
-                      <button mat-button matStepperPrevious type="button"><mat-icon>arrow_back</mat-icon> Voltar</button>
-                      <button mat-flat-button color="primary" (click)="submitForm()" [disabled]="formGroups.security.invalid">Finalizar e Acessar Dashboard <mat-icon>rocket_launch</mat-icon></button>
-                   </div>
-                </mat-step>
-
-             </mat-stepper>
-          </div>
-
-        </div>
-      </main>
-
-      <footer class="bottom-footer">
-        <span><mat-icon inline>check_circle</mat-icon> CONFORMIDADE CAPES</span>
-        <span><mat-icon inline>lock</mat-icon> CRIPTOGRAFIA SSL 256-BIT</span>
-      </footer>
-    </div>
-  `,
+  templateUrl: './signup.page.html',
   styles: `
     :host {
       display: block;
       min-height: 100vh;
-      background-color: #F9F9FB;
+      background-color: #f9f9fb;
       font-family: 'Manrope', sans-serif;
     }
 
@@ -157,11 +51,11 @@ import { StepSecurityComponent } from './components/step-security.component';
       justify-content: space-between;
       padding: 0 2rem;
       background: white;
-      border-bottom: 1px solid #E2E8F0;
+      border-bottom: 1px solid #e2e8f0;
     }
     .logo {
       font-weight: 700;
-      color: #1A237E;
+      color: #1a237e;
       font-size: 1.125rem;
     }
     .nav-actions {
@@ -170,14 +64,14 @@ import { StepSecurityComponent } from './components/step-security.component';
     }
     .nav-actions a {
       text-decoration: none;
-      color: #1A237E;
+      color: #1a237e;
       font-weight: 600;
       font-size: 0.875rem;
       border-bottom: 2px solid transparent;
       padding-bottom: 4px;
     }
     .nav-actions a:hover {
-      border-bottom-color: #1A237E;
+      border-bottom-color: #1a237e;
     }
 
     .content-wrapper {
@@ -202,14 +96,14 @@ import { StepSecurityComponent } from './components/step-security.component';
       gap: 1.5rem;
     }
     .sidebar-card {
-      background: #F8FAFC;
+      background: #f8fafc;
       border-radius: 16px;
       padding: 1.5rem;
     }
     .sidebar-title {
       font-size: 1.25rem;
       font-weight: 800;
-      color: #1A237E;
+      color: #1a237e;
       margin: 0 0 1.5rem 0;
     }
     .sidebar-steps {
@@ -226,16 +120,17 @@ import { StepSecurityComponent } from './components/step-security.component';
       transition: opacity 0.3s ease;
       position: relative;
     }
-    .step-item.active, .step-item.completed {
+    .step-item.active,
+    .step-item.completed {
       opacity: 1;
     }
-    
+
     .step-icon {
       width: 32px;
       height: 32px;
       border-radius: 50%;
-      background: #E2E8F0;
-      color: #64748B;
+      background: #e2e8f0;
+      color: #64748b;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -244,11 +139,11 @@ import { StepSecurityComponent } from './components/step-security.component';
       z-index: 2;
     }
     .step-item.active .step-icon {
-      background: #1A237E;
+      background: #1a237e;
       color: white;
     }
     .step-item.completed .step-icon {
-      background: #10B981;
+      background: #10b981;
       color: white;
     }
     .step-item.completed:not(.active) .step-icon mat-icon {
@@ -264,19 +159,19 @@ import { StepSecurityComponent } from './components/step-security.component';
       letter-spacing: 0.1em;
       text-transform: uppercase;
       font-weight: 700;
-      color: #64748B;
+      color: #64748b;
     }
     .step-name {
       font-size: 1rem;
       font-weight: 700;
-      color: #1E293B;
+      color: #1e293b;
     }
     .step-item.active .step-name {
-      color: #1A237E;
+      color: #1a237e;
     }
 
     .support-card {
-      background: #1A237E;
+      background: #1a237e;
       color: white;
       border-radius: 12px;
       padding: 1.5rem;
@@ -285,7 +180,7 @@ import { StepSecurityComponent } from './components/step-security.component';
       font-size: 0.875rem;
       line-height: 1.5;
       margin: 1rem 0;
-      color: #E0E7FF;
+      color: #e0e7ff;
     }
     .support-footer {
       font-size: 0.65rem;
@@ -293,14 +188,14 @@ import { StepSecurityComponent } from './components/step-security.component';
       display: flex;
       align-items: center;
       gap: 0.25rem;
-      color: #A5B4FC;
+      color: #a5b4fc;
     }
 
     /* Main Form Area */
     .main-form-area {
-      background: white;
+      background-color: #fff;
       border-radius: 24px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
       padding: 2.5rem;
       position: relative;
     }
@@ -316,7 +211,7 @@ import { StepSecurityComponent } from './components/step-security.component';
       gap: 1rem;
       margin-top: 3rem;
       padding-top: 1.5rem;
-      border-top: 1px solid #E2E8F0;
+      border-top: 1px solid #e2e8f0;
     }
     .stepper-actions button {
       border-radius: 8px;
@@ -324,12 +219,23 @@ import { StepSecurityComponent } from './components/step-security.component';
       height: 48px;
     }
 
+    .signup-error {
+      background: rgb(239 68 68 / 10%);
+      border: 1px solid rgb(239 68 68 / 16%);
+      border-radius: 0.75rem;
+      color: #b91c1c;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin: 1.25rem 0 0;
+      padding: 0.75rem 0.9rem;
+    }
+
     .bottom-footer {
       display: flex;
       justify-content: center;
       gap: 2rem;
       padding: 2rem;
-      color: #94A3B8;
+      color: #94a3b8;
       font-size: 0.75rem;
       font-weight: 600;
       letter-spacing: 0.05em;
@@ -351,61 +257,96 @@ import { StepSecurityComponent } from './components/step-security.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SignupPage {
-  private fb = inject(FormBuilder);
-  private router = inject(Router);
+  private readonly fb = inject(FormBuilder);
+  private readonly router = inject(Router);
+  private readonly authStateService = inject(AuthStateService);
 
-  currentStep = signal(0);
+  protected readonly currentStep = signal(0);
+  protected readonly submitError = signal<string | null>(null);
+  protected readonly submitting = signal(false);
 
   formGroups = {
-    personal: this.fb.group({
-      fullName: ['', Validators.required],
-      cpf: ['', [Validators.required, Validators.pattern(/^[0-9]{3}\.?[0-9]{3}\.?[0-9]{3}\-?[0-9]{2}$/)]],
+    personal: this.fb.nonNullable.group({
+      fullName: ['', [Validators.required, Validators.minLength(2)]],
+      cpf: ['', [Validators.required, cpfValidator()]],
+      phone: ['', [phoneValidator()]],
       email: ['', [Validators.required, Validators.email]],
     }),
-    institution: this.fb.group({
-      university: ['', Validators.required],
-      center: ['', Validators.required],
-      department: ['', Validators.required],
+    institution: this.fb.nonNullable.group({
+      university: ['', [Validators.required, Validators.minLength(2)]],
+      center: ['', [Validators.required, Validators.minLength(2)]],
+      department: ['', [Validators.required, Validators.minLength(2)]],
     }),
-    career: this.fb.group({
-      practiceAreas: [[], Validators.required],
-      careerClass: ['', Validators.required],
+    career: this.fb.nonNullable.group({
+      practiceAreas: [[] as string[], Validators.required],
+      careerClass: ['', [Validators.required, Validators.minLength(2)]],
       currentLevel: ['', Validators.required],
       lastProgressionDate: ['', Validators.required],
     }),
-    security: this.fb.group({
-      password: ['', [Validators.required, Validators.minLength(8)]],
-      confirmPassword: ['', Validators.required],
-      acceptTerms: [false, Validators.requiredTrue],
-      acceptLgpd: [false, Validators.requiredTrue],
-    }),
+    security: this.fb.nonNullable.group(
+      {
+        password: ['', [Validators.required, Validators.minLength(8)]],
+        confirmPassword: ['', Validators.required],
+        acceptTerms: [false, Validators.requiredTrue],
+        acceptLgpd: [false, Validators.requiredTrue],
+      },
+      { validators: [passwordMatchValidator()] },
+    ),
   };
 
-  onStepChange(event: any) {
+  onStepChange(event: StepperSelectionEvent): void {
     this.currentStep.set(event.selectedIndex);
   }
 
-  goToLogin() {
-    this.router.navigate(['/login']);
+  goToLogin(): void {
+    void this.router.navigate(['/login']);
   }
 
-  submitForm() {
+  submitForm(): void {
+    void this.submitRegistration();
+  }
+
+  private async submitRegistration(): Promise<void> {
     if (
       this.formGroups.personal.valid &&
       this.formGroups.institution.valid &&
       this.formGroups.career.valid &&
       this.formGroups.security.valid
     ) {
-      const formData = {
-        ...this.formGroups.personal.value,
-        ...this.formGroups.institution.value,
-        ...this.formGroups.career.value,
-        ...this.formGroups.security.value,
+      this.submitError.set(null);
+      this.submitting.set(true);
+
+      const personalData = this.formGroups.personal.getRawValue();
+      const institutionData = this.formGroups.institution.getRawValue();
+      const careerData = this.formGroups.career.getRawValue();
+      const securityData = this.formGroups.security.getRawValue();
+
+      const registerPayload = {
+        fullName: personalData.fullName,
+        cpf: personalData.cpf,
+        email: personalData.email,
+        ...institutionData,
+        ...careerData,
+        ...securityData,
+        lastProgressionDate: String(careerData.lastProgressionDate),
       };
-      console.log('Registration submitted:', formData);
-      // Aqui faria a requisição para o backend
-      // alert('Cadastro realizado com sucesso!');
-      this.router.navigate(['/']);
+
+      try {
+        await this.authStateService.register(registerPayload, { persist: true });
+        await this.router.navigate(['/dashboard']);
+      } catch {
+        this.submitError.set(
+          'Não foi possível concluir o cadastro agora. Verifique os dados e tente novamente.',
+        );
+      } finally {
+        this.submitting.set(false);
+      }
+      return;
     }
+
+    this.formGroups.personal.markAllAsTouched();
+    this.formGroups.institution.markAllAsTouched();
+    this.formGroups.career.markAllAsTouched();
+    this.formGroups.security.markAllAsTouched();
   }
 }

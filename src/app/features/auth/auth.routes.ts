@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { guestGuard } from '../../core/auth/guest.guard';
 
 export const routes: Routes = [
   {
@@ -8,19 +9,18 @@ export const routes: Routes = [
   },
   {
     path: 'login',
-    loadComponent: () =>
-      import('./pages/login/login.page').then((m) => m.LoginPage),
+    canMatch: [guestGuard],
+    loadComponent: () => import('./pages/login/login.page').then((m) => m.LoginPage),
   },
   {
     path: 'cadastro',
-    loadComponent: () =>
-      import('./pages/signup/signup.page').then((m) => m.SignupPage),
+    canMatch: [guestGuard],
+    loadComponent: () => import('./pages/signup/signup.page').then((m) => m.SignupPage),
   },
   {
     path: 'recuperar-senha',
+    canMatch: [guestGuard],
     loadComponent: () =>
-      import('./pages/forgot-password/forgot-password.page').then(
-        (m) => m.ForgotPasswordPage,
-      ),
+      import('./pages/forgot-password/forgot-password.page').then((m) => m.ForgotPasswordPage),
   },
 ];

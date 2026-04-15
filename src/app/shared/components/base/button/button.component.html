@@ -1,40 +1,63 @@
-@if (variant() === 'primary' || variant() === 'danger') {
+@if (variant() === 'icon') {
+  <button
+    mat-icon-button
+    [type]="type()"
+    [disabled]="isDisabled"
+    [class]="buttonClass"
+    (click)="onClick()"
+    [attr.aria-label]="label()"
+  >
+    <mat-icon aria-hidden="true">{{ icon() }}</mat-icon>
+  </button>
+} @else if (variant() === 'primary' || variant() === 'danger') {
   <button
     mat-flat-button
     [type]="type()"
-    [disabled]="disabled()"
+    [disabled]="isDisabled"
     [class]="buttonClass"
     (click)="onClick()"
   >
-    <span class="app-btn__label">{{ label() }}</span>
-    @if (icon()) {
-      <mat-icon aria-hidden="true">{{ icon() }}</mat-icon>
+    @if (loading()) {
+      <mat-spinner diameter="16" [strokeWidth]="2"></mat-spinner>
+    } @else {
+      <span class="app-btn__label">{{ label() }}</span>
+      @if (icon()) {
+        <mat-icon aria-hidden="true">{{ icon() }}</mat-icon>
+      }
     }
   </button>
 } @else if (variant() === 'secondary') {
   <button
     mat-stroked-button
     [type]="type()"
-    [disabled]="disabled()"
+    [disabled]="isDisabled"
     [class]="buttonClass"
     (click)="onClick()"
   >
-    <span class="app-btn__label">{{ label() }}</span>
-    @if (icon()) {
-      <mat-icon aria-hidden="true">{{ icon() }}</mat-icon>
+    @if (loading()) {
+      <mat-spinner diameter="16" [strokeWidth]="2"></mat-spinner>
+    } @else {
+      <span class="app-btn__label">{{ label() }}</span>
+      @if (icon()) {
+        <mat-icon aria-hidden="true">{{ icon() }}</mat-icon>
+      }
     }
   </button>
 } @else {
   <button
     mat-button
     [type]="type()"
-    [disabled]="disabled()"
+    [disabled]="isDisabled"
     [class]="buttonClass"
     (click)="onClick()"
   >
-    <span class="app-btn__label">{{ label() }}</span>
-    @if (icon()) {
-      <mat-icon aria-hidden="true">{{ icon() }}</mat-icon>
+    @if (loading()) {
+      <mat-spinner diameter="16" [strokeWidth]="2"></mat-spinner>
+    } @else {
+      <span class="app-btn__label">{{ label() }}</span>
+      @if (icon()) {
+        <mat-icon aria-hidden="true">{{ icon() }}</mat-icon>
+      }
     }
   </button>
 }

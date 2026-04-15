@@ -1,0 +1,47 @@
+:host {
+  display: block;
+}
+
+.dashboard-placeholder {
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid rgb(226 232 240 / 76%);
+  border-radius: 1.5rem;
+  display: grid;
+  gap: 0.75rem;
+  justify-items: center;
+  min-height: 18rem;
+  padding: 2rem;
+  text-align: center;
+}
+
+.dashboard-placeholder__icon {
+  align-items: center;
+  background: rgb(26 35 126 / 6%);
+  border-radius: 999px;
+  color: #1a237e;
+  display: inline-flex;
+  height: 4rem;
+  justify-content: center;
+  width: 4rem;
+}
+
+.dashboard-placeholder__eyebrow {
+  color: #6b7280;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.dashboard-placeholder h1 {
+  color: #1a1c1d;
+  margin: 0;
+}
+
+.dashboard-placeholder p:last-child {
+  color: #6b7280;
+  margin: 0;
+  max-width: 32rem;
+}

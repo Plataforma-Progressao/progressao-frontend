@@ -5,21 +5,42 @@
 .app-btn {
   align-items: center;
   border-radius: var(--radius-full, 999px);
+  cursor: pointer;
   display: inline-flex;
   gap: 0.5rem;
   justify-content: center;
   min-height: 2.75rem;
   min-width: 8rem;
+  position: relative;
+  transition:
+    background-color 200ms ease,
+    box-shadow 200ms ease,
+    transform 100ms ease;
+  user-select: none;
   white-space: nowrap;
 
+  &:disabled {
+    cursor: not-allowed;
+  }
+
   .mat-icon {
+    align-items: center;
+    display: inline-flex;
     font-size: 1rem;
     height: 1rem;
+    justify-content: center;
     line-height: 1rem;
+    vertical-align: middle;
     width: 1rem;
   }
 
+  .mat-spinner {
+    display: inline-flex;
+  }
+
   .app-btn__label {
+    align-items: center;
+    display: inline-flex;
     font-weight: 700;
     letter-spacing: 0.02em;
     line-height: 1;
@@ -47,8 +68,12 @@
     --mdc-filled-button-disabled-container-color: #d4d4d8;
     --mdc-filled-button-disabled-label-text-color: #6b7280;
     --mdc-filled-button-container-shape: 999px;
-    --mdc-protected-button-container-elevation-shadow:
-      0 10px 15px -3px rgb(0 6 102 / 20%), 0 4px 6px -4px rgb(0 6 102 / 20%);
+    --mdc-protected-button-container-elevation-shadow: 0 10px 15px -3px rgb(0 6 102 / 20%),
+      0 4px 6px -4px rgb(0 6 102 / 20%);
+
+    &:active:not(:disabled) {
+      transform: scale(0.98);
+    }
   }
 
   &.app-btn--secondary {
@@ -63,6 +88,20 @@
   &.app-btn--danger {
     --mdc-filled-button-container-color: var(--color-error, #b00020);
     --mdc-filled-button-label-text-color: #ffffff;
+
+    &:active:not(:disabled) {
+      transform: scale(0.98);
+    }
+  }
+
+  &.app-btn--icon {
+    min-height: 2.75rem;
+    min-width: 2.75rem;
+    border-radius: 999px;
+  }
+
+  &.app-btn--loading {
+    pointer-events: none;
   }
 
   &.app-btn--block {

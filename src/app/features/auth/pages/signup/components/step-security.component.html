@@ -1,0 +1,92 @@
+<div class="step-container" [formGroup]="form()">
+  <div class="header-block">
+    <h2 class="title">Quase lá, Professor.</h2>
+    <p class="subtitle">
+      Defina suas credenciais de acesso e revise os termos de uso para finalizar seu perfil de
+      pesquisador.
+    </p>
+  </div>
+
+  <div class="form-wrapper">
+    <div class="form-grid">
+      <mat-form-field appearance="fill">
+        <mat-label>Senha de Acesso</mat-label>
+        <input
+          matInput
+          [type]="hidePassword() ? 'password' : 'text'"
+          formControlName="password"
+          placeholder="••••••••"
+        />
+        <button
+          mat-icon-button
+          matSuffix
+          (click)="togglePassword($event)"
+          [attr.aria-label]="'Ocultar senha'"
+          type="button"
+        >
+          <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+        <mat-hint>Mínimo de 8 caracteres, incluindo letras e números.</mat-hint>
+        @if (form().get('password')?.hasError('required') && form().get('password')?.touched) {
+          <mat-error>A senha é obrigatória.</mat-error>
+        }
+        @if (form().get('password')?.hasError('minlength') && form().get('password')?.touched) {
+          <mat-error>Informe ao menos 8 caracteres.</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Confirmar Senha</mat-label>
+        <input
+          matInput
+          [type]="hidePasswordConfirm() ? 'password' : 'text'"
+          formControlName="confirmPassword"
+          placeholder="••••••••"
+        />
+        <button
+          mat-icon-button
+          matSuffix
+          (click)="togglePasswordConfirm($event)"
+          [attr.aria-label]="'Ocultar senha'"
+          type="button"
+        >
+          <mat-icon>{{ hidePasswordConfirm() ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+        @if (
+          form().get('confirmPassword')?.hasError('required') &&
+          form().get('confirmPassword')?.touched
+        ) {
+          <mat-error>A confirmação de senha é obrigatória.</mat-error>
+        }
+        @if (form().hasError('passwordMismatch') && form().get('confirmPassword')?.touched) {
+          <mat-error>As senhas precisam ser iguais.</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <div class="checkbox-group">
+      <mat-checkbox formControlName="acceptTerms" color="primary">
+        Li e concordo com os <a href="#">Termos de Uso e Condições</a> da plataforma Digital
+        Curator, incluindo as normas de ética em pesquisa institucional.
+      </mat-checkbox>
+      <mat-checkbox formControlName="acceptLgpd" color="primary">
+        Autorizo o tratamento dos meus dados pessoais e profissionais conforme as diretrizes da
+        <a href="#">LGPD (Lei Geral de Proteção de Dados)</a> para fins de curadoria e progresso na
+        carreira acadêmica.
+      </mat-checkbox>
+    </div>
+  </div>
+
+  <div class="success-card">
+    <div class="success-icon-bg">
+      <mat-icon class="success-icon">stars</mat-icon>
+    </div>
+    <div class="success-text">
+      <h4>Tudo pronto para sua jornada!</h4>
+      <p>
+        Ao finalizar, seu perfil será sincronizado com a base institucional e você terá acesso total
+        ao seu novo dashboard.
+      </p>
+    </div>
+  </div>
+</div>

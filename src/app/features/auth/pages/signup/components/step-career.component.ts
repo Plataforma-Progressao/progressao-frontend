@@ -8,96 +8,15 @@ import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-step-career',
-  imports: [ReactiveFormsModule, MatFormFieldModule, MatSelectModule, MatInputModule, MatButtonToggleModule, MatIconModule],
-  template: `
-    <div class="step-layout" [formGroup]="form()">
-      <div class="main-content">
-        <h2 class="title">Perfil Profissional</h2>
-        <p class="subtitle">Configure os detalhes da sua jornada acadêmica para que possamos curar as melhores oportunidades de progressão para sua carreira.</p>
-
-        <div class="form-wrapper">
-          <div class="form-grid">
-            <mat-form-field appearance="outline" class="col-span-full">
-              <mat-label>Área de Atuação</mat-label>
-              <mat-select formControlName="practiceAreas" multiple>
-                <mat-option value="ai">Inteligência Artificial</mat-option>
-                <mat-option value="bio">Bioinformática</mat-option>
-                <mat-option value="sys">Sistemas Distribuídos</mat-option>
-                <mat-option value="data">Ciência de Dados</mat-option>
-              </mat-select>
-              <mat-icon matSuffix>school</mat-icon>
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Classe de Carreira</mat-label>
-              <mat-select formControlName="careerClass">
-                <mat-option value="auxiliar">Auxiliar</mat-option>
-                <mat-option value="assistente">Assistente</mat-option>
-                <mat-option value="adjunto">Adjunto</mat-option>
-                <mat-option value="associado">Associado</mat-option>
-                <mat-option value="titular">Titular</mat-option>
-              </mat-select>
-              <mat-icon matSuffix>emoji_events</mat-icon>
-            </mat-form-field>
-
-            <div class="toggle-group-wrapper">
-              <span class="input-label">Nível Atual</span>
-              <mat-button-toggle-group formControlName="currentLevel" aria-label="Nível Atual" class="custom-toggle-group">
-                <mat-button-toggle value="I">I</mat-button-toggle>
-                <mat-button-toggle value="II">II</mat-button-toggle>
-                <mat-button-toggle value="III">III</mat-button-toggle>
-                <mat-button-toggle value="IV">IV</mat-button-toggle>
-              </mat-button-toggle-group>
-            </div>
-
-            <mat-form-field appearance="outline" class="col-span-full">
-              <mat-label>Data da última progressão</mat-label>
-              <input matInput type="date" formControlName="lastProgressionDate" />
-            </mat-form-field>
-          </div>
-        </div>
-      </div>
-
-      <div class="side-content">
-        <div class="chart-card">
-          <div class="chart-header">
-            <mat-icon>trending_up</mat-icon>
-            <h4>Previsão de Progressão</h4>
-          </div>
-          <div class="chart-placeholder">
-             <div class="bar-container">
-               <div class="bar bar-1"></div>
-               <span class="year">2022</span>
-             </div>
-             <div class="bar-container">
-               <div class="bar bar-2"></div>
-               <span class="year">2023</span>
-             </div>
-             <div class="bar-container">
-               <div class="bar bar-3">
-                  <span class="goal-badge">Meta 2024</span>
-               </div>
-               <span class="year">2024</span>
-             </div>
-             <div class="bar-container">
-               <div class="bar bar-4"></div>
-               <span class="year">2025</span>
-             </div>
-          </div>
-          <div class="chart-footer">
-            <div class="success-icon-bg"><mat-icon class="success-icon">stars</mat-icon></div>
-            <p>Você está no caminho certo para o nível <strong>Adjunto III</strong> em <br/><strong>Agosto de 2024</strong></p>
-          </div>
-        </div>
-
-        <div class="curation-card">
-          <h4>Curadoria de Carreira</h4>
-          <p>Docentes da classe <strong>Adjunto II</strong> costumam focar em publicações em periódicos Q1 para acelerar a progressão para Associado.</p>
-          <a href="#" class="link-action">Ver critérios de produtividade ↗</a>
-        </div>
-      </div>
-    </div>
-  `,
+  imports: [
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatInputModule,
+    MatButtonToggleModule,
+    MatIconModule,
+  ],
+  templateUrl: './step-career.component.html',
   styles: `
     .step-layout {
       display: grid;
@@ -107,21 +26,22 @@ import { MatIconModule } from '@angular/material/icon';
     .title {
       font-size: 2rem;
       font-weight: 800;
-      color: #1A237E;
+      color: #1a237e;
       margin-top: 0;
       margin-bottom: 0.5rem;
     }
     .subtitle {
-      color: #4B5563;
+      color: #4b5563;
       margin-bottom: 2rem;
       font-size: 1rem;
     }
 
     .form-wrapper {
-      background: white;
-      border-radius: 12px;
+      background: #ffffff;
+      border-radius: 16px;
       padding: 1.5rem;
-      border: 1px solid #F1F5F9;
+      border: 1px solid var(--color-outline);
+      box-shadow: 0 12px 32px rgba(15, 23, 42, 0.05);
     }
 
     .form-grid {
@@ -133,11 +53,11 @@ import { MatIconModule } from '@angular/material/icon';
     .col-span-full {
       grid-column: 1 / -1;
     }
-    
+
     .input-label {
       font-size: 0.75rem;
       font-weight: 600;
-      color: #1E293B;
+      color: #1e293b;
       margin-bottom: 0.5rem;
       display: block;
     }
@@ -146,7 +66,7 @@ import { MatIconModule } from '@angular/material/icon';
       flex-direction: column;
     }
     .custom-toggle-group {
-      border: 1px solid #CBD5E1;
+      border: 1px solid #cbd5e1;
       border-radius: 4px;
       box-shadow: none;
       width: 100%;
@@ -166,23 +86,25 @@ import { MatIconModule } from '@angular/material/icon';
     }
 
     .chart-card {
-      background: #F8FAFC;
+      background: #ffffff;
+      border: 1px solid var(--color-outline);
       border-radius: 16px;
       padding: 1.5rem;
+      box-shadow: 0 12px 32px rgba(15, 23, 42, 0.05);
     }
     .chart-header {
       display: flex;
       align-items: center;
       gap: 0.5rem;
       margin-bottom: 2rem;
-      color: #1A237E;
+      color: #1a237e;
     }
     .chart-header h4 {
       margin: 0;
       font-size: 1rem;
       font-weight: 700;
     }
-    
+
     .chart-placeholder {
       display: flex;
       align-items: flex-end;
@@ -190,8 +112,11 @@ import { MatIconModule } from '@angular/material/icon';
       height: 140px;
       margin-bottom: 1.5rem;
       padding-bottom: 0.5rem;
-      border-bottom: 1px dashed #CBD5E1;
+      border-bottom: 1px dashed #cbd5e1;
       padding-top: 2rem;
+      background: #f8fafc;
+      border-radius: 12px;
+      padding-inline: 1rem;
     }
     .bar-container {
       display: flex;
@@ -207,17 +132,31 @@ import { MatIconModule } from '@angular/material/icon';
       border-radius: 4px 4px 0 0;
       position: relative;
     }
-    .bar-1 { height: 30%; background: #E2E8F0; }
-    .bar-2 { height: 60%; background: #94A3B8; }
-    .bar-3 { height: 90%; background: #34D399; }
-    .bar-4 { height: 95%; background: #E2E8F0; border: 1px dashed #CBD5E1; box-sizing: border-box; }
-    
+    .bar-1 {
+      height: 30%;
+      background: #e2e8f0;
+    }
+    .bar-2 {
+      height: 60%;
+      background: #94a3b8;
+    }
+    .bar-3 {
+      height: 90%;
+      background: #34d399;
+    }
+    .bar-4 {
+      height: 95%;
+      background: #e2e8f0;
+      border: 1px dashed #cbd5e1;
+      box-sizing: border-box;
+    }
+
     .goal-badge {
       position: absolute;
       top: -24px;
       left: 50%;
       transform: translateX(-50%);
-      background: #065F46;
+      background: #065f46;
       color: white;
       font-size: 0.5rem;
       padding: 2px 6px;
@@ -228,7 +167,7 @@ import { MatIconModule } from '@angular/material/icon';
     }
     .year {
       font-size: 0.65rem;
-      color: #64748B;
+      color: #64748b;
       font-weight: 600;
     }
     .chart-footer {
@@ -240,7 +179,7 @@ import { MatIconModule } from '@angular/material/icon';
       border-radius: 12px;
     }
     .success-icon-bg {
-      background: #D1FAE5;
+      background: #d1fae5;
       border-radius: 50%;
       padding: 0.5rem;
       display: flex;
@@ -248,19 +187,21 @@ import { MatIconModule } from '@angular/material/icon';
       justify-content: center;
     }
     .success-icon {
-      color: #10B981;
+      color: #10b981;
     }
     .chart-footer p {
       margin: 0;
       font-size: 0.8rem;
-      color: #1E293B;
+      color: #1e293b;
     }
 
     .curation-card {
-      background: #283593;
-      color: white;
+      background: #ffffff;
+      color: var(--color-text-primary);
       border-radius: 16px;
       padding: 1.5rem;
+      border: 1px solid var(--color-outline);
+      box-shadow: 0 12px 32px rgba(15, 23, 42, 0.05);
     }
     .curation-card h4 {
       margin: 0 0 0.75rem 0;
@@ -271,10 +212,10 @@ import { MatIconModule } from '@angular/material/icon';
       margin: 0 0 1rem 0;
       font-size: 0.875rem;
       line-height: 1.5;
-      color: #E0E7FF;
+      color: var(--color-text-secondary);
     }
     .link-action {
-      color: white;
+      color: var(--color-primary);
       font-weight: 600;
       font-size: 0.875rem;
       text-decoration: none;

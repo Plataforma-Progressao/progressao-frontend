@@ -1,0 +1,120 @@
+<section class="dashboard-home">
+  <header class="dashboard-home__hero">
+    <div>
+      <p class="dashboard-home__eyebrow">Visão Geral do Curador</p>
+      <h1>Visão Geral do Curador</h1>
+      <p class="dashboard-home__description">
+        Boas vindas novamente, Dr. Manuel. Suas métricas de progressão estão atualizadas.
+      </p>
+    </div>
+  </header>
+
+  <div class="dashboard-home__grid">
+    <article class="dashboard-card dashboard-card--score">
+      <div class="dashboard-card__score-ring" [style.--progress]="currentScore / quarterTarget">
+        <div class="dashboard-card__score-ring-inner">
+          <strong>{{ currentScore | number }}</strong>
+          <span>PONTOS TOTAIS</span>
+        </div>
+      </div>
+      <p class="dashboard-card__caption">Meta do Quadrienio: {{ quarterTarget | number }}</p>
+    </article>
+
+    <article class="dashboard-card dashboard-card--career">
+      <header class="dashboard-card__header">
+        <h2>Próximo Nível da Carreira</h2>
+        <span class="dashboard-card__badge">EM PROGRESSO</span>
+      </header>
+
+      <div class="dashboard-card__career-levels">
+        <strong>Associado IV</strong>
+        <span>Titular I</span>
+      </div>
+
+      <div class="dashboard-card__career-progress">
+        <span
+          class="dashboard-card__career-progress-value"
+          [style.width.%]="nextLevelProgress"
+        ></span>
+      </div>
+
+      <div class="dashboard-card__career-metrics">
+        <article>
+          <span>Anos no Nível</span>
+          <strong>3 / 4</strong>
+        </article>
+        <article>
+          <span>Pubs. Qualis A</span>
+          <strong>12 / 15</strong>
+        </article>
+        <article>
+          <span>Orientações</span>
+          <strong>5 / 4</strong>
+        </article>
+      </div>
+    </article>
+
+    <article class="dashboard-card dashboard-card--pillars">
+      <header class="dashboard-card__header">
+        <h2>Distribuição por Pilar</h2>
+      </header>
+
+      <div class="dashboard-card__pillar-list">
+        @for (pillar of pillarProgress; track pillar.label) {
+          <div class="dashboard-card__pillar-row">
+            <div class="dashboard-card__pillar-meta">
+              <strong>{{ pillar.label }}</strong>
+              <span>{{ pillar.score }} pts ({{ pillar.percentage }}%)</span>
+            </div>
+            <div class="dashboard-card__pillar-track">
+              <span
+                class="dashboard-card__pillar-value"
+                [style.background]="pillar.accent"
+                [style.width.%]="pillar.percentage"
+              ></span>
+            </div>
+          </div>
+        }
+      </div>
+    </article>
+
+    <article class="dashboard-card dashboard-card--completion">
+      <p class="dashboard-card__eyebrow-light">Conclusão do Biênio</p>
+      <h2>Ciclo: 2023 - 2024</h2>
+      <strong>84%</strong>
+      <p>Você está 12% à frente da média do departamento.</p>
+
+      <div class="dashboard-card__completion-track">
+        <span class="dashboard-card__completion-value"></span>
+      </div>
+    </article>
+  </div>
+
+  <article class="dashboard-card dashboard-card--notifications">
+    <header class="dashboard-card__header dashboard-card__header--link">
+      <h2>Notificações e Alertas</h2>
+      <a href="#" aria-label="Ver todas as notificações">Ver tudo</a>
+    </header>
+
+    <div class="dashboard-card__notification-list">
+      @for (notification of notifications; track notification.title) {
+        <article class="dashboard-card__notification-item">
+          <div
+            class="dashboard-card__notification-icon"
+            [class]="'dashboard-card__notification-icon--' + notification.tone"
+          >
+            <mat-icon>{{ notification.icon }}</mat-icon>
+          </div>
+
+          <div class="dashboard-card__notification-body">
+            <div class="dashboard-card__notification-heading">
+              <strong>{{ notification.title }}</strong>
+              <span>{{ notification.timestamp }}</span>
+            </div>
+            <p>{{ notification.description }}</p>
+          </div>
+        </article>
+      }
+    </div>
+  </article>
+</section>

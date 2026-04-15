@@ -1,0 +1,23 @@
+<div class="dashboard-shell">
+  <app-dashboard-sidenav
+    [opened]="mobileMenuOpened()"
+    [user]="currentUser()"
+    [navigationItems]="navigationItems"
+    (closeRequested)="closeMobileMenu()"
+    (itemSelected)="closeMobileMenu()"
+    (logoutRequested)="logout()"
+  />
+
+  <div class="dashboard-shell__content">
+    <app-dashboard-header
+      [user]="currentUser()"
+      [mobileMenuOpened]="mobileMenuOpened()"
+      (menuToggle)="toggleMobileMenu()"
+      (addActivity)="openCreateActivity()"
+    />
+
+    <main class="dashboard-shell__main">
+      <router-outlet />
+    </main>
+  </div>
+</div>

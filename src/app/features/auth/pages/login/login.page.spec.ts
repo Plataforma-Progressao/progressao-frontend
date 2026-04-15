@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
+import { vi } from 'vitest';
 import { LoginPage } from './login.page';
+import { AuthStateService } from '../../../../core/auth/auth-state.service';
 
 describe('LoginPage', () => {
   let component: LoginPage;
@@ -9,7 +11,16 @@ describe('LoginPage', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [LoginPage],
-      providers: [provideRouter([])],
+      providers: [
+        provideRouter([]),
+        {
+          provide: AuthStateService,
+          useValue: {
+            ensureSessionValid: vi.fn().mockResolvedValue(false),
+            login: vi.fn().mockResolvedValue(undefined),
+          },
+        },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(LoginPage);

@@ -7,94 +7,30 @@ import { MatIconModule } from '@angular/material/icon';
 @Component({
   selector: 'app-step-institution',
   imports: [ReactiveFormsModule, MatFormFieldModule, MatSelectModule, MatIconModule],
-  template: `
-    <div class="step-layout" [formGroup]="form()">
-      <div class="main-content">
-        <h5 class="overline">ETAPA 02 DE 04</h5>
-        <h2 class="title">Onde você atua hoje?</h2>
-        <p class="subtitle">Vincule seu perfil à sua unidade acadêmica para habilitar as ferramentas de progressão docente.</p>
-
-        <div class="form-grid">
-          <mat-form-field appearance="outline" class="col-span-full">
-            <mat-label>Selecione a instituição</mat-label>
-            <mat-select formControlName="university">
-              <mat-option value="ufmg">Universidade Federal de Minas Gerais (UFMG)</mat-option>
-              <mat-option value="ufrj">Universidade Federal do Rio de Janeiro (UFRJ)</mat-option>
-              <mat-option value="unifesp">Universidade Federal de São Paulo (UNIFESP)</mat-option>
-              <mat-option value="ufsc">Universidade Federal de Santa Catarina (UFSC)</mat-option>
-            </mat-select>
-            <mat-icon matSuffix>account_balance</mat-icon>
-            @if (form().get('university')?.hasError('required') && form().get('university')?.touched) {
-              <mat-error>A instituição é obrigatória.</mat-error>
-            }
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Escolha o Centro</mat-label>
-            <mat-select formControlName="center">
-              <mat-option value="icex">Instituto de Ciências Exatas</mat-option>
-              <mat-option value="face">Faculdade de Economia</mat-option>
-              <mat-option value="letras">Faculdade de Letras</mat-option>
-            </mat-select>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Selecione o Depto.</mat-label>
-            <mat-select formControlName="department">
-              <mat-option value="dcc">Dep. Ciência da Computação</mat-option>
-              <mat-option value="dmat">Dep. de Matemática</mat-option>
-              <mat-option value="dfis">Dep. de Física</mat-option>
-            </mat-select>
-          </mat-form-field>
-        </div>
-
-        <div class="validation-card">
-          <mat-icon class="success-icon">verified_user</mat-icon>
-          <div class="validation-text">
-            <h4>Validado automaticamente</h4>
-            <p>Ao selecionar uma instituição federativa, seus dados serão pré-validados com a base do MEC e do portal da transparência.</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="side-content">
-        <div class="image-card">
-          <div class="image-overlay">
-            <span class="badge">EXCELÊNCIA</span>
-            <h3>Sua carreira conectada à rede federal.</h3>
-          </div>
-        </div>
-        <div class="stats-card">
-          <h2>94%</h2>
-          <span class="stats-title">SINCRONIZAÇÃO</span>
-          <p>Docentes que vinculam sua instituição reduzem o tempo de preenchimento do Barema em até 40%.</p>
-        </div>
-      </div>
-    </div>
-  `,
+  templateUrl: './step-institution.component.html',
   styles: `
     .step-layout {
       display: grid;
       grid-template-columns: 1fr 300px;
       gap: 2rem;
     }
-    
+
     .overline {
       font-size: 0.75rem;
       letter-spacing: 0.1em;
-      color: #64748B;
+      color: #64748b;
       text-transform: uppercase;
       margin-bottom: 0.5rem;
     }
     .title {
       font-size: 2rem;
       font-weight: 800;
-      color: #1A237E;
+      color: #1a237e;
       margin-top: 0;
       margin-bottom: 0.5rem;
     }
     .subtitle {
-      color: #4B5563;
+      color: #4b5563;
       margin-bottom: 2rem;
       font-size: 1rem;
     }
@@ -111,25 +47,26 @@ import { MatIconModule } from '@angular/material/icon';
 
     .validation-card {
       display: flex;
-      background-color: #F8FAFC;
-      border: 1px solid #E2E8F0;
-      border-radius: 12px;
+      background-color: #ffffff;
+      border: 1px solid var(--color-outline);
+      border-radius: 16px;
       padding: 1.25rem;
       gap: 1rem;
       align-items: flex-start;
+      box-shadow: 0 12px 32px rgba(15, 23, 42, 0.05);
     }
     .success-icon {
-      color: #10B981;
+      color: #10b981;
     }
     .validation-text h4 {
       margin: 0 0 0.25rem 0;
       font-size: 0.875rem;
-      color: #1E293B;
+      color: #1e293b;
     }
     .validation-text p {
       margin: 0;
       font-size: 0.75rem;
-      color: #64748B;
+      color: #64748b;
     }
 
     .side-content {
@@ -139,24 +76,32 @@ import { MatIconModule } from '@angular/material/icon';
     }
 
     .image-card {
-      background: linear-gradient(to bottom, rgba(26, 35, 126, 0.2), rgba(26, 35, 126, 0.9)), url('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80') center/cover;
-      height: 240px;
+      background: #ffffff;
+      border: 1px solid var(--color-outline);
       border-radius: 16px;
-      position: relative;
+      padding: 1rem;
+      box-shadow: 0 12px 32px rgba(15, 23, 42, 0.05);
     }
+
     .image-overlay {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
+      min-height: 180px;
+      border-radius: 12px;
       padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      gap: 0.5rem;
       color: white;
+      background:
+        radial-gradient(circle at top right, rgba(255, 255, 255, 0.18), transparent 38%),
+        linear-gradient(160deg, rgba(26, 35, 126, 0.84), rgba(15, 23, 42, 0.94));
     }
+
     .image-card .badge {
       font-size: 0.65rem;
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      background: rgba(255,255,255,0.2);
+      background: rgba(255, 255, 255, 0.2);
       padding: 0.25rem 0.5rem;
       border-radius: 4px;
       display: inline-block;
@@ -170,14 +115,15 @@ import { MatIconModule } from '@angular/material/icon';
     }
 
     .stats-card {
-      background: white;
+      background: #ffffff;
+      border: 1px solid var(--color-outline);
       border-radius: 16px;
       padding: 1.5rem;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      box-shadow: 0 12px 32px rgba(15, 23, 42, 0.05);
     }
     .stats-card h2 {
       margin: 0;
-      color: #10B981;
+      color: #10b981;
       font-size: 3rem;
       font-weight: 800;
       line-height: 1;
@@ -186,7 +132,7 @@ import { MatIconModule } from '@angular/material/icon';
       display: block;
       font-size: 0.65rem;
       font-weight: 700;
-      color: #64748B;
+      color: #64748b;
       letter-spacing: 0.1em;
       margin-bottom: 0.75rem;
       margin-top: 0.25rem;
@@ -194,7 +140,7 @@ import { MatIconModule } from '@angular/material/icon';
     .stats-card p {
       margin: 0;
       font-size: 0.875rem;
-      color: #4B5563;
+      color: var(--color-text-secondary);
       line-height: 1.5;
     }
 
@@ -205,7 +151,8 @@ import { MatIconModule } from '@angular/material/icon';
       .side-content {
         flex-direction: row;
       }
-      .image-card, .stats-card {
+      .image-card,
+      .stats-card {
         flex: 1;
       }
     }

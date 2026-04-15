@@ -1,0 +1,189 @@
+<div class="page-layout">
+  <header class="top-nav">
+    <div class="logo">Plataforma Progressão</div>
+    <div class="nav-actions">
+      <a href="#">Ajuda</a>
+      <a href="#">Segurança</a>
+    </div>
+  </header>
+
+  <main class="content-wrapper">
+    <div class="layout-grid">
+      <div class="stepper-sidebar">
+        <div class="sidebar-card">
+          <h2 class="sidebar-title">Cadastro Docente</h2>
+          <div class="sidebar-steps">
+            <div
+              class="step-item"
+              [class.active]="currentStep() === 0"
+              [class.completed]="currentStep() > 0"
+            >
+              <div class="step-icon">
+                @if (currentStep() > 0) {
+                  <mat-icon>check</mat-icon>
+                } @else {
+                  <span>1</span>
+                }
+              </div>
+              <div class="step-text">
+                <span class="step-overline">PASSO 1</span>
+                <span class="step-name">Pessoal</span>
+              </div>
+            </div>
+
+            <div
+              class="step-item"
+              [class.active]="currentStep() === 1"
+              [class.completed]="currentStep() > 1"
+            >
+              <div class="step-icon">
+                @if (currentStep() > 1) {
+                  <mat-icon>check</mat-icon>
+                } @else {
+                  <span>2</span>
+                }
+              </div>
+              <div class="step-text">
+                <span class="step-overline">PASSO 2</span>
+                <span class="step-name">Instituição</span>
+              </div>
+            </div>
+
+            <div
+              class="step-item"
+              [class.active]="currentStep() === 2"
+              [class.completed]="currentStep() > 2"
+            >
+              <div class="step-icon">
+                @if (currentStep() > 2) {
+                  <mat-icon>check</mat-icon>
+                } @else {
+                  <span>3</span>
+                }
+              </div>
+              <div class="step-text">
+                <span class="step-overline">PASSO 3</span>
+                <span class="step-name">Carreira</span>
+              </div>
+            </div>
+
+            <div
+              class="step-item"
+              [class.active]="currentStep() === 3"
+              [class.completed]="currentStep() > 3"
+            >
+              <div class="step-icon">
+                @if (currentStep() > 3) {
+                  <mat-icon>lock</mat-icon>
+                } @else {
+                  <mat-icon>lock</mat-icon>
+                }
+              </div>
+              <div class="step-text">
+                <span class="step-overline">PASSO 4</span>
+                <span class="step-name">Segurança</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="support-card">
+          <mat-icon>verified_user</mat-icon>
+          <p>
+            "A segurança dos seus dados acadêmicos é nossa prioridade. Utilizamos criptografia de
+            ponta a ponta para proteger seu portfólio."
+          </p>
+          <span class="support-footer"
+            ><mat-icon inline>shield</mat-icon> PROTOCOLO DE CURADORIA DIGITAL</span
+          >
+        </div>
+      </div>
+
+      <div class="main-form-area">
+        <mat-stepper
+          [linear]="true"
+          #stepper
+          class="custom-stepper"
+          (selectionChange)="onStepChange($event)"
+        >
+          <mat-step [stepControl]="formGroups.personal">
+            <app-step-personal [form]="formGroups.personal"></app-step-personal>
+            <div class="stepper-actions">
+              <button mat-button type="button" (click)="goToLogin()">
+                Já é cadastrado? Fazer login
+              </button>
+              <button
+                mat-flat-button
+                color="primary"
+                matStepperNext
+                [disabled]="formGroups.personal.invalid"
+              >
+                Próximo Passo <mat-icon>arrow_forward</mat-icon>
+              </button>
+            </div>
+          </mat-step>
+
+          <mat-step [stepControl]="formGroups.institution">
+            <app-step-institution [form]="formGroups.institution"></app-step-institution>
+            <div class="stepper-actions">
+              <button mat-button matStepperPrevious type="button">
+                <mat-icon>arrow_back</mat-icon> Voltar
+              </button>
+              <button
+                mat-flat-button
+                color="primary"
+                matStepperNext
+                [disabled]="formGroups.institution.invalid"
+              >
+                Próximo Passo <mat-icon>arrow_forward</mat-icon>
+              </button>
+            </div>
+          </mat-step>
+
+          <mat-step [stepControl]="formGroups.career">
+            <app-step-career [form]="formGroups.career"></app-step-career>
+            <div class="stepper-actions">
+              <button mat-button matStepperPrevious type="button">
+                <mat-icon>arrow_back</mat-icon> Voltar
+              </button>
+              <button
+                mat-flat-button
+                color="primary"
+                matStepperNext
+                [disabled]="formGroups.career.invalid"
+              >
+                Próximo Passo <mat-icon>arrow_forward</mat-icon>
+              </button>
+            </div>
+          </mat-step>
+
+          <mat-step [stepControl]="formGroups.security">
+            <app-step-security [form]="formGroups.security"></app-step-security>
+            @if (submitError()) {
+              <p class="signup-error" role="alert">{{ submitError() }}</p>
+            }
+            <div class="stepper-actions">
+              <button mat-button matStepperPrevious type="button">
+                <mat-icon>arrow_back</mat-icon> Voltar
+              </button>
+              <button
+                mat-flat-button
+                color="primary"
+                (click)="submitForm()"
+                [disabled]="formGroups.security.invalid || submitting()"
+              >
+                {{ submitting() ? 'Finalizando cadastro...' : 'Finalizar e Acessar Dashboard' }}
+                <mat-icon>rocket_launch</mat-icon>
+              </button>
+            </div>
+          </mat-step>
+        </mat-stepper>
+      </div>
+    </div>
+  </main>
+
+  <footer class="bottom-footer">
+    <span><mat-icon inline>check_circle</mat-icon> CONFORMIDADE CAPES</span>
+    <span><mat-icon inline>lock</mat-icon> CRIPTOGRAFIA SSL 256-BIT</span>
+  </footer>
+</div>
