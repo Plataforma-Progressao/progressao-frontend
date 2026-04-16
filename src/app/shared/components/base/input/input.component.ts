@@ -13,6 +13,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { formatCpfValue, formatPhoneValue } from '../../../forms/br-form.utils';
+
+type InputMask = 'none' | 'cpf' | 'phone';
 
 @Component({
   selector: 'app-input',
@@ -43,6 +46,7 @@ export class InputComponent implements ControlValueAccessor {
   readonly errorMessage = input<string | null>(null);
   readonly control = input<AbstractControl | null>(null);
   readonly disabledInput = input(false, { transform: booleanAttribute });
+  readonly mask = input<InputMask>('none');
 
   readonly blurred = output<FocusEvent>();
   readonly suffixClicked = output<void>();
@@ -53,7 +57,7 @@ export class InputComponent implements ControlValueAccessor {
   protected onTouched: () => void = () => undefined;
 
   writeValue(value: string | null): void {
-    this.value = value ?? '';
+    this.value = this.applyMask(value ?? '');
     this.cdr.markForCheck();
   }
 
@@ -72,8 +76,19 @@ export class InputComponent implements ControlValueAccessor {
 
   protected onInput(event: Event): void {
     const target = event.target as HTMLInputElement;
-    this.value = target.value;
-    this.onChange(target.value);
+    const selectionStart = target.selectionStart ?? target.value.length;
+    const digitsBeforeCaret = this.countDigits(target.value.slice(0, selectionStart));
+    const maskedValue = this.applyMask(target.value);
+
+    this.value = maskedValue;
+    target.value = maskedValue;
+
+    if (this.mask() !== 'none') {
+      const nextCaret = this.findCaretPosition(maskedValue, digitsBeforeCaret);
+      target.setSelectionRange(nextCaret, nextCaret);
+    }
+
+    this.onChange(maskedValue);
   }
 
   protected onBlur(event: FocusEvent): void {
@@ -92,5 +107,53 @@ export class InputComponent implements ControlValueAccessor {
 
   protected get isDisabled(): boolean {
     return this.disabled || this.disabledInput();
+  }
+
+  protected get maxLength(): number | null {
+    if (this.mask() === 'cpf') {
+      return 14;
+    }
+
+    if (this.mask() === 'phone') {
+      return 15;
+    }
+
+    return null;
+  }
+
+  private applyMask(value: string): string {
+    if (this.mask() === 'cpf') {
+      return formatCpfValue(value);
+    }
+
+    if (this.mask() === 'phone') {
+      return formatPhoneValue(value);
+    }
+
+    return value;
+  }
+
+  private countDigits(value: string): number {
+    return value.replace(/\D/g, '').length;
+  }
+
+  private findCaretPosition(maskedValue: string, digitsBeforeCaret: number): number {
+    if (digitsBeforeCaret <= 0) {
+      return 0;
+    }
+
+    let digitCount = 0;
+
+    for (let index = 0; index < maskedValue.length; index += 1) {
+      if (/\d/.test(maskedValue[index])) {
+        digitCount += 1;
+      }
+
+      if (digitCount >= digitsBeforeCaret) {
+        return index + 1;
+      }
+    }
+
+    return maskedValue.length;
   }
 }

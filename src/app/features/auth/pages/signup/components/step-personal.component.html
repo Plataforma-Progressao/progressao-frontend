@@ -23,10 +23,10 @@
       label="CPF"
       type="tel"
       placeholder="000.000.000-00"
+      mask="cpf"
       prefixIcon="pin"
       [control]="form().get('cpf')"
       errorMessage="CPF inválido."
-      (blurred)="onCpfInput($event)"
     />
 
     <app-input
@@ -34,10 +34,10 @@
       label="Telefone para contato"
       type="tel"
       placeholder="(00) 00000-0000"
+      mask="phone"
       prefixIcon="call"
       [control]="form().get('phone')"
       errorMessage="Telefone inválido."
-      (blurred)="onPhoneInput($event)"
     />
 
     <app-input

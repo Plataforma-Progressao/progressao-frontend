@@ -45,6 +45,70 @@ describe('InputComponent', () => {
     expect(component['hasError']).toBe(true);
   });
 
+  it('should apply CPF mask while typing', () => {
+    fixture.componentRef.setInput('mask', 'cpf');
+    fixture.detectChanges();
+
+    let emitted = '';
+    component.registerOnChange((value: string) => {
+      emitted = value;
+    });
+
+    const input = fixture.nativeElement.querySelector('input') as HTMLInputElement;
+    input.value = '1234567890123';
+    input.dispatchEvent(new Event('input'));
+
+    expect(input.value).toBe('123.456.789-01');
+    expect(emitted).toBe('123.456.789-01');
+  });
+
+  it('should apply phone mask while typing', () => {
+    fixture.componentRef.setInput('mask', 'phone');
+    fixture.detectChanges();
+
+    let emitted = '';
+    component.registerOnChange((value: string) => {
+      emitted = value;
+    });
+
+    const input = fixture.nativeElement.querySelector('input') as HTMLInputElement;
+    input.value = '1198765432100';
+    input.dispatchEvent(new Event('input'));
+
+    expect(input.value).toBe('(11) 98765-4321');
+    expect(emitted).toBe('(11) 98765-4321');
+  });
+
+  it('should set maxlength based on mask', () => {
+    fixture.componentRef.setInput('mask', 'cpf');
+    fixture.detectChanges();
+
+    const input = fixture.nativeElement.querySelector('input') as HTMLInputElement;
+    expect(input.getAttribute('maxlength')).toBe('14');
+
+    fixture.componentRef.setInput('mask', 'phone');
+    fixture.detectChanges();
+    expect(input.getAttribute('maxlength')).toBe('15');
+  });
+
+  it('should mask value on writeValue for CPF', () => {
+    fixture.componentRef.setInput('mask', 'cpf');
+    component.writeValue('12345678901');
+    fixture.detectChanges();
+
+    const input = fixture.nativeElement.querySelector('input') as HTMLInputElement;
+    expect(input.value).toBe('123.456.789-01');
+  });
+
+  it('should mask value on writeValue for phone', () => {
+    fixture.componentRef.setInput('mask', 'phone');
+    component.writeValue('11987654321');
+    fixture.detectChanges();
+
+    const input = fixture.nativeElement.querySelector('input') as HTMLInputElement;
+    expect(input.value).toBe('(11) 98765-4321');
+  });
+
   it('should render prefix and suffix icons as ligature text', () => {
     fixture.componentRef.setInput('prefixIcon', 'mail_outline');
     fixture.componentRef.setInput('suffixIcon', 'visibility');
@@ -67,9 +131,7 @@ describe('InputComponent', () => {
       emitted = true;
     });
 
-    const suffixButton = fixture.nativeElement.querySelector(
-      'button[matIconButton][matSuffix]',
-    ) as HTMLButtonElement;
+    const suffixButton = fixture.nativeElement.querySelector('button[matSuffix]') as HTMLButtonElement;
 
     suffixButton.click();
 

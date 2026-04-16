@@ -13,6 +13,7 @@
     [placeholder]="placeholder()"
     [value]="value"
     [disabled]="isDisabled"
+    [attr.maxlength]="maxLength"
     [attr.aria-label]="label() || placeholder()"
     [attr.aria-invalid]="hasError"
     (input)="onInput($event)"
