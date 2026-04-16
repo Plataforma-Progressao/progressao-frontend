@@ -1,0 +1,13 @@
+<article class="dashboard-card dashboard-card--completion">
+  <p class="dashboard-card__eyebrow-light">Conclusão do biênio</p>
+  <h2>Ciclo: {{ biennium().cycleLabel }}</h2>
+  <strong>{{ biennium().completionPercentage }}%</strong>
+  <p>{{ biennium().departmentComparison }}</p>
+
+  <div class="dashboard-card__completion-track">
+    <span
+      class="dashboard-card__completion-value"
+      [style.width.%]="biennium().completionPercentage"
+    ></span>
+  </div>
+</article>

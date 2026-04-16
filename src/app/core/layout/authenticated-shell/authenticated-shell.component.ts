@@ -43,7 +43,7 @@ export class AuthenticatedShellComponent {
   }
 
   private async performLogout(): Promise<void> {
-    await this.authStateService.logout();
+    void this.authStateService.logout();
     await this.router.navigateByUrl('/login');
   }
 

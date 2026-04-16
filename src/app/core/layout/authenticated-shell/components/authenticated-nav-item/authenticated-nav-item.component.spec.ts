@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
-import { DashboardNavItemComponent } from './dashboard-nav-item.component';
+import { AuthenticatedNavItemComponent } from './authenticated-nav-item.component';
 
-describe('DashboardNavItemComponent', () => {
-  let fixture: ComponentFixture<DashboardNavItemComponent>;
+describe('AuthenticatedNavItemComponent', () => {
+  let fixture: ComponentFixture<AuthenticatedNavItemComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [DashboardNavItemComponent, RouterTestingModule],
+      imports: [AuthenticatedNavItemComponent, RouterTestingModule],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(DashboardNavItemComponent);
+    fixture = TestBed.createComponent(AuthenticatedNavItemComponent);
     fixture.componentRef.setInput('item', {
       label: 'Dashboard',
       icon: 'dashboard',

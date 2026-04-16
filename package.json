@@ -5,6 +5,7 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "typecheck": "tsc --noEmit --incremental false -p tsconfig.app.json && tsc --noEmit --incremental false -p tsconfig.spec.json",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "ng lint",

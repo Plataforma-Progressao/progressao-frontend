@@ -1,0 +1,23 @@
+<article class="dashboard-card dashboard-card--pillars">
+  <header class="dashboard-card__header">
+    <h2>Distribuição por pilar</h2>
+  </header>
+
+  <div class="dashboard-card__pillar-list">
+    @for (pillar of pillars(); track pillar.label) {
+      <div class="dashboard-card__pillar-row">
+        <div class="dashboard-card__pillar-meta">
+          <strong>{{ pillar.label }}</strong>
+          <span>{{ pillar.score }} pts ({{ pillar.percentage }}%)</span>
+        </div>
+        <div class="dashboard-card__pillar-track">
+          <span
+            class="dashboard-card__pillar-value"
+            [style.background]="pillar.accent"
+            [style.width.%]="pillar.percentage"
+          ></span>
+        </div>
+      </div>
+    }
+  </div>
+</article>

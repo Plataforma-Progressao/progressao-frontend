@@ -5,6 +5,8 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { ButtonComponent, CheckboxComponent, InputComponent } from '../../../../shared';
 import { AuthStateService } from '../../../../core/auth/auth-state.service';
+import { AuthPageFooterComponent } from '../../components/auth-page-footer/auth-page-footer.component';
+import { AuthPageHeaderComponent } from '../../components/auth-page-header/auth-page-header.component';
 
 @Component({
   selector: 'app-login-page',
@@ -13,6 +15,8 @@ import { AuthStateService } from '../../../../core/auth/auth-state.service';
     RouterLink,
     MatCardModule,
     MatIconModule,
+    AuthPageHeaderComponent,
+    AuthPageFooterComponent,
     InputComponent,
     CheckboxComponent,
     ButtonComponent,

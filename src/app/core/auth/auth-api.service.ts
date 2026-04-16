@@ -5,6 +5,7 @@ import { environment } from '../../../environments/environment';
 import { ApiSuccessResponse } from '../http/api-envelope.types';
 import {
   AuthCredentials,
+  ForgotPasswordResponse,
   AuthResponse,
   AuthResponseUser,
   LogoutResponse,
@@ -48,6 +49,14 @@ export class AuthApiService {
       .post<
         ApiSuccessResponse<LogoutResponse>
       >(`${this.apiBaseUrl}/auth/logout`, { refreshToken }, { context: this.authlessContext })
+      .pipe(map((response) => response.data));
+  }
+
+  forgotPassword(email: string): Observable<ForgotPasswordResponse> {
+    return this.http
+      .post<
+        ApiSuccessResponse<ForgotPasswordResponse>
+      >(`${this.apiBaseUrl}/auth/forgot-password`, { email }, { context: this.authlessContext })
       .pipe(map((response) => response.data));
   }
 

@@ -1,0 +1,9 @@
+<article class="dashboard-card dashboard-card--score">
+  <div class="dashboard-card__score-ring" [style.--progress]="progress()">
+    <div class="dashboard-card__score-ring-inner">
+      <strong>{{ score().current | number }}</strong>
+      <span>PONTOS TOTAIS</span>
+    </div>
+  </div>
+  <p class="dashboard-card__caption">Meta do quadriênio: {{ score().target | number }}</p>
+</article>

@@ -46,6 +46,11 @@ export interface LogoutResponse {
   readonly revoked: true;
 }
 
+export interface ForgotPasswordResponse {
+  readonly message: string;
+  readonly resetToken?: string;
+}
+
 export interface AuthSessionOptions {
   readonly persist: boolean;
 }

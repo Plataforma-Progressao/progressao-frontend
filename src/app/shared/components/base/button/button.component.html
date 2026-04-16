@@ -16,10 +16,14 @@
     [disabled]="isDisabled"
     [class]="buttonClass"
     (click)="onClick()"
+    [attr.aria-label]="loading() ? label() : null"
   >
     @if (loading()) {
       <mat-spinner diameter="16" [strokeWidth]="2"></mat-spinner>
     } @else {
+      @if (prefixIcon()) {
+        <mat-icon aria-hidden="true">{{ prefixIcon() }}</mat-icon>
+      }
       <span class="app-btn__label">{{ label() }}</span>
       @if (icon()) {
         <mat-icon aria-hidden="true">{{ icon() }}</mat-icon>
@@ -33,6 +37,7 @@
     [disabled]="isDisabled"
     [class]="buttonClass"
     (click)="onClick()"
+    [attr.aria-label]="loading() ? label() : null"
   >
     @if (loading()) {
       <mat-spinner diameter="16" [strokeWidth]="2"></mat-spinner>
@@ -50,6 +55,7 @@
     [disabled]="isDisabled"
     [class]="buttonClass"
     (click)="onClick()"
+    [attr.aria-label]="loading() ? label() : null"
   >
     @if (loading()) {
       <mat-spinner diameter="16" [strokeWidth]="2"></mat-spinner>

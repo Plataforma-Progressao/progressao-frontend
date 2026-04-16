@@ -1,0 +1,90 @@
+.dashboard-card {
+  background: #ffffff;
+  border: 1px solid rgb(226 232 240 / 76%);
+  border-radius: 1.5rem;
+  box-shadow: 0 18px 35px -24px rgb(26 28 29 / 22%);
+  padding: 1.25rem;
+}
+
+.dashboard-card--career {
+  display: grid;
+  gap: 1rem;
+  min-height: 18rem;
+}
+
+.dashboard-card__header {
+  align-items: start;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+h2 {
+  color: #1a1c1d;
+  margin: 0;
+}
+
+.dashboard-card__badge {
+  background: #d1fae5;
+  border-radius: 999px;
+  color: #16a34a;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.35rem 0.75rem;
+}
+
+.dashboard-card__career-levels {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+.dashboard-card__career-levels strong,
+.dashboard-card__career-levels span {
+  color: #1a237e;
+  font-weight: 700;
+}
+
+.dashboard-card__career-progress {
+  background: #e7eaf3;
+  border-radius: 999px;
+  height: 0.7rem;
+  overflow: hidden;
+}
+
+.dashboard-card__career-progress-value {
+  background: linear-gradient(90deg, #1a237e 0%, #6974ea 100%);
+  border-radius: inherit;
+  display: block;
+  height: 100%;
+}
+
+.dashboard-card__career-metrics {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.dashboard-card__career-metrics article {
+  background: #f8f9fc;
+  border-radius: 1rem;
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.85rem;
+}
+
+.dashboard-card__career-metrics span {
+  color: #6b7280;
+  font-size: 0.78rem;
+}
+
+.dashboard-card__career-metrics strong {
+  color: #1a1c1d;
+  font-size: 1.1rem;
+}
+
+@media (max-width: 47.99rem) {
+  .dashboard-card__career-metrics {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,45 +1,42 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { provideHttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { provideRouter } from '@angular/router';
+import { vi } from 'vitest';
+import { AuthStateService } from '../../auth/auth-state.service';
 import { AuthenticatedShellComponent } from './authenticated-shell.component';
-import { AuthStateService } from '../../../../core/auth/auth-state.service';
 
 describe('AuthenticatedShellComponent', () => {
   let fixture: ComponentFixture<AuthenticatedShellComponent>;
+  let router: Router;
+
+  const authStateServiceMock = {
+    currentUser: vi.fn(() => ({
+      id: '1',
+      email: 'manuel.rocha@universidade.br',
+      name: 'Dr. Manuel Rocha',
+      role: 'USER' as const,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      title: 'Prof. Associado IV',
+      avatarInitials: 'MR',
+    })),
+    logout: vi.fn(() => new Promise<void>(() => undefined)),
+  };
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [AuthenticatedShellComponent],
-      providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting()],
+      providers: [
+        provideRouter([]),
+        {
+          provide: AuthStateService,
+          useValue: authStateServiceMock,
+        },
+      ],
     }).compileComponents();
 
-    const authStateService = TestBed.inject(AuthStateService);
-    const httpTestingController = TestBed.inject(HttpTestingController);
-
-    const loginPromise = authStateService.login({
-      email: 'manuel.rocha@universidade.br',
-      password: 'password123',
-    });
-
-    const loginRequest = httpTestingController.expectOne('http://localhost:3000/api/auth/login');
-    loginRequest.flush({
-      success: true,
-      data: {
-        accessToken: 'access-token',
-        refreshToken: 'refresh-token',
-        user: {
-          id: '1',
-          email: 'manuel.rocha@universidade.br',
-          name: 'Dr. Manuel Rocha',
-          role: 'USER',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
-      },
-    });
-
-    await loginPromise;
+    router = TestBed.inject(Router);
+    vi.spyOn(router, 'navigateByUrl').mockResolvedValue(true);
 
     fixture = TestBed.createComponent(AuthenticatedShellComponent);
     fixture.detectChanges();
@@ -51,5 +48,12 @@ describe('AuthenticatedShellComponent', () => {
     expect(compiled.querySelector('app-authenticated-header')).toBeTruthy();
     expect(compiled.querySelector('app-authenticated-sidenav')).toBeTruthy();
     expect(compiled.querySelector('router-outlet')).toBeTruthy();
+  });
+
+  it('navigates to login without waiting for remote logout', async () => {
+    (fixture.componentInstance as any).logout();
+
+    expect(authStateServiceMock.logout).toHaveBeenCalled();
+    expect(router.navigateByUrl).toHaveBeenCalledWith('/login');
   });
 });

@@ -8,7 +8,7 @@ import {
   input,
   output,
 } from '@angular/core';
-import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { ControlValueAccessor, AbstractControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -41,7 +41,7 @@ export class InputComponent implements ControlValueAccessor {
   readonly suffixAction = input(false, { transform: booleanAttribute });
   readonly hint = input<string | null>(null);
   readonly errorMessage = input<string | null>(null);
-  readonly control = input<FormControl | null>(null);
+  readonly control = input<AbstractControl | null>(null);
   readonly disabledInput = input(false, { transform: booleanAttribute });
 
   readonly blurred = output<FocusEvent>();

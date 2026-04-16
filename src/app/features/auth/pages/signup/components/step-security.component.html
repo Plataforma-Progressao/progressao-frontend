@@ -9,71 +9,53 @@
 
   <div class="form-wrapper">
     <div class="form-grid">
-      <mat-form-field appearance="fill">
-        <mat-label>Senha de Acesso</mat-label>
-        <input
-          matInput
-          [type]="hidePassword() ? 'password' : 'text'"
-          formControlName="password"
-          placeholder="••••••••"
-        />
-        <button
-          matIconButton
-          matSuffix
-          (click)="togglePassword($event)"
-          [attr.aria-label]="'Ocultar senha'"
-          type="button"
-        >
-          <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
-        </button>
-        <mat-hint>Mínimo de 8 caracteres, incluindo letras e números.</mat-hint>
-        @if (form().get('password')?.hasError('required') && form().get('password')?.touched) {
-          <mat-error>A senha é obrigatória.</mat-error>
-        }
-        @if (form().get('password')?.hasError('minlength') && form().get('password')?.touched) {
-          <mat-error>Informe ao menos 8 caracteres.</mat-error>
-        }
-      </mat-form-field>
+      <app-input
+        formControlName="password"
+        label="Senha de acesso"
+        [type]="hidePassword() ? 'password' : 'text'"
+        placeholder="••••••••"
+        prefixIcon="lock_outline"
+        [suffixIcon]="hidePassword() ? 'visibility' : 'visibility_off'"
+        [suffixIconAriaLabel]="hidePassword() ? 'Mostrar senha' : 'Ocultar senha'"
+        [suffixAction]="true"
+        (suffixClicked)="togglePassword()"
+        [control]="form().get('password')"
+        hint="Minimo de 8 caracteres, incluindo letras e numeros."
+        errorMessage="Informe ao menos 8 caracteres."
+      />
 
-      <mat-form-field appearance="fill">
-        <mat-label>Confirmar Senha</mat-label>
-        <input
-          matInput
-          [type]="hidePasswordConfirm() ? 'password' : 'text'"
-          formControlName="confirmPassword"
-          placeholder="••••••••"
-        />
-        <button
-          matIconButton
-          matSuffix
-          (click)="togglePasswordConfirm($event)"
-          [attr.aria-label]="'Ocultar senha'"
-          type="button"
-        >
-          <mat-icon>{{ hidePasswordConfirm() ? 'visibility_off' : 'visibility' }}</mat-icon>
-        </button>
-        @if (
-          form().get('confirmPassword')?.hasError('required') &&
-          form().get('confirmPassword')?.touched
-        ) {
-          <mat-error>A confirmação de senha é obrigatória.</mat-error>
-        }
-        @if (form().hasError('passwordMismatch') && form().get('confirmPassword')?.touched) {
-          <mat-error>As senhas precisam ser iguais.</mat-error>
-        }
-      </mat-form-field>
+      <app-input
+        formControlName="confirmPassword"
+        label="Confirmar senha"
+        [type]="hidePasswordConfirm() ? 'password' : 'text'"
+        placeholder="••••••••"
+        prefixIcon="lock"
+        [suffixIcon]="hidePasswordConfirm() ? 'visibility' : 'visibility_off'"
+        [suffixIconAriaLabel]="hidePasswordConfirm() ? 'Mostrar senha' : 'Ocultar senha'"
+        [suffixAction]="true"
+        (suffixClicked)="togglePasswordConfirm()"
+        [control]="form().get('confirmPassword')"
+        errorMessage="Confirme sua senha para continuar."
+      />
+
+      @if (form().hasError('passwordMismatch') && form().get('confirmPassword')?.touched) {
+        <p class="form-error" role="alert">As senhas precisam ser iguais.</p>
+      }
     </div>
 
     <div class="checkbox-group">
-      <mat-checkbox formControlName="acceptTerms" color="primary">
-        Li e concordo com os <a href="#">Termos de Uso e Condições</a> da plataforma Digital
-        Curator, incluindo as normas de ética em pesquisa institucional.
-      </mat-checkbox>
-      <mat-checkbox formControlName="acceptLgpd" color="primary">
-        Autorizo o tratamento dos meus dados pessoais e profissionais conforme as diretrizes da
-        <a href="#">LGPD (Lei Geral de Proteção de Dados)</a> para fins de curadoria e progresso na
-        carreira acadêmica.
-      </mat-checkbox>
+      <app-checkbox
+        formControlName="acceptTerms"
+        label="Li e concordo com os Termos de Uso e Condicoes da plataforma Digital Curator, incluindo as normas de etica em pesquisa institucional."
+      />
+      <p class="checkbox-helper">Consulte os <a href="#">Termos de Uso e Condicoes</a>.</p>
+      <app-checkbox
+        formControlName="acceptLgpd"
+        label="Autorizo o tratamento dos meus dados pessoais e profissionais conforme as diretrizes da LGPD para fins de curadoria e progresso na carreira academica."
+      />
+      <p class="checkbox-helper">
+        Consulte a politica de <a href="#">Protecao de Dados (LGPD)</a>.
+      </p>
     </div>
   </div>
 

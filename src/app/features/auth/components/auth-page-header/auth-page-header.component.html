@@ -1,0 +1,13 @@
+<header class="auth-header">
+  <a routerLink="/login" class="auth-header__brand" aria-label="Ir para a tela de login">
+    Plataforma Progressão
+  </a>
+
+  <nav class="auth-header__nav" aria-label="Links de apoio">
+    <button type="button" class="auth-header__link">Ajuda</button>
+    <button type="button" class="auth-header__link">Privacidade</button>
+    @if (showSignupLink()) {
+      <a routerLink="/cadastro" class="auth-header__cta">Criar conta</a>
+    }
+  </nav>
+</header>

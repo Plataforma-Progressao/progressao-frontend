@@ -7,6 +7,7 @@ import {
   AuthSession,
   AuthSessionOptions,
   DashboardUser,
+  ForgotPasswordResponse,
   RegisterPayload,
   TokenPair,
 } from './auth.models';
@@ -43,6 +44,10 @@ export class AuthStateService {
   ): Promise<void> {
     const response = await firstValueFrom(this.authApiService.register(payload));
     this.persistSession(this.createSession(response, options.persist), options.persist);
+  }
+
+  async forgotPassword(email: string): Promise<ForgotPasswordResponse> {
+    return firstValueFrom(this.authApiService.forgotPassword(email));
   }
 
   async ensureSessionValid(): Promise<boolean> {
@@ -82,13 +87,13 @@ export class AuthStateService {
   async logout(): Promise<void> {
     const session = this.session();
 
-    try {
-      if (session) {
-        await firstValueFrom(this.authApiService.logout(session.refreshToken));
-      }
-    } finally {
-      this.clearSession();
+    this.clearSession();
+
+    if (!session) {
+      return;
     }
+
+    void firstValueFrom(this.authApiService.logout(session.refreshToken)).catch(() => undefined);
   }
 
   async refreshSession(): Promise<boolean> {

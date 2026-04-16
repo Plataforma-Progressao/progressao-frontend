@@ -1,11 +1,5 @@
 <div class="page-layout">
-  <header class="top-nav">
-    <div class="logo">Plataforma Progressão</div>
-    <div class="nav-actions">
-      <a href="#">Ajuda</a>
-      <a href="#">Segurança</a>
-    </div>
-  </header>
+  <app-auth-page-header [showSignupLink]="false" />
 
   <main class="content-wrapper">
     <div class="layout-grid">
@@ -109,51 +103,68 @@
           <mat-step [stepControl]="formGroups.personal">
             <app-step-personal [form]="formGroups.personal"></app-step-personal>
             <div class="stepper-actions">
-              <button mat-button type="button" (click)="goToLogin()">
-                Já é cadastrado? Fazer login
-              </button>
-              <button
-                mat-flat-button
-                color="primary"
-                matStepperNext
+              <app-button
+                variant="tertiary"
+                size="large"
+                type="button"
+                label="Já é cadastrado? Fazer login"
+                (clicked)="goToLogin()"
+              ></app-button>
+              <app-button
+                variant="primary"
+                size="large"
+                type="button"
+                label="Continuar"
+                icon="arrow_forward"
                 [disabled]="formGroups.personal.invalid"
-              >
-                Próximo Passo <mat-icon>arrow_forward</mat-icon>
-              </button>
+                (clicked)="goToNextStep(stepper)"
+              ></app-button>
             </div>
           </mat-step>
 
           <mat-step [stepControl]="formGroups.institution">
             <app-step-institution [form]="formGroups.institution"></app-step-institution>
             <div class="stepper-actions">
-              <button mat-button matStepperPrevious type="button">
-                <mat-icon>arrow_back</mat-icon> Voltar
-              </button>
-              <button
-                mat-flat-button
-                color="primary"
-                matStepperNext
+              <app-button
+                variant="secondary"
+                size="large"
+                type="button"
+                label="Voltar"
+                icon="arrow_back"
+                (clicked)="goToPreviousStep(stepper)"
+              ></app-button>
+              <app-button
+                variant="primary"
+                size="large"
+                type="button"
+                label="Continuar"
+                icon="arrow_forward"
                 [disabled]="formGroups.institution.invalid"
-              >
-                Próximo Passo <mat-icon>arrow_forward</mat-icon>
-              </button>
+                (clicked)="goToNextStep(stepper)"
+              ></app-button>
             </div>
           </mat-step>
 
           <mat-step [stepControl]="formGroups.career">
             <app-step-career [form]="formGroups.career"></app-step-career>
             <div class="stepper-actions">
-              <button mat-button matStepperPrevious type="button">
-                <mat-icon>arrow_back</mat-icon> Voltar
-              </button>
-              <button
-                mat-flat-button
-                color="primary"
-                matStepperNext
+              <app-button
+                variant="secondary"
+                size="large"
+                type="button"
+                label="Voltar"
+                icon="arrow_back"
+                (clicked)="goToPreviousStep(stepper)"
+              ></app-button>
+              <app-button
+                variant="primary"
+                size="large"
+                type="button"
+                label="Continuar"
+                icon="arrow_forward"
                 [disabled]="formGroups.career.invalid"
-              >
-                Próximo Passo <mat-icon>arrow_forward</mat-icon>
-              </button>
+                (clicked)="goToNextStep(stepper)"
+              ></app-button>
             </div>
           </mat-step>
 
@@ -163,18 +174,24 @@
               <p class="signup-error" role="alert">{{ submitError() }}</p>
             }
             <div class="stepper-actions">
-              <button mat-button matStepperPrevious type="button">
-                <mat-icon>arrow_back</mat-icon> Voltar
-              </button>
-              <button
-                mat-flat-button
-                color="primary"
-                (click)="submitForm()"
+              <app-button
+                variant="secondary"
+                size="large"
+                type="button"
+                label="Voltar"
+                icon="arrow_back"
+                (clicked)="goToPreviousStep(stepper)"
+              ></app-button>
+              <app-button
+                variant="primary"
+                size="large"
+                type="button"
+                [label]="submitting() ? 'Finalizando cadastro...' : 'Finalizar e Acessar Dashboard'"
+                icon="rocket_launch"
+                [loading]="submitting()"
                 [disabled]="formGroups.security.invalid || submitting()"
-              >
-                {{ submitting() ? 'Finalizando cadastro...' : 'Finalizar e Acessar Dashboard' }}
-                <mat-icon>rocket_launch</mat-icon>
-              </button>
+                (clicked)="submitForm()"
+              ></app-button>
             </div>
           </mat-step>
         </mat-stepper>
@@ -182,8 +199,5 @@
     </div>
   </main>
 
-  <footer class="bottom-footer">
-    <span><mat-icon inline>check_circle</mat-icon> CONFORMIDADE CAPES</span>
-    <span><mat-icon inline>lock</mat-icon> CRIPTOGRAFIA SSL 256-BIT</span>
-  </footer>
+  <app-auth-page-footer />
 </div>

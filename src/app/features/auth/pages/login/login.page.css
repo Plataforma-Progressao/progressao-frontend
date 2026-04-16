@@ -3,12 +3,19 @@
   min-height: 100dvh;
 }
 
+.auth-page-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
 .login-screen {
   align-items: center;
   background: linear-gradient(135deg, #f9f9fb 0%, #eeeeef 100%);
   display: flex;
+  flex: 1;
   justify-content: center;
-  min-height: 100dvh;
+  min-height: 0;
   padding: max(clamp(1rem, 4vw, 3rem), env(safe-area-inset-top))
     max(clamp(1rem, 4vw, 3rem), env(safe-area-inset-right))
     max(clamp(1rem, 4vw, 3rem), env(safe-area-inset-bottom))

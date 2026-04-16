@@ -22,6 +22,7 @@ export class ButtonComponent {
   readonly fullWidth = input(false, { transform: booleanAttribute });
   readonly type = input<ButtonType>('button');
   readonly icon = input<string | null>(null);
+  readonly prefixIcon = input<string | null>(null);
   readonly loading = input(false, { transform: booleanAttribute });
 
   readonly clicked = output<void>();

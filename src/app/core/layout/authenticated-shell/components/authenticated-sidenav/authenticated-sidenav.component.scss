@@ -103,6 +103,8 @@
 }
 
 .dashboard-sidenav__logout {
+  --mat-text-button-state-layer-color: rgb(229 57 53 / 18%);
+  --mat-text-button-ripple-color: rgb(229 57 53 / 30%);
   --mat-button-text-label-text-color: #e53935;
   align-items: center;
   align-self: stretch;

@@ -1,0 +1,29 @@
+:host {
+  display: block;
+}
+
+.dashboard-home-hero {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.dashboard-home-hero__eyebrow {
+  color: #6b7280;
+  font-size: 0.9rem;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+h1 {
+  color: #1a1c1d;
+  font-size: clamp(1.8rem, 3vw, 2.5rem);
+  letter-spacing: -0.04em;
+  margin: 0;
+}
+
+.dashboard-home-hero__description {
+  color: #6b7280;
+  line-height: 1.55;
+  margin: 0;
+  max-width: 44rem;
+}

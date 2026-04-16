@@ -1,0 +1,33 @@
+<article class="dashboard-card dashboard-card--career">
+  <header class="dashboard-card__header">
+    <h2>Próximo nível da carreira</h2>
+    <span class="dashboard-card__badge">EM PROGRESSO</span>
+  </header>
+
+  <div class="dashboard-card__career-levels">
+    <strong>{{ career().currentLevelLabel }}</strong>
+    <span>{{ career().nextLevelLabel }}</span>
+  </div>
+
+  <div class="dashboard-card__career-progress">
+    <span
+      class="dashboard-card__career-progress-value"
+      [style.width.%]="career().progressPercentage"
+    ></span>
+  </div>
+
+  <div class="dashboard-card__career-metrics">
+    <article>
+      <span>Anos no nível</span>
+      <strong>{{ career().yearsInLevel }} / {{ career().yearsRequired }}</strong>
+    </article>
+    <article>
+      <span>Pubs. Qualis A</span>
+      <strong>{{ career().qualisPublications }} / {{ career().qualisTarget }}</strong>
+    </article>
+    <article>
+      <span>Orientações</span>
+      <strong>{{ career().supervisions }} / {{ career().supervisionsTarget }}</strong>
+    </article>
+  </div>
+</article>

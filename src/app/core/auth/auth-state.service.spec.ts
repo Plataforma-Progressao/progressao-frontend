@@ -81,4 +81,38 @@ describe('AuthStateService', () => {
     expect(await validationPromise).toBe(false);
     expect(service.isAuthenticated()).toBe(false);
   });
+
+  it('clears local session immediately during logout before backend response', async () => {
+    const loginPromise = service.login({
+      email: 'manuel.rocha@universidade.br',
+      password: 'password123',
+    });
+
+    const loginRequest = httpTestingController.expectOne('http://localhost:3000/api/auth/login');
+    loginRequest.flush({
+      success: true,
+      data: {
+        accessToken: 'access-token',
+        refreshToken: 'refresh-token',
+        user: {
+          id: '1',
+          email: 'manuel.rocha@universidade.br',
+          name: 'Dr. Manuel Rocha',
+          role: 'USER',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+      },
+    });
+    await loginPromise;
+
+    const logoutPromise = service.logout();
+    const logoutRequest = httpTestingController.expectOne('http://localhost:3000/api/auth/logout');
+
+    expect(service.isAuthenticated()).toBe(false);
+    expect(localStorage.getItem('plataforma-progressao.auth.session')).toBeNull();
+
+    logoutRequest.flush({ success: true, data: { revoked: true } });
+    await logoutPromise;
+  });
 });
