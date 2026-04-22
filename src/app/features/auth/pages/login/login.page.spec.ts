@@ -58,11 +58,27 @@ describe('LoginPage', () => {
   });
 
   it('should keep submit enabled while form is invalid to allow validation feedback', () => {
+    component['loginForm'].reset({
+      email: '',
+      password: '',
+      rememberMe: false,
+    });
+    fixture.detectChanges();
+
     const submitButton = fixture.nativeElement.querySelector(
       'app-button button[type="submit"]',
     ) as HTMLButtonElement;
 
     expect(component['loginForm'].invalid).toBe(true);
     expect(submitButton.disabled).toBe(false);
+  });
+
+  it('starts with the admin credentials from the README', () => {
+    expect(component['loginForm'].getRawValue()).toEqual({
+      email: 'admin@progressao.uf.br',
+      password: 'Admin@123456',
+      rememberMe: false,
+    });
+    expect(component['loginForm'].valid).toBe(true);
   });
 });

@@ -131,7 +131,9 @@ describe('InputComponent', () => {
       emitted = true;
     });
 
-    const suffixButton = fixture.nativeElement.querySelector('button[matSuffix]') as HTMLButtonElement;
+    const suffixButton = fixture.nativeElement.querySelector(
+      'button[matSuffix]',
+    ) as HTMLButtonElement;
 
     suffixButton.click();
 

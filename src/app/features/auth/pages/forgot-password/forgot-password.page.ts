@@ -7,6 +7,10 @@ import { AuthStateService } from '../../../../core/auth/auth-state.service';
 import { AuthPageFooterComponent } from '../../components/auth-page-footer/auth-page-footer.component';
 import { AuthPageHeaderComponent } from '../../components/auth-page-header/auth-page-header.component';
 
+const DEFAULT_FORGOT_PASSWORD_FORM_VALUES = {
+  email: 'admin@progressao.uf.br',
+};
+
 @Component({
   selector: 'app-forgot-password-page',
   imports: [
@@ -110,7 +114,7 @@ export class ForgotPasswordPage {
   protected readonly feedback = signal<{ type: 'success' | 'error'; message: string } | null>(null);
 
   protected readonly forgotPasswordForm = this.fb.nonNullable.group({
-    email: ['', [Validators.required, Validators.email]],
+    email: [DEFAULT_FORGOT_PASSWORD_FORM_VALUES.email, [Validators.required, Validators.email]],
   });
 
   protected async onSubmit(): Promise<void> {

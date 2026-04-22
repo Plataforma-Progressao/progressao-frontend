@@ -22,7 +22,7 @@
               </span>
               <span>
                 <strong>Gestão inteligente</strong>
-                <small>Curadoria automatizada de produções e títulos.</small>
+                <small> Curadoria automatizada de produções e títulos.</small>
               </span>
             </li>
 
@@ -32,7 +32,7 @@
               </span>
               <span>
                 <strong>Progresso contínuo</strong>
-                <small>Acompanhamento em tempo real da sua evolução docente.</small>
+                <small> Acompanhamento em tempo real da sua evolução docente.</small>
               </span>
             </li>
           </ul>
@@ -65,13 +65,6 @@
             errorMessage="Digite um e-mail válido."
           />
 
-          <div class="password-header">
-            <span>Senha</span>
-            <a routerLink="/recuperar-senha" class="forgot-link" aria-label="Recuperar senha"
-              >Esqueceu a senha?</a
-            >
-          </div>
-
           <app-input
             formControlName="password"
             label="Senha"
@@ -86,7 +79,13 @@
             errorMessage="A senha deve ter pelo menos 8 caracteres."
           />
 
-          <app-checkbox formControlName="rememberMe" label="Manter-me conectado" />
+          <div class="password-header">
+            <app-checkbox formControlName="rememberMe" label="Manter-me conectado" />
+
+            <a routerLink="/recuperar-senha" class="forgot-link" aria-label="Recuperar senha"
+              >Esqueceu a senha?</a
+            >
+          </div>
 
           <app-button
             variant="primary"

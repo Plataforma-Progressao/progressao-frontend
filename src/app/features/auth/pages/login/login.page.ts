@@ -8,6 +8,12 @@ import { AuthStateService } from '../../../../core/auth/auth-state.service';
 import { AuthPageFooterComponent } from '../../components/auth-page-footer/auth-page-footer.component';
 import { AuthPageHeaderComponent } from '../../components/auth-page-header/auth-page-header.component';
 
+const DEFAULT_LOGIN_FORM_VALUES = {
+  email: 'admin@progressao.uf.br',
+  password: 'Admin@123456',
+  rememberMe: false,
+};
+
 @Component({
   selector: 'app-login-page',
   imports: [
@@ -37,9 +43,9 @@ export class LoginPage {
   protected readonly loading = signal(false);
 
   protected readonly loginForm = this.fb.nonNullable.group({
-    email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(8)]],
-    rememberMe: [false],
+    email: [DEFAULT_LOGIN_FORM_VALUES.email, [Validators.required, Validators.email]],
+    password: [DEFAULT_LOGIN_FORM_VALUES.password, [Validators.required, Validators.minLength(8)]],
+    rememberMe: [DEFAULT_LOGIN_FORM_VALUES.rememberMe],
   });
 
   constructor() {

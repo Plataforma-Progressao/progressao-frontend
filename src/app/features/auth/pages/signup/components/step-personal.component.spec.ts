@@ -41,7 +41,9 @@ describe('StepPersonalComponent', () => {
     );
     fixture.detectChanges();
 
-    const cpfInput = fixture.nativeElement.querySelector('app-input[formControlName="cpf"]') as HTMLElement;
+    const cpfInput = fixture.nativeElement.querySelector(
+      'app-input[formControlName="cpf"]',
+    ) as HTMLElement;
     const phoneInput = fixture.nativeElement.querySelector(
       'app-input[formControlName="phone"]',
     ) as HTMLElement;

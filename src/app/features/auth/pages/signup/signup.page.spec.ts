@@ -74,6 +74,13 @@ describe('SignupPage', () => {
     const component = fixture.componentInstance;
     const stepperMock = { next: vi.fn(), previous: vi.fn() } as unknown as MatStepper;
 
+    component.formGroups.personal.reset({
+      fullName: '',
+      cpf: '',
+      phone: '',
+      email: '',
+    });
+
     component.goToNextStep(stepperMock);
 
     expect(stepperMock.next).not.toHaveBeenCalled();
@@ -95,6 +102,40 @@ describe('SignupPage', () => {
     component.goToNextStep(stepperMock);
 
     expect(stepperMock.next).toHaveBeenCalledTimes(1);
+  });
+
+  it('starts with valid defaults across all signup steps', () => {
+    const fixture = TestBed.createComponent(SignupPage);
+    const component = fixture.componentInstance;
+    fixture.detectChanges();
+
+    expect(component.formGroups.personal.getRawValue()).toEqual({
+      fullName: 'Dra. Ana Souza',
+      cpf: '123.456.789-09',
+      phone: '(31) 99999-0000',
+      email: 'ana.souza@universidade.br',
+    });
+    expect(component.formGroups.institution.getRawValue()).toEqual({
+      university: 'ufmg',
+      center: 'icex',
+      department: 'dcc',
+    });
+    expect(component.formGroups.career.getRawValue()).toEqual({
+      practiceAreas: ['data', 'sys'],
+      careerClass: 'adjunto',
+      currentLevel: 'III',
+      lastProgressionDate: '2024-08-15',
+    });
+    expect(component.formGroups.security.getRawValue()).toEqual({
+      password: 'Progressao@123',
+      confirmPassword: 'Progressao@123',
+      acceptTerms: true,
+      acceptLgpd: true,
+    });
+    expect(component.formGroups.personal.valid).toBe(true);
+    expect(component.formGroups.institution.valid).toBe(true);
+    expect(component.formGroups.career.valid).toBe(true);
+    expect(component.formGroups.security.valid).toBe(true);
   });
 
   it('goes back when previous action is triggered', () => {

@@ -19,6 +19,32 @@ import { AuthPageFooterComponent } from '../../components/auth-page-footer/auth-
 import { AuthPageHeaderComponent } from '../../components/auth-page-header/auth-page-header.component';
 import { ButtonComponent } from '../../../../shared/components/base/button/button.component';
 
+const DEFAULT_SIGNUP_FORM_VALUES = {
+  personal: {
+    fullName: 'Dra. Ana Souza',
+    cpf: '123.456.789-09',
+    phone: '(31) 99999-0000',
+    email: 'ana.souza@universidade.br',
+  },
+  institution: {
+    university: 'ufmg',
+    center: 'icex',
+    department: 'dcc',
+  },
+  career: {
+    practiceAreas: ['data', 'sys'],
+    careerClass: 'adjunto',
+    currentLevel: 'III',
+    lastProgressionDate: '2024-08-15',
+  },
+  security: {
+    password: 'Progressao@123',
+    confirmPassword: 'Progressao@123',
+    acceptTerms: true,
+    acceptLgpd: true,
+  },
+};
+
 @Component({
   selector: 'app-signup-page',
   imports: [
@@ -48,28 +74,49 @@ export class SignupPage {
 
   formGroups = {
     personal: this.fb.nonNullable.group({
-      fullName: ['', [Validators.required, Validators.minLength(2)]],
-      cpf: ['', [Validators.required, cpfValidator()]],
-      phone: ['', [phoneValidator()]],
-      email: ['', [Validators.required, Validators.email]],
+      fullName: [
+        DEFAULT_SIGNUP_FORM_VALUES.personal.fullName,
+        [Validators.required, Validators.minLength(2)],
+      ],
+      cpf: [DEFAULT_SIGNUP_FORM_VALUES.personal.cpf, [Validators.required, cpfValidator()]],
+      phone: [DEFAULT_SIGNUP_FORM_VALUES.personal.phone, [phoneValidator()]],
+      email: [DEFAULT_SIGNUP_FORM_VALUES.personal.email, [Validators.required, Validators.email]],
     }),
     institution: this.fb.nonNullable.group({
-      university: ['', [Validators.required, Validators.minLength(2)]],
-      center: ['', [Validators.required, Validators.minLength(2)]],
-      department: ['', [Validators.required, Validators.minLength(2)]],
+      university: [
+        DEFAULT_SIGNUP_FORM_VALUES.institution.university,
+        [Validators.required, Validators.minLength(2)],
+      ],
+      center: [
+        DEFAULT_SIGNUP_FORM_VALUES.institution.center,
+        [Validators.required, Validators.minLength(2)],
+      ],
+      department: [
+        DEFAULT_SIGNUP_FORM_VALUES.institution.department,
+        [Validators.required, Validators.minLength(2)],
+      ],
     }),
     career: this.fb.nonNullable.group({
-      practiceAreas: [[] as string[], Validators.required],
-      careerClass: ['', [Validators.required, Validators.minLength(2)]],
-      currentLevel: ['', Validators.required],
-      lastProgressionDate: ['', Validators.required],
+      practiceAreas: [DEFAULT_SIGNUP_FORM_VALUES.career.practiceAreas, Validators.required],
+      careerClass: [
+        DEFAULT_SIGNUP_FORM_VALUES.career.careerClass,
+        [Validators.required, Validators.minLength(2)],
+      ],
+      currentLevel: [DEFAULT_SIGNUP_FORM_VALUES.career.currentLevel, Validators.required],
+      lastProgressionDate: [
+        DEFAULT_SIGNUP_FORM_VALUES.career.lastProgressionDate,
+        Validators.required,
+      ],
     }),
     security: this.fb.nonNullable.group(
       {
-        password: ['', [Validators.required, Validators.minLength(8)]],
-        confirmPassword: ['', Validators.required],
-        acceptTerms: [false, Validators.requiredTrue],
-        acceptLgpd: [false, Validators.requiredTrue],
+        password: [
+          DEFAULT_SIGNUP_FORM_VALUES.security.password,
+          [Validators.required, Validators.minLength(8)],
+        ],
+        confirmPassword: [DEFAULT_SIGNUP_FORM_VALUES.security.confirmPassword, Validators.required],
+        acceptTerms: [DEFAULT_SIGNUP_FORM_VALUES.security.acceptTerms, Validators.requiredTrue],
+        acceptLgpd: [DEFAULT_SIGNUP_FORM_VALUES.security.acceptLgpd, Validators.requiredTrue],
       },
       { validators: [passwordMatchValidator()] },
     ),
