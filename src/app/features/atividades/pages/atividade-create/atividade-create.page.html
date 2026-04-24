@@ -1,0 +1,251 @@
+<section class="mx-auto w-full max-w-[72rem] flex flex-col gap-10 pb-12 pt-6">
+  <header class="space-y-2">
+    <a
+      class="inline-flex items-center gap-2 text-sm font-medium leading-5 text-[color:rgb(69_70_82)]"
+      routerLink="/atividades"
+    >
+      <mat-icon class="!size-5 !text-[1rem] !leading-5">arrow_back</mat-icon>
+      Voltar para listagem
+    </a>
+    <h1 class="text-[2.25rem] leading-10 tracking-[-0.05625rem] text-[color:var(--mat-sys-primary)]">
+      Nova Atividade Acadêmica
+    </h1>
+    <p class="max-w-[42rem] text-base leading-6 text-[color:rgb(69_70_82)]">
+      Registre suas atividades de pesquisa, ensino ou extensão para o cálculo do progresso funcional.
+    </p>
+  </header>
+
+  <div class="grid gap-8 lg:grid-cols-12">
+    <section
+      class="flex flex-col gap-8 lg:col-span-8"
+      aria-label="Formulário de cadastro de atividade"
+    >
+      <form
+        class="flex flex-col gap-6 rounded-[1.75rem] bg-[var(--mat-sys-surface-container)] p-8 shadow-[0_1px_2px_rgba(0,0,0,0.05)]"
+        [formGroup]="form"
+        (ngSubmit)="submit()"
+      >
+        <div class="flex flex-col gap-2">
+          <label class="text-sm font-semibold leading-5 text-[color:rgb(69_70_82)]" for="tituloAtividade">
+            Título da Atividade
+          </label>
+          <input
+            id="tituloAtividade"
+            class="h-12 w-full border border-b-2 border-[color:rgb(198_197_212)] bg-[color:rgb(243_243_245)] px-4 text-base text-[color:rgb(26_28_29)] outline-none focus:border-[color:var(--mat-sys-primary)]"
+            type="text"
+            placeholder="Ex: Publicação de Artigo em Revista Qualis A1"
+            formControlName="titulo"
+          />
+          @if (form.controls.titulo.invalid && form.controls.titulo.touched) {
+            <p class="text-xs text-[color:var(--mat-sys-error)]">Informe um título com pelo menos 8 caracteres.</p>
+          }
+        </div>
+
+        <div class="grid gap-6 md:grid-cols-[minmax(0,1fr)_12.8125rem]">
+          <div class="flex flex-col gap-2">
+            <label class="text-sm font-semibold leading-5 text-[color:rgb(69_70_82)]" for="categoriaAtividade">
+              Tipo de Atividade
+            </label>
+            <select
+              id="categoriaAtividade"
+              class="h-12 w-full border border-b-2 border-[color:rgb(198_197_212)] bg-[color:rgb(243_243_245)] px-4 text-base text-[color:rgb(26_28_29)] outline-none focus:border-[color:var(--mat-sys-primary)]"
+              formControlName="categoria"
+            >
+              <option value="">Selecione uma categoria</option>
+              @for (option of categoriaOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <label class="text-sm font-semibold leading-5 text-[color:rgb(69_70_82)]" for="cargaHorariaAtividade">
+              Carga Horária (horas)
+            </label>
+            <input
+              id="cargaHorariaAtividade"
+              class="h-12 w-full border border-b-2 border-[color:rgb(198_197_212)] bg-[color:rgb(243_243_245)] px-4 text-base text-[color:rgb(26_28_29)] outline-none focus:border-[color:var(--mat-sys-primary)]"
+              type="number"
+              min="0"
+              max="999"
+              step="0.1"
+              formControlName="cargaHoraria"
+            />
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <label class="text-sm font-semibold leading-5 text-[color:rgb(69_70_82)]" for="descricaoAtividade">
+            Descrição e Detalhes
+          </label>
+          <textarea
+            id="descricaoAtividade"
+            class="min-h-24 w-full resize-none border border-b-2 border-[color:rgb(198_197_212)] bg-[color:rgb(243_243_245)] px-4 py-3 text-base leading-6 text-[color:rgb(26_28_29)] outline-none focus:border-[color:var(--mat-sys-primary)]"
+            placeholder="Descreva brevemente a atividade e sua relevância..."
+            formControlName="descricao"
+          ></textarea>
+        </div>
+
+        <div class="flex flex-col gap-4">
+          <label class="text-sm font-semibold leading-5 text-[color:rgb(69_70_82)]">Comprovantes e Arquivos</label>
+
+          <input
+            #filePicker
+            class="hidden"
+            type="file"
+            accept=".pdf,.png,.jpg,.jpeg"
+            multiple
+            (change)="onFileInputChange($event)"
+          />
+
+          <div
+            class="rounded-2xl border-2 border-dashed border-[color:rgb(198_197_212)] bg-[color:rgba(243,243,245,0.5)] px-8 py-[2.125rem] text-center"
+            [class.border-[color:var(--mat-sys-primary)]]="dragging()"
+            (dragover)="onDragOver($event)"
+            (dragleave)="onDragLeave($event)"
+            (drop)="onDrop($event)"
+          >
+            <div class="mx-auto mb-4 grid size-12 place-items-center rounded-full bg-[color:rgb(224_224_255)]">
+              <mat-icon class="text-[color:var(--mat-sys-primary)]">upload_file</mat-icon>
+            </div>
+            <p class="text-base font-semibold leading-6 text-[color:rgb(26_28_29)]">
+              Clique para fazer upload ou arraste os arquivos
+            </p>
+            <p class="mt-1 text-xs leading-4 text-[color:rgb(118_118_131)]">PDF, PNG ou JPG (máx. 10MB)</p>
+            <button
+              type="button"
+              class="mt-4 inline-flex items-center justify-center rounded-full bg-white px-6 py-2 text-sm font-bold text-[color:var(--mat-sys-primary)] shadow-[0_1px_2px_rgba(0,0,0,0.05)]"
+              (click)="filePicker.click()"
+            >
+              Selecionar Arquivos
+            </button>
+          </div>
+
+          @for (upload of uploads(); track upload.localId) {
+            <div class="flex items-center justify-between rounded-xl border border-[color:rgba(198,197,212,0.1)] bg-[color:rgb(243_243_245)] p-[0.8125rem]">
+              <div class="flex items-center gap-3">
+                <mat-icon class="text-[color:var(--mat-sys-primary)]">description</mat-icon>
+                <div>
+                  <p class="text-xs font-bold leading-4 text-[color:rgb(26_28_29)]">{{ upload.fileName }}</p>
+                  <p [class]="uploadStatusClass(upload.status)">
+                    {{ (upload.sizeBytes / 1024 / 1024).toFixed(1) }} MB • {{ uploadStatusLabel(upload.status) }}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                class="rounded-full p-2 text-[color:var(--mat-sys-error)] hover:bg-black/5"
+                aria-label="Remover comprovante"
+                (click)="removeUpload(upload)"
+              >
+                <mat-icon class="!text-[0.875rem]">delete</mat-icon>
+              </button>
+            </div>
+          }
+        </div>
+      </form>
+
+      <div class="flex items-center justify-end gap-6 pt-2">
+        <button
+          type="button"
+          class="rounded-full px-8 py-3 text-base font-bold text-[color:var(--mat-sys-primary)]"
+          (click)="cancel()"
+        >
+          Cancelar
+        </button>
+        <button
+          type="button"
+          class="rounded-full bg-gradient-to-r from-[#000666] to-[#1a237e] px-10 py-4 text-base font-bold text-white shadow-[0_10px_15px_-3px_rgba(0,6,102,0.2),0_4px_6px_-4px_rgba(0,6,102,0.2)] disabled:opacity-60"
+          [disabled]="!canSubmit()"
+          (click)="submit()"
+        >
+          Confirmar Registro
+        </button>
+      </div>
+    </section>
+
+    <aside class="flex flex-col gap-6 pb-12 lg:col-span-4" aria-label="Painel de pontuação e resumo">
+      <section class="flex flex-col gap-6 rounded-[1.75rem] border border-[color:rgba(198,197,212,0.1)] bg-white p-6 shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
+        <h2 class="text-[1.125rem] leading-7 text-[color:var(--mat-sys-primary)]">Cálculo de Pontuação Estimado</h2>
+
+        <div class="relative flex flex-col gap-6 pl-10 before:absolute before:bottom-0 before:left-[0.9375rem] before:top-0 before:w-0.5 before:bg-[color:rgba(198,197,212,0.2)]">
+          <div class="relative">
+            <span class="absolute -left-10 top-1 inline-grid size-[1.875rem] place-items-center rounded-full bg-[color:rgb(163_246_156)]">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M5.01667 8.51667L9.12917 4.40417L8.3125 3.5875L5.01667 6.88333L3.35417 5.22083L2.5375 6.0375L5.01667 8.51667ZM5.83333 11.6667C5.02639 11.6667 4.26806 11.5135 3.55833 11.2073C2.84861 10.901 2.23125 10.4854 1.70625 9.96042C1.18125 9.43542 0.765625 8.81806 0.459375 8.10833C0.153125 7.39861 0 6.64028 0 5.83333C0 5.02639 0.153125 4.26806 0.459375 3.55833C0.765625 2.84861 1.18125 2.23125 1.70625 1.70625C2.23125 1.18125 2.84861 0.765625 3.55833 0.459375C4.26806 0.153125 5.02639 0 5.83333 0C6.64028 0 7.39861 0.153125 8.10833 0.459375C8.81806 0.765625 9.43542 1.18125 9.96042 1.70625C10.4854 2.23125 10.901 2.84861 11.2073 3.55833C11.5135 4.26806 11.6667 5.02639 11.6667 5.83333C11.6667 6.64028 11.5135 7.39861 11.2073 8.10833C10.901 8.81806 10.4854 9.43542 9.96042 9.96042C9.43542 10.4854 8.81806 10.901 8.10833 11.2073C7.39861 11.5135 6.64028 11.6667 5.83333 11.6667Z" fill="#005312"/>
+              </svg>
+            </span>
+            <div class="p-4">
+              <p class="text-xs font-bold uppercase tracking-[0.0375rem] text-[color:rgb(118_118_131)]">Base da Categoria</p>
+              <p class="text-[2rem] leading-8 text-[color:rgb(26_28_29)]">
+                {{ scoreEstimate().baseCategoria.toFixed(1).replace('.', ',') }}
+                <span class="text-sm text-[color:rgb(118_118_131)]">pts</span>
+              </p>
+              <p class="text-xs leading-4 text-[color:rgb(69_70_82)]">Pontuação fixa para categoria selecionada.</p>
+            </div>
+          </div>
+
+          <div class="relative">
+            <span class="absolute -left-10 top-1 inline-grid size-[1.875rem] place-items-center rounded-full bg-white ring-1 ring-[color:rgba(198,197,212,0.8)]">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M7.75833 8.575L8.575 7.75833L6.41667 5.6V2.91667H5.25V6.06667L7.75833 8.575ZM5.83333 11.6667C5.02639 11.6667 4.26806 11.5135 3.55833 11.2073C2.84861 10.901 2.23125 10.4854 1.70625 9.96042C1.18125 9.43542 0.765625 8.81806 0.459375 8.10833C0.153125 7.39861 0 6.64028 0 5.83333C0 5.02639 0.153125 4.26806 0.459375 3.55833C0.765625 2.84861 1.18125 2.23125 1.70625 1.70625C2.23125 1.18125 2.84861 0.765625 3.55833 0.459375C4.26806 0.153125 5.02639 0 5.83333 0C6.64028 0 7.39861 0.153125 8.10833 0.459375C8.81806 0.765625 9.43542 1.18125 9.96042 1.70625C10.4854 2.23125 10.901 2.84861 11.2073 3.55833C11.5135 4.26806 11.6667 5.02639 11.6667 5.83333C11.6667 6.64028 11.5135 7.39861 11.2073 8.10833C10.901 8.81806 10.4854 9.43542 9.96042 9.96042C9.43542 10.4854 8.81806 10.901 8.10833 11.2073C7.39861 11.5135 6.64028 11.6667 5.83333 11.6667ZM5.83333 10.5C7.12639 10.5 8.22743 10.0455 9.13646 9.13646C10.0455 8.22743 10.5 7.12639 10.5 5.83333C10.5 4.54028 10.0455 3.43924 9.13646 2.53021C8.22743 1.62118 7.12639 1.16667 5.83333 1.16667C4.54028 1.16667 3.43924 1.62118 2.53021 2.53021C1.62118 3.43924 1.16667 4.54028 1.16667 5.83333C1.16667 7.12639 1.62118 8.22743 2.53021 9.13646C3.43924 10.0455 4.54028 10.5 5.83333 10.5Z" fill="#767683"/>
+              </svg>
+            </span>
+            <div class="p-4">
+              <p class="text-xs font-bold uppercase tracking-[0.0375rem] text-[color:rgb(118_118_131)]">Fator de Carga Horária</p>
+              <p class="text-[2rem] leading-8 text-[color:rgb(26_28_29)]">
+                +{{ scoreEstimate().fatorCargaHoraria.toFixed(1).replace('.', ',') }}
+                <span class="text-sm text-[color:rgb(118_118_131)]">pts</span>
+              </p>
+              <p class="text-xs leading-4 text-[color:rgb(69_70_82)]">Calculado sobre a carga horária informada.</p>
+            </div>
+          </div>
+
+          <div class="relative">
+            <span class="absolute -left-10 top-1 inline-grid size-[1.875rem] place-items-center rounded-full bg-[color:var(--mat-sys-primary)]">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M2.23125 11.0833L3.17917 6.98542L0 4.22917L4.2 3.86458L5.83333 0L7.46667 3.86458L11.6667 4.22917L8.4875 6.98542L9.43542 11.0833L5.83333 8.91042L2.23125 11.0833Z" fill="white"/>
+              </svg>
+            </span>
+            <div class="rounded-2xl bg-[color:rgba(224,224,255,0.45)] p-4">
+              <p class="text-xs font-bold uppercase tracking-[0.0375rem] text-[color:var(--mat-sys-primary)]">Impacto Total</p>
+              <p class="text-[2.25rem] leading-10 text-[color:var(--mat-sys-primary)]">
+                {{ scoreEstimate().impactoTotal.toFixed(1).replace('.', ',') }}
+                <span class="text-base">pontos</span>
+              </p>
+              <div class="mt-2 h-1.5 w-full rounded-full bg-[color:rgba(198,197,212,0.3)]">
+                <div
+                  class="h-full rounded-full bg-[color:var(--mat-sys-primary)]"
+                  [style.width]="scoreBarWidth()"
+                ></div>
+              </div>
+              <p class="mt-2 text-[0.6875rem] leading-4 text-[color:rgb(69_70_82)]">
+                Esta atividade representa {{ scoreEstimate().percentualMeta }}% da meta para sua próxima progressão.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="rounded-2xl border border-[color:rgb(163_246_156)] bg-[color:rgba(163,246,156,0.35)] p-4">
+          <p class="text-sm font-semibold leading-5 text-[color:rgb(0_83_18)]">
+            Dica do Curador: Anexar o DOI do artigo aumenta a velocidade de validação pela banca revisora em até 40%.
+          </p>
+        </div>
+      </section>
+
+      <section
+        class="relative overflow-hidden rounded-[1.75rem] bg-[color:rgb(49_46_129)] p-6 text-white"
+        aria-label="Resumo da carreira"
+      >
+        <p class="text-[1.125rem] leading-7">Resumo da Carreira</p>
+        <p class="text-sm leading-5 text-white/70">Seu progresso atual na Classe IV:</p>
+        <p class="mt-2 text-[2.25rem] leading-10 font-semibold">
+          242
+          <span class="text-base font-normal text-white/70">/ 350 pts</span>
+        </p>
+        <mat-icon class="pointer-events-none absolute -bottom-2 -right-2 !text-[4rem] text-white/15">query_stats</mat-icon>
+      </section>
+    </aside>
+  </div>
+</section>
+

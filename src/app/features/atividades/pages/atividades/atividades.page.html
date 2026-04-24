@@ -1,0 +1,210 @@
+<section class="mx-auto w-full max-w-[80rem] space-y-8 pb-12 pt-6">
+  <header class="space-y-2 pb-2">
+    <h1
+      class="font-[var(--mat-sys-typescale-headline-large-font,Manrope)] text-[2.25rem] leading-[2.5rem] tracking-[-0.05625rem] text-[var(--mat-sys-on-surface)]">
+      Atividades Docente
+    </h1>
+    <p class="max-w-[42rem] text-[1rem] leading-6 text-[color:rgb(69_70_82)]">
+      Gerencie sua produção acadêmica, publicações e atividades administrativas do clico atual. Mantenha seu currículo
+      atualizado para progressão funcional.
+    </p>
+  </header>
+
+  <nav class="flex items-center border-b border-b-[color:rgba(198,197,212,0.3)]" aria-label="Categorias de atividades">
+    @for (tab of tabs; track tab) {
+    <button type="button" [class]="tabButtonClass(tab)" (click)="setTab(tab)"
+      [attr.aria-current]="activeTab() === tab ? 'page' : null">
+      {{ tab }}
+    </button>
+    }
+  </nav>
+
+  <div class="grid grid-cols-1 gap-4 md:grid-cols-4">
+    <div class="md:col-span-2">
+      <label class="relative block">
+        <span class="sr-only">Buscar por título ou palavra-chave</span>
+        <mat-icon
+          class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[color:rgb(107_114_128)]">search</mat-icon>
+        <input
+          class="h-[3.1875rem] w-full rounded-t-lg border border-b-2 border-[color:rgb(198_197_212)] bg-[color:rgb(243_243_245)] pl-11 pr-4 text-base text-[var(--mat-sys-on-surface)] outline-none focus:border-[color:var(--mat-sys-primary)]"
+          type="search" autocomplete="off" spellcheck="false" placeholder="Buscar por título ou palavra-chave..."
+          [value]="query()" (input)="updateQuery($event)" />
+      </label>
+    </div>
+
+    <div class="md:col-span-1">
+      <div class="relative">
+        <button type="button"
+          class="flex h-[3.1875rem] w-full items-center justify-between rounded-t-lg border border-b-2 border-[color:rgb(198_197_212)] bg-[color:rgb(243_243_245)] px-4 text-left text-base text-[var(--mat-sys-on-surface)]"
+          aria-haspopup="listbox" aria-label="Filtrar por status">
+          <span>Status: {{ statusFilter() }}</span>
+          <mat-icon class="text-[color:rgb(69_70_82)]">expand_more</mat-icon>
+        </button>
+
+        <div class="sr-only" aria-live="polite">Filtro atual: {{ statusFilter() }}</div>
+      </div>
+    </div>
+
+    <div class="hidden md:block md:col-span-1"></div>
+  </div>
+
+  <section
+    class="overflow-hidden rounded-xl bg-[var(--mat-sys-surface-container)] shadow-[0_0_0_1px_rgba(198,197,212,0.1),0_1px_2px_rgba(0,0,0,0.05)]"
+    aria-label="Tabela de atividades">
+    <div
+      class="grid grid-cols-[minmax(0,1fr)_8.2rem_8.7rem_9.2rem_6.2rem] bg-[color:rgb(243_243_245)] text-xs font-bold uppercase tracking-[0.0375rem] text-[color:rgb(69_70_82)]">
+      <div class="px-6 py-4">Título da Atividade</div>
+      <div class="px-6 py-4 text-center">Categoria</div>
+      <div class="px-6 py-4 text-center">Pontuação</div>
+      <div class="px-6 py-4 text-center">Status</div>
+      <div class="px-6 py-4 text-right">Ações</div>
+    </div>
+
+    <div>
+      @for (row of filteredRows(); track row.id) {
+      <div
+        class="grid grid-cols-[minmax(0,1fr)_8.2rem_8.7rem_9.2rem_6.2rem] items-center border-t border-t-[color:rgba(198,197,212,0.1)] bg-white">
+        <div class="px-6 py-[1.40625rem]">
+          <div class="text-base font-semibold text-[var(--mat-sys-on-surface)]">{{ row.title }}</div>
+          <div class="text-xs leading-4 text-[color:rgb(69_70_82)]">{{ row.subtitle }}</div>
+        </div>
+
+        <div class="px-6 py-[1.90625rem] text-center">
+          <span [class]="categoriaBadgeClass(row.categoria)">
+            {{ row.categoria }}
+          </span>
+        </div>
+
+        <div class="px-6 py-[1.96875rem] text-center font-mono text-base font-bold text-[var(--mat-sys-on-surface)]">
+          {{ row.score.toFixed(1) }}
+        </div>
+
+        <div class="flex items-center justify-center gap-2 px-6">
+          @switch (row.status) {
+          @case ('Validado') {
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 15 15" fill="none"
+            aria-hidden="true">
+            <path
+              d="M6.45 10.95L11.7375 5.6625L10.6875 4.6125L6.45 8.85L4.3125 6.7125L3.2625 7.7625L6.45 10.95ZM7.5 15C6.4625 15 5.4875 14.8031 4.575 14.4094C3.6625 14.0156 2.86875 13.4812 2.19375 12.8062C1.51875 12.1312 0.984375 11.3375 0.590625 10.425C0.196875 9.5125 0 8.5375 0 7.5C0 6.4625 0.196875 5.4875 0.590625 4.575C0.984375 3.6625 1.51875 2.86875 2.19375 2.19375C2.86875 1.51875 3.6625 0.984375 4.575 0.590625C5.4875 0.196875 6.4625 0 7.5 0C8.5375 0 9.5125 0.196875 10.425 0.590625C11.3375 0.984375 12.1312 1.51875 12.8062 2.19375C13.4812 2.86875 14.0156 3.6625 14.4094 4.575C14.8031 5.4875 15 6.4625 15 7.5C15 8.5375 14.8031 9.5125 14.4094 10.425C14.0156 11.3375 13.4812 12.1312 12.8062 12.8062C12.1312 13.4812 11.3375 14.0156 10.425 14.4094C9.5125 14.8031 8.5375 15 7.5 15Z"
+              fill="#005312" />
+          </svg>
+          }
+          @case ('Pendente') {
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none"
+            aria-hidden="true">
+            <path
+              d="M6.75 13.5C5.025 13.5 3.52187 12.9281 2.24062 11.7844C0.959375 10.6406 0.225 9.2125 0.0375 7.5H1.575C1.75 8.8 2.32812 9.875 3.30938 10.725C4.29063 11.575 5.4375 12 6.75 12C8.2125 12 9.45312 11.4906 10.4719 10.4719C11.4906 9.45312 12 8.2125 12 6.75C12 5.2875 11.4906 4.04688 10.4719 3.02813C9.45312 2.00938 8.2125 1.5 6.75 1.5C5.8875 1.5 5.08125 1.7 4.33125 2.1C3.58125 2.5 2.95 3.05 2.4375 3.75H4.5V5.25H0V0.75H1.5V2.5125C2.1375 1.7125 2.91562 1.09375 3.83437 0.65625C4.75312 0.21875 5.725 0 6.75 0C7.6875 0 8.56562 0.178125 9.38437 0.534375C10.2031 0.890625 10.9156 1.37188 11.5219 1.97812C12.1281 2.58437 12.6094 3.29688 12.9656 4.11562C13.3219 4.93437 13.5 5.8125 13.5 6.75C13.5 7.6875 13.3219 8.56562 12.9656 9.38437C12.6094 10.2031 12.1281 10.9156 11.5219 11.5219C10.9156 12.1281 10.2031 12.6094 9.38437 12.9656C8.56562 13.3219 7.6875 13.5 6.75 13.5ZM8.85 9.9L6 7.05V3H7.5V6.45L9.9 8.85L8.85 9.9Z"
+              fill="#414467" />
+          </svg>
+          }
+          @case ('Erro') {
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 15 15" fill="none"
+            aria-hidden="true">
+            <path
+              d="M7.5 11.25C7.7125 11.25 7.89062 11.1781 8.03438 11.0344C8.17813 10.8906 8.25 10.7125 8.25 10.5C8.25 10.2875 8.17813 10.1094 8.03438 9.96562C7.89062 9.82187 7.7125 9.75 7.5 9.75C7.2875 9.75 7.10938 9.82187 6.96562 9.96562C6.82187 10.1094 6.75 10.2875 6.75 10.5C6.75 10.7125 6.82187 10.8906 6.96562 11.0344C7.10938 11.1781 7.2875 11.25 7.5 11.25ZM6.75 8.25H8.25V3.75H6.75V8.25ZM7.5 15C6.4625 15 5.4875 14.8031 4.575 14.4094C3.6625 14.0156 2.86875 13.4812 2.19375 12.8062C1.51875 12.1312 0.984375 11.3375 0.590625 10.425C0.196875 9.5125 0 8.5375 0 7.5C0 6.4625 0.196875 5.4875 0.590625 4.575C0.984375 3.6625 1.51875 2.86875 2.19375 2.19375C2.86875 1.51875 3.6625 0.984375 4.575 0.590625C5.4875 0.196875 6.4625 0 7.5 0C8.5375 0 9.5125 0.196875 10.425 0.590625C11.3375 0.984375 12.1312 1.51875 12.8062 2.19375C13.4812 2.86875 14.0156 3.6625 14.4094 4.575C14.8031 5.4875 15 6.4625 15 7.5C15 8.5375 14.8031 9.5125 14.4094 10.425C14.0156 11.3375 13.4812 12.1312 12.8062 12.8062C12.1312 13.4812 11.3375 14.0156 10.425 14.4094C9.5125 14.8031 8.5375 15 7.5 15ZM7.5 13.5C9.175 13.5 10.5938 12.9188 11.7563 11.7563C12.9188 10.5938 13.5 9.175 13.5 7.5C13.5 5.825 12.9188 4.40625 11.7563 3.24375C10.5938 2.08125 9.175 1.5 7.5 1.5C5.825 1.5 4.40625 2.08125 3.24375 3.24375C2.08125 4.40625 1.5 5.825 1.5 7.5C1.5 9.175 2.08125 10.5938 3.24375 11.7563C4.40625 12.9188 5.825 13.5 7.5 13.5Z"
+              fill="#BA1A1A" />
+          </svg>
+          }
+          }
+          <span [class]="statusTextClass(row.status)">
+            {{ row.status }}
+          </span>
+        </div>
+
+        <div class="flex items-center justify-end px-6">
+          <button type="button" class="rounded-full p-2 text-[color:rgb(69_70_82)] hover:bg-black/5"
+            aria-label="Mais ações">
+            <mat-icon class="!text-[1rem]">more_vert</mat-icon>
+          </button>
+        </div>
+      </div>
+      } @empty {
+      <div class="border-t border-t-[color:rgba(198,197,212,0.1)] px-6 py-8 text-sm text-[color:rgb(69_70_82)]">
+        Nenhuma atividade encontrada para os filtros atuais.
+      </div>
+      }
+    </div>
+
+    <footer
+      class="flex items-center justify-between border-t border-t-[color:rgba(198,197,212,0.2)] bg-[color:rgba(243_243_245,0.5)] px-6 py-4">
+      <p class="text-xs font-medium text-[color:rgb(69_70_82)]">
+        Mostrando {{ filteredRows().length }} de {{ totalItems() }} atividades
+      </p>
+
+      <div class="flex items-center gap-2" aria-label="Paginação">
+        <button type="button" class="rounded p-2 opacity-30" (click)="previousPage()"
+          [attr.aria-disabled]="pageIndex() === 1" [disabled]="pageIndex() === 1" aria-label="Página anterior">
+          <mat-icon class="!text-[1rem]">chevron_left</mat-icon>
+        </button>
+
+        @for (p of [1, 2, 3]; track p) {
+        <button type="button" [class]="paginationButtonClass(p)" (click)="goToPage(p)"
+          [attr.aria-current]="pageIndex() === p ? 'page' : null">
+          {{ p }}
+        </button>
+        }
+
+        <button type="button" class="rounded p-2" (click)="nextPage()"
+          [attr.aria-disabled]="pageIndex() === totalPages()" [disabled]="pageIndex() === totalPages()"
+          aria-label="Próxima página">
+          <mat-icon class="!text-[1rem]">chevron_right</mat-icon>
+        </button>
+      </div>
+    </footer>
+  </section>
+
+  <section class="grid grid-cols-1 gap-8 pt-4 lg:grid-cols-12" aria-label="Cards de apoio">
+    <div class="relative overflow-hidden rounded-[1.75rem] bg-[var(--mat-sys-primary)] p-8 text-white lg:col-span-7">
+      <div class="absolute -bottom-10 -right-10 size-48 rounded-full bg-white/10 blur-3xl"></div>
+
+      <div class="space-y-4">
+        <h2 class="text-2xl font-normal leading-8">Meta de Progressão Atual</h2>
+        <p class="max-w-[28rem] text-base leading-6 opacity-80">
+          Você atingiu 65% da pontuação necessária para a próxima categoria funcional. Continue publicando e registrando
+          suas atividades!
+        </p>
+
+        <div class="h-4 w-full overflow-hidden rounded-full bg-white/20">
+          <div class="h-full w-[65%] bg-[color:rgb(163_246_156)]"></div>
+        </div>
+
+        <div class="flex items-center justify-between text-xs font-bold uppercase tracking-[0.0375rem]">
+          <span>Atual: 245 PTS</span>
+          <span>Meta: 380 PTS</span>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="relative flex flex-col justify-between overflow-hidden rounded-[1.75rem] bg-[color:rgb(243_243_245)] p-8 lg:col-span-5">
+      <div class="absolute inset-0 rounded-[1.75rem] shadow-[0_0_0_1px_rgba(198,197,212,0.1)]"></div>
+
+      <div class="relative space-y-4">
+        <div class="flex items-center gap-2">
+          <mat-icon class="text-[color:var(--mat-sys-primary)]">auto_awesome</mat-icon>
+          <h3 class="text-lg font-normal leading-7 text-[color:rgb(49_46_129)]">Curator Tip</h3>
+        </div>
+        <blockquote class="text-sm italic leading-5 text-[color:rgb(69_70_82)]">
+          "Atividades de Extensão têm peso dobrado neste semestre. Considere validar seus certificados de participação
+          em
+          congressos comunitários o quanto antes."
+        </blockquote>
+      </div>
+
+      <div class="relative pt-6">
+        <a class="inline-flex items-center gap-1 text-sm font-bold text-[color:var(--mat-sys-primary)]" href="#">
+          Ver regras de pontuação
+          <mat-icon class="!text-[1rem]">arrow_forward</mat-icon>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <button type="button"
+    class="fixed bottom-8 right-8 grid size-16 place-items-center rounded-[1.75rem] bg-[color:var(--mat-sys-primary)] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)]"
+    aria-label="Adicionar atividade" routerLink="nova">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+      <path d="M7.5 10H0V7.5H7.5V0H10V7.5H17.5V10H10V17.5H7.5V10Z" fill="white" />
+    </svg>
+  </button>
+</section>

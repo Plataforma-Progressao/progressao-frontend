@@ -13,10 +13,10 @@ describe('AuthenticatedHeaderComponent', () => {
     fixture.detectChanges();
   });
 
-  it('renders the search field and primary action', () => {
+  it('renders the search field and does not render add activity action', () => {
     const compiled = fixture.nativeElement as HTMLElement;
 
     expect(compiled.querySelector('input[type="search"]')).toBeTruthy();
-    expect(compiled.textContent).toContain('Adicionar Atividade');
+    expect(compiled.textContent).not.toContain('Adicionar Atividade');
   });
 });

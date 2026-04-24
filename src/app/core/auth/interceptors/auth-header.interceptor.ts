@@ -1,7 +1,7 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { environment } from '../../../../environments/environment';
 import { AuthStateService } from '../auth-state.service';
+import { getApiUrl } from '../../config/runtime-config';
 import { SKIP_AUTH } from './auth-context.tokens';
 
 export const authHeaderInterceptor: HttpInterceptorFn = (request, next) => {
@@ -9,7 +9,7 @@ export const authHeaderInterceptor: HttpInterceptorFn = (request, next) => {
     return next(request);
   }
 
-  const apiBaseUrl = `${environment.apiUrl.replace(/\/+$/, '')}/api`;
+  const apiBaseUrl = `${getApiUrl().replace(/\/+$/, '')}/api`;
 
   if (!request.url.startsWith(apiBaseUrl)) {
     return next(request);

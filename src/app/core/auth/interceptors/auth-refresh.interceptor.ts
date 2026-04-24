@@ -8,12 +8,12 @@ import {
 import { inject } from '@angular/core';
 import { Observable, from, throwError } from 'rxjs';
 import { catchError, switchMap } from 'rxjs/operators';
-import { environment } from '../../../../environments/environment';
 import { AuthStateService } from '../auth-state.service';
+import { getApiUrl } from '../../config/runtime-config';
 import { AUTH_RETRY, SKIP_AUTH } from './auth-context.tokens';
 
 function isBackendApiRequest(request: HttpRequest<unknown>): boolean {
-  const apiBaseUrl = `${environment.apiUrl.replace(/\/+$/, '')}/api`;
+  const apiBaseUrl = `${getApiUrl().replace(/\/+$/, '')}/api`;
   return request.url.startsWith(apiBaseUrl);
 }
 

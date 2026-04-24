@@ -1,12 +1,11 @@
 import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { ButtonComponent } from '../../../../../shared';
 import { DashboardUser } from '../../../../auth/auth.models';
 
 @Component({
   selector: 'app-authenticated-header',
-  imports: [MatIconModule, MatButtonModule, ButtonComponent],
+  imports: [MatIconModule, MatButtonModule],
   templateUrl: './authenticated-header.component.html',
   styleUrl: './authenticated-header.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -16,7 +15,6 @@ export class AuthenticatedHeaderComponent {
   readonly mobileMenuOpened = input(false);
 
   readonly menuToggle = output<void>();
-  readonly addActivity = output<void>();
 
   protected readonly searchQuery = signal('');
   protected readonly userShortName = computed(() => this.user()?.name ?? 'Docente');
@@ -24,10 +22,6 @@ export class AuthenticatedHeaderComponent {
 
   protected onMenuClick(): void {
     this.menuToggle.emit();
-  }
-
-  protected onAddActivity(): void {
-    this.addActivity.emit();
   }
 
   protected onSearchInput(event: Event): void {

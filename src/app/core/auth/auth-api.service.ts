@@ -1,7 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpContext } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
-import { environment } from '../../../environments/environment';
 import { ApiSuccessResponse } from '../http/api-envelope.types';
 import {
   AuthCredentials,
@@ -13,11 +12,12 @@ import {
   TokenPair,
 } from './auth.models';
 import { SKIP_AUTH } from './interceptors/auth-context.tokens';
+import { getApiUrl } from '../config/runtime-config';
 
 @Injectable({ providedIn: 'root' })
 export class AuthApiService {
   private readonly http = inject(HttpClient);
-  private readonly apiBaseUrl = `${environment.apiUrl.replace(/\/+$/, '')}/api`;
+  private readonly apiBaseUrl = `${getApiUrl().replace(/\/+$/, '')}/api`;
   private readonly authlessContext = new HttpContext().set(SKIP_AUTH, true);
 
   login(credentials: AuthCredentials): Observable<AuthResponse> {

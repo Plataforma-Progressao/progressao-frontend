@@ -38,10 +38,6 @@ export class AuthenticatedShellComponent {
     void this.performLogout();
   }
 
-  protected openCreateActivity(): void {
-    void this.router.navigateByUrl('/atividades');
-  }
-
   private async performLogout(): Promise<void> {
     void this.authStateService.logout();
     await this.router.navigateByUrl('/login');
