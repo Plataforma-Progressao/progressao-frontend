@@ -11,28 +11,6 @@
     </div>
   </div>
 
-  <div class="dashboard-header__search-wrapper">
-    <label class="dashboard-header__search" aria-label="Buscar atividades">
-      <mat-icon>search</mat-icon>
-      <input type="text" [value]="searchQuery()" (input)="onSearchInput($event)" autocomplete="off" spellcheck="false"
-        placeholder="Buscar atividades..." />
-      @if (searchQuery()) {
-      <button type="button" mat-icon-button class="dashboard-header__search-clear" (click)="clearSearch()"
-        aria-label="Limpar pesquisa">
-        <mat-icon>close</mat-icon>
-      </button>
-      }
-    </label>
-  </div>
-
-  <div class="dashboard-header__actions">
-    <button type="button" mat-icon-button class="dashboard-header__notification-button" aria-label="Notificações">
-      <mat-icon>notifications_none</mat-icon>
-    </button>
-
-    <app-button variant="primary" size="medium" label="Adicionar Atividade" icon="add" (clicked)="onAddActivity()" />
-  </div>
-
   <div class="dashboard-header__profile" aria-label="Perfil atual">
     <div class="dashboard-header__avatar">{{ user()?.avatarInitials ?? 'PD' }}</div>
     <div>
