@@ -14,7 +14,7 @@
   <div class="dashboard-header__search-wrapper">
     <label class="dashboard-header__search" aria-label="Buscar atividades">
       <mat-icon>search</mat-icon>
-      <input type="search" [value]="searchQuery()" (input)="onSearchInput($event)" autocomplete="off" spellcheck="false"
+      <input type="text" [value]="searchQuery()" (input)="onSearchInput($event)" autocomplete="off" spellcheck="false"
         placeholder="Buscar atividades..." />
       @if (searchQuery()) {
       <button type="button" mat-icon-button class="dashboard-header__search-clear" (click)="clearSearch()"
@@ -29,6 +29,8 @@
     <button type="button" mat-icon-button class="dashboard-header__notification-button" aria-label="Notificações">
       <mat-icon>notifications_none</mat-icon>
     </button>
+
+    <app-button variant="primary" size="medium" label="Adicionar Atividade" icon="add" (clicked)="onAddActivity()" />
   </div>
 
   <div class="dashboard-header__profile" aria-label="Perfil atual">
@@ -39,24 +41,3 @@
     </div>
   </div>
 </header>
-<header class="dashboard-header">
-  <div class="dashboard-header__brand">
-    <button type="button" mat-icon-button class="dashboard-header__menu-button" (click)="onMenuClick()" [attr.aria-expanded]="mobileMenuOpened()"
-      aria-label="Abrir menu lateral">
-      <mat-icon>menu</mat-icon>
-    </button>
-
-    <div>
-      <p class="dashboard-header__brand-label">Plataforma Progressão</p>
-      <p class="dashboard-header__subtitle">Curadoria de desempenho docente</p>
-    </div>
-  </div>
-
-  <div class="dashboard-header__profile" aria-label="Perfil atual">
-    <div class="dashboard-header__avatar">{{ user()?.avatarInitials ?? 'PD' }}</div>
-    <div>
-      <strong>{{ userShortName() }}</strong>
-      <span>{{ userRole() }}</span>
-    </div>
-  </div>
-</header>git add .
