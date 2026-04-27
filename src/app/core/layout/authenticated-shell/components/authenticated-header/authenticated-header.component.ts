@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { DashboardUser } from '../../../../auth/auth.models';
@@ -16,20 +16,11 @@ export class AuthenticatedHeaderComponent {
 
   readonly menuToggle = output<void>();
 
-  protected readonly searchQuery = signal('');
   protected readonly userShortName = computed(() => this.user()?.name ?? 'Docente');
   protected readonly userRole = computed(() => this.user()?.title ?? 'Professor');
 
   protected onMenuClick(): void {
     this.menuToggle.emit();
   }
-
-  protected onSearchInput(event: Event): void {
-    const target = event.target as HTMLInputElement;
-    this.searchQuery.set(target.value);
-  }
-
-  protected clearSearch(): void {
-    this.searchQuery.set('');
-  }
 }
+

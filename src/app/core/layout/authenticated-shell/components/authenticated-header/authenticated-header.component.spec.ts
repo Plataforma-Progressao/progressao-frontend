@@ -13,10 +13,10 @@ describe('AuthenticatedHeaderComponent', () => {
     fixture.detectChanges();
   });
 
-  it('renders the search field and does not render add activity action', () => {
+  it('renders the header brand and does not render add activity action', () => {
     const compiled = fixture.nativeElement as HTMLElement;
 
-    expect(compiled.querySelector('input[type="search"]')).toBeTruthy();
+    expect(compiled.querySelector('.dashboard-header__brand-label')).toBeTruthy();
     expect(compiled.textContent).not.toContain('Adicionar Atividade');
   });
 });

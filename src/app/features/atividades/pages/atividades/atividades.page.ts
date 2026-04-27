@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
-import { RouterLink } from '@angular/router';
 
 type AtividadeCategoria = 'Pesquisa' | 'Ensino' | 'Extensão' | 'Gestão';
 type AtividadeStatus = 'Validado' | 'Pendente' | 'Erro';
@@ -19,7 +18,7 @@ type AtividadesTab = (typeof ALL_TABS)[number];
 
 @Component({
   selector: 'app-atividades-page',
-  imports: [MatIconModule, RouterLink],
+  imports: [MatIconModule],
   templateUrl: './atividades.page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
