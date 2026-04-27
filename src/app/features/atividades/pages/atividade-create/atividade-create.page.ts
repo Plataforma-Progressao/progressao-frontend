@@ -171,7 +171,7 @@ export class AtividadeCreatePage {
       case 'uploading':
         return `${base} text-[color:rgb(65_68_103)]`;
       case 'uploaded':
-        return `${base} text-[color:rgb(0_83_18)]`;
+        return `${base} text-[#767683]`;
       case 'error':
         return `${base} text-[color:var(--mat-sys-error)]`;
     }

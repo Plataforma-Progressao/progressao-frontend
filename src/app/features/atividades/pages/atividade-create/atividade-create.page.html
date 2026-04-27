@@ -1,16 +1,16 @@
 <section class="mx-auto w-full max-w-[72rem] flex flex-col gap-10 pb-12 pt-6">
   <header class="space-y-2">
     <a
-      class="inline-flex items-center gap-2 text-sm font-medium leading-5 text-[color:rgb(69_70_82)]"
+      class="inline-flex items-center gap-2 text-sm font-medium leading-5 text-[#6b7280]"
       routerLink="/atividades"
     >
       <mat-icon class="!size-5 !text-[1rem] !leading-5">arrow_back</mat-icon>
       Voltar para listagem
     </a>
-    <h1 class="text-[2.25rem] leading-10 tracking-[-0.05625rem] text-[color:var(--mat-sys-primary)]">
+    <h1 class="m-0 text-[clamp(1.8rem,3vw,2.5rem)] tracking-[-0.04em] text-[#1a1c1d]">
       Nova Atividade Acadêmica
     </h1>
-    <p class="max-w-[42rem] text-base leading-6 text-[color:rgb(69_70_82)]">
+    <p class="m-0 max-w-[44rem] leading-[1.55] text-[#6b7280]">
       Registre suas atividades de pesquisa, ensino ou extensão para o cálculo do progresso funcional.
     </p>
   </header>
@@ -122,11 +122,13 @@
           </div>
 
           @for (upload of uploads(); track upload.localId) {
-            <div class="flex items-center justify-between rounded-xl border border-[color:rgba(198,197,212,0.1)] bg-[color:rgb(243_243_245)] p-[0.8125rem]">
+            <div class="flex items-center justify-between rounded-xl border border-[#c6c5d4]/10 bg-[#f3f3f5] p-[0.8125rem]">
               <div class="flex items-center gap-3">
-                <mat-icon class="text-[color:var(--mat-sys-primary)]">description</mat-icon>
+                <svg class="h-5 w-4 shrink-0 text-[#000666]" viewBox="0 0 16 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M4 16H12V14H4V16V16M4 12H12V10H4V12V12M2 20C1.45 20 0.979167 19.8042 0.5875 19.4125C0.195833 19.0208 0 18.55 0 18V2C0 1.45 0.195833 0.979167 0.5875 0.5875C0.979167 0.195833 1.45 0 2 0H10L16 6V18C16 18.55 15.8042 19.0208 15.4125 19.4125C15.0208 19.8042 14.55 20 14 20H2V20M9 7V2H2V2V2V18V18V18H14V18V18V7H9V7M2 2V2V7V7V2V7V7V18V18V18V18V18V18V2V2V2V2" fill="currentColor"/>
+                </svg>
                 <div>
-                  <p class="text-xs font-bold leading-4 text-[color:rgb(26_28_29)]">{{ upload.fileName }}</p>
+                  <p class="text-xs font-bold leading-4 text-[#1a1c1d]">{{ upload.fileName }}</p>
                   <p [class]="uploadStatusClass(upload.status)">
                     {{ (upload.sizeBytes / 1024 / 1024).toFixed(1) }} MB • {{ uploadStatusLabel(upload.status) }}
                   </p>
@@ -134,11 +136,13 @@
               </div>
               <button
                 type="button"
-                class="rounded-full p-2 text-[color:var(--mat-sys-error)] hover:bg-black/5"
+                class="rounded-full p-2 text-[#ba1a1a] hover:bg-black/5"
                 aria-label="Remover comprovante"
                 (click)="removeUpload(upload)"
               >
-                <mat-icon class="!text-[0.875rem]">delete</mat-icon>
+                <svg class="h-[0.84375rem] w-3 shrink-0" viewBox="0 0 12 13.5" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M2.25 13.5C1.8375 13.5 1.48437 13.3531 1.19062 13.0594C0.896875 12.7656 0.75 12.4125 0.75 12V2.25H0V0.75H3.75V0H8.25V0.75H12V2.25H11.25V12C11.25 12.4125 11.1031 12.7656 10.8094 13.0594C10.5156 13.3531 10.1625 13.5 9.75 13.5H2.25V13.5M9.75 2.25H2.25V12V12V12H9.75V12V12V2.25V2.25M3.75 10.5H5.25V3.75H3.75V10.5V10.5M6.75 10.5H8.25V3.75H6.75V10.5V10.5M2.25 2.25V2.25V12V12V12V12V12V12V2.25V2.25" fill="currentColor"/>
+                </svg>
               </button>
             </div>
           }
@@ -226,9 +230,12 @@
           </div>
         </div>
 
-        <div class="rounded-2xl border border-[color:rgb(163_246_156)] bg-[color:rgba(163,246,156,0.35)] p-4">
-          <p class="text-sm font-semibold leading-5 text-[color:rgb(0_83_18)]">
-            Dica do Curador: Anexar o DOI do artigo aumenta a velocidade de validação pela banca revisora em até 40%.
+        <div class="flex items-start gap-3 rounded-2xl border border-[#a3f69c] bg-[#a3f69c]/30 px-[1.0625rem] pb-[1.0625rem] pt-[1.5625rem]">
+          <svg class="h-5 w-[0.9375rem] shrink-0 text-[#005312]" viewBox="0 0 15 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M7.5 20C6.95 20 6.47917 19.8042 6.0875 19.4125C5.69583 19.0208 5.5 18.55 5.5 18H9.5C9.5 18.55 9.30417 19.0208 8.9125 19.4125C8.52083 19.8042 8.05 20 7.5 20V20M3.5 17V15H11.5V17H3.5V17M3.75 14C2.6 13.3167 1.6875 12.4 1.0125 11.25C0.3375 10.1 0 8.85 0 7.5C0 5.41667 0.729167 3.64583 2.1875 2.1875C3.64583 0.729167 5.41667 0 7.5 0C9.58333 0 11.3542 0.729167 12.8125 2.1875C14.2708 3.64583 15 5.41667 15 7.5C15 8.85 14.6625 10.1 13.9875 11.25C13.3125 12.4 12.4 13.3167 11.25 14H3.75V14M4.35 12H10.65C11.4 11.4667 11.9792 10.8083 12.3875 10.025C12.7958 9.24167 13 8.4 13 7.5C13 5.96667 12.4667 4.66667 11.4 3.6C10.3333 2.53333 9.03333 2 7.5 2C5.96667 2 4.66667 2.53333 3.6 3.6C2.53333 4.66667 2 5.96667 2 7.5C2 8.4 2.20417 9.24167 2.6125 10.025C3.02083 10.8083 3.6 11.4667 4.35 12V12M7.5 12V12V12V12V12V12V12V12V12V12V12" fill="currentColor"/>
+          </svg>
+          <p class="text-[0.75rem] leading-[1.21875rem] text-[#005312]">
+            <strong class="font-bold">Dica do Curador:</strong> Anexar o DOI do artigo aumenta a velocidade de validação pela banca revisora em até 40%.
           </p>
         </div>
       </section>
