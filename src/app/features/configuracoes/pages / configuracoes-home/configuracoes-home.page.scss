@@ -7,37 +7,34 @@
 
 .config-home {
   margin: 0 auto;
-  max-width: 60rem; // Largura do container alinhada com o painel
+  max-width: 60rem; 
   width: 100%;
-  padding: 2rem 0; // Margem padrão do painel
+  padding: 2rem 0;
 }
 
-/* --- Título Principal --- */
 .config-home__title {
   font-family: 'Manrope', sans-serif;
   color: #1a2359;
-  font-size: 36px; // Solicitado: 36px
-  font-weight: 400; // Solicitado: Regular
+  font-size: 36px;
+  font-weight: 400;
   margin-bottom: 2rem;
-  text-align: left; // Mantém à esquerda
+  text-align: left;
 }
 
-/* --- Cartão Branco --- */
 .config-home__card {
   background: #ffffff;
-  border-radius: 1.5rem; // Bordas bem arredondadas per Figma
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03); // Sombra super suave
-  padding: 3.5rem 4rem; // Espaçamento interno generoso
+  border-radius: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  padding: 3.5rem 4rem;
   width: 100%;
 }
 
-/* --- Avatar (Centralizado) --- */
 .config-home__info-side {
   display: flex;
-  justify-content: center; // Centraliza a foto horizontalmente
+  justify-content: center;
   width: 100%;
-  margin-bottom: 2.5rem; // Espaço antes do formulário
-  border: none; // Removendo qualquer linha divisória
+  margin-bottom: 2.5rem; 
+  border: none;
 }
 
 .config-home__avatar-section {
@@ -50,7 +47,7 @@
 .config-home__avatar-wrapper {
   background: #f3f4f6;
   border-radius: 1rem;
-  height: 8rem; // Tamanho proporcional à referência
+  height: 8rem;
   width: 8rem;
   overflow: hidden;
 }
@@ -62,15 +59,15 @@
 }
 
 .config-home__btn-edit-photo {
-  background: #1a237e; // Azul escuro
-  border: 4px solid #ffffff; // Borda branca grossa para sobrepor a foto
+  background: #1a237e;
+  border: 4px solid #ffffff;
   border-radius: 9999px;
   color: #ffffff;
   cursor: pointer;
   font-family: 'Manrope', sans-serif;
   font-size: 0.75rem;
   font-weight: 700;
-  margin-top: -1.25rem; // Puxa o botão para cima da imagem
+  margin-top: -1.25rem; 
   padding: 0.4rem 1.5rem;
   transition: filter 0.2s ease;
   z-index: 10;
@@ -80,12 +77,10 @@
   filter: brightness(1.1);
 }
 
-/* Oculta os dados de perfil (Nome/Email) para ficar fiel à referência */
 .config-home__profile-summary {
   display: none;
 }
 
-/* --- Formulário --- */
 .config-home__form-side {
   width: 100%;
 }
@@ -93,20 +88,19 @@
 .config-home__form {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem; // Espaçamento entre as linhas do form
+  gap: 1.5rem;
 }
 
-/* Grade específica para as senhas (Lado a lado) */
 .config-home__form-grid {
   display: grid;
   gap: 1.5rem;
-  grid-template-columns: repeat(2, 1fr); // 2 colunas perfeitamente divididas
+  grid-template-columns: repeat(2, 1fr);
 }
 
 .config-home__form-group {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem; // Espaço entre o Label e o Input
+  gap: 0.5rem;
 }
 
 .config-home__form-label {
@@ -114,7 +108,7 @@
   font-family: 'Manrope', sans-serif;
   font-size: 0.65rem;
   font-weight: 700;
-  text-transform: uppercase; // Letras maiúsculas per Figma
+  text-transform: uppercase;
   letter-spacing: 0.05em;
   padding-left: 0.25rem;
 }
@@ -126,12 +120,11 @@
   width: 100%;
 }
 
-/* --- Formato dos Inputs --- */
 .config-home__form-input {
-  background: #f4f5f7; // Fundo cinza bem claro per Figma
-  border: none; // Sem bordas ao redor
-  border-bottom: 2px solid #e5e7eb; // Apenas a linha embaixo
-  border-radius: 0.5rem 0.5rem 0 0; // Arredondado SÓ em cima, reto embaixo
+  background: #f4f5f7;
+  border: none;
+  border-bottom: 2px solid #e5e7eb;
+  border-radius: 0.5rem 0.5rem 0 0; 
   color: #1f2937;
   font-family: 'Manrope', sans-serif;
   font-size: 0.875rem;
@@ -147,10 +140,9 @@
 
 .config-home__form-input:focus {
   background: #ebeef3;
-  border-bottom-color: #1a237e; // Linha azul ao focar
+  border-bottom-color: #1a237e;
 }
 
-/* Ajustes de Padding para ícones */
 .config-home__form-input--has-icon-left {
   padding-left: 3rem;
 }
@@ -163,7 +155,6 @@
   padding-right: 4.5rem;
 }
 
-/* --- Ícones --- */
 .config-home__input-icon {
   color: #6b7280;
   position: absolute;
@@ -178,14 +169,12 @@
   right: 1rem;
 }
 
-/* Ícone da marca ORCID */
 .config-home__input-icon--brand img {
   height: 18px;
   width: 18px;
-  opacity: 0.6; // Suaviza o ícone para bater com o mockup
+  opacity: 0.6;
 }
 
-/* Botão de revelar senha (Olho) */
 .config-home__password-toggle {
   background: transparent;
   border: none;
@@ -233,12 +222,11 @@
   }
 }
 
-/* --- Botões de Ação (Direita) --- */
 .config-home__actions {
   align-items: center;
   display: flex;
   gap: 2rem;
-  justify-content: flex-end; // Mantém à direita
+  justify-content: flex-end;
   margin-top: 2rem;
   width: 100%;
 }
@@ -279,14 +267,13 @@
   transform: translateY(1px);
 }
 
-/* --- Responsividade --- */
 @media (max-width: 48rem) {
   .config-home__card {
     padding: 2rem 1.5rem;
   }
   
   .config-home__form-grid {
-    grid-template-columns: 1fr; // Empilha as senhas no celular
+    grid-template-columns: 1fr;
   }
   
   .config-home__actions {
