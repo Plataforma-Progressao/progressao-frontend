@@ -4,8 +4,8 @@ export const routes: Routes = [
   {
     path: '',
     loadComponent: () =>
-      import('./pages / historico-home/historico-home.page').then(
-        (m) => m.HistoricoHomePage,
+      import('../../shared/components/placeholder-page/placeholder-page.component').then(
+        (m) => m.PlaceholderPageComponent,
       ),
     data: {
       title: 'Histórico',
