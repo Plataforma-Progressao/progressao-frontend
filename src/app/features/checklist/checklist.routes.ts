@@ -1,15 +1,9 @@
 import { Routes } from '@angular/router';
+import { ChecklistHomePage } from './pages/checklist-home/checklist-home.page';
 
 export const routes: Routes = [
   {
     path: '',
-    loadComponent: () =>
-      import('../../shared/components/placeholder-page/placeholder-page.component').then(
-        (m) => m.PlaceholderPageComponent,
-      ),
-    data: {
-      title: 'Checklist',
-      description: 'Revise pendências e etapas obrigatórias antes do envio final.',
-    },
-  },
+    component: ChecklistHomePage
+  }
 ];
