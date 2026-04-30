@@ -14,11 +14,12 @@
 
 .config-home__title {
   font-family: 'Manrope', sans-serif;
-  color: #1a2359;
-  font-size: 36px;
+  color: #1a1c1d;
   font-weight: 400;
   margin-bottom: 2rem;
   text-align: left;
+  font-size: clamp(1.8rem, 3vw, 2.5rem);
+  letter-spacing: -0.04em;
 }
 
 .config-home__card {
