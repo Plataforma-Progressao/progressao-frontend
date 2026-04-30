@@ -52,6 +52,12 @@
     font-size: 0.875rem;
   }
 
+  &.app-btn--compact {
+    min-width: 0;
+    padding-left: 0.875rem;
+    padding-right: 0.875rem;
+  }
+
   @media (pointer: coarse) {
     &.app-btn--small {
       min-height: 2.75rem;
