@@ -166,7 +166,7 @@ export class AtividadeCreatePage {
   }
 
   protected uploadStatusClass(status: UploadItem['status']): string {
-    const base = 'text-[0.625rem] leading-[0.9375rem]';
+    const base = 'text-[0.8125rem] leading-[1.125rem]';
     switch (status) {
       case 'uploading':
         return `${base} text-[color:rgb(65_68_103)]`;

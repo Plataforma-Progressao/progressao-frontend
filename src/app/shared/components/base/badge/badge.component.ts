@@ -19,7 +19,7 @@ export class BadgeComponent {
 
   protected get badgeClass(): string {
     const baseClass =
-      'inline-flex items-center rounded px-2 py-1 text-[0.625rem] font-bold uppercase leading-3';
+      'inline-flex items-center rounded px-2 py-1 text-[0.8125rem] font-bold uppercase leading-4';
 
     const variantClasses: Record<BadgeVariant, string> = {
       primary: 'bg-[color:var(--mat-sys-primary)] text-white',
