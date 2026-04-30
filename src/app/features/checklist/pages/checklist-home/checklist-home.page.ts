@@ -23,9 +23,13 @@ export interface DocumentoChecklist {
   imports: [CommonModule, MatIconModule, MatMenuModule],
 })
 export class ChecklistHomePage implements OnInit {
-  progressoTotal = 60;
-  docsValidados = 6;
-  docsTotais = 10;
+    totalDocs = 10;
+    concluidos = 6;
+    atencao = 2;
+    pendentes = 2;
+    get percentConcluido() { return (this.concluidos / this.totalDocs) * 100; }
+    get percentAtencao() { return (this.atencao / this.totalDocs) * 100; }
+    get percentPendente() { return (this.pendentes / this.totalDocs) * 100; }
 
   documentos: DocumentoChecklist[] = [
     {
@@ -73,19 +77,14 @@ export class ChecklistHomePage implements OnInit {
   }
 
     filtrarDocumentos(filtro: string) {
-        // Se for para limpar o filtro (mostrar todos)
         if (filtro === 'Todos') {
             this.documentos = [...this.documentosOriginais];
             return;
         }
-
-        // Fazemos um "de -> para" porque o menu diz "Enviados", mas o status no código é "Concluído"
         let statusBuscado = filtro;
         if (filtro === 'Enviados') {
             statusBuscado = 'Concluído';
         }
-
-        // Filtra a lista original e atualiza a lista que aparece na tela
         this.documentos = this.documentosOriginais.filter(doc => doc.status === statusBuscado);
     }
 }

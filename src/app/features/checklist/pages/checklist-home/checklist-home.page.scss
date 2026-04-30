@@ -60,12 +60,24 @@ $color-red-alert: #BA1A1A;
     border-radius: 6px;
     overflow: hidden;
     margin-bottom: 1rem;
+    display: flex;
   }
 
   &__progress-fill {
     height: 100%;
-    background: $color-green-light; 
-    border-radius: 6px;
+    transition: width 0.5s ease;
+
+    &--concluido {
+      background: $color-green-light;
+    }
+
+    &--atencao {
+      background: $color-red-alert;
+    }
+
+    &--pendentes {
+      background: $color-gray-border;
+    }
   }
 
   &__legend {
