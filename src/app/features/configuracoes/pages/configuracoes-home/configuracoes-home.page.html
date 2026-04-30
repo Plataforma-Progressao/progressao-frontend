@@ -2,7 +2,6 @@
   <h1 class="config-home__title">Configurações</h1>
 
   <div class="config-home__card">
-
     <aside class="config-home__info-side">
       <div class="config-home__avatar-section">
         <div class="config-home__avatar-wrapper">
@@ -12,28 +11,27 @@
           Editar Foto
         </button>
       </div>
-
-      <div class="config-home__profile-summary">
-        <p class="config-home__profile-name">Dra. Ana Souza</p>
-        <p class="config-home__profile-role">Prof Associado IV</p>
-        <p class="config-home__profile-email-badge">ana.souza@universidade.br</p>
-      </div>
     </aside>
 
     <section class="config-home__form-side">
-      <form class="config-home__form">
+      <form [formGroup]="configForm" class="config-home__form">
 
         <div class="config-home__form-group">
           <label class="config-home__form-label">Nome completo </label>
           <div class="config-home__input-wrapper">
-            <input type="text" class="config-home__form-input" placeholder="Dra. Ana Souza">
+            <input type="text" 
+              class="config-home__form-input" 
+              formControlName="nome">
           </div>
         </div>
 
         <div class="config-home__form-group">
           <label class="config-home__form-label">E-mail institucional </label>
           <div class="config-home__input-wrapper">
-            <input type="email" class="config-home__form-input config-home__form-input--has-icon-right" placeholder="ana.souza@universidade.br">
+            <input type="email" 
+              class="config-home__form-input config-home__form-input--has-icon-right" 
+              formControlName="email"
+              autocomplete="off">
             <mat-icon class="config-home__input-icon config-home__input-icon--right">alternate_email</mat-icon>
           </div>
         </div>
@@ -43,10 +41,14 @@
             <label class="config-home__form-label">Senha</label>
             <div class="config-home__input-wrapper">
               <mat-icon class="config-home__input-icon config-home__input-icon--left">lock_outline</mat-icon>
-              <input type="password" class="config-home__form-input config-home__form-input--has-icon-left config-home__form-input--has-icon-right" placeholder="••••••••••••••">
-              
-              <button type="button" class="config-home__password-toggle" title="Mostrar/Esconder senha">
-                <mat-icon class="config-home__input-icon config-home__input-icon--right">visibility_off</mat-icon>
+              <input 
+                [type]="hideSenha ? 'password' : 'text'" 
+                formControlName="senha"
+                class="config-home__form-input config-home__form-input--has-icon-left config-home__form-input--has-icon-right" >
+              <button type="button" class="config-home__password-toggle" (click)="hideSenha = !hideSenha" title="Mostrar/Esconder senha">
+                <mat-icon class="config-home__input-icon config-home__input-icon--right">
+                  {{ hideSenha ? 'visibility_off' : 'visibility' }}
+                </mat-icon>
               </button>
             </div>
           </div>
@@ -55,11 +57,16 @@
             <label class="config-home__form-label">Confirmar Senha</label>
             <div class="config-home__input-wrapper">
               <mat-icon class="config-home__input-icon config-home__input-icon--left">lock_outline</mat-icon>
-              <input type="password" class="config-home__form-input config-home__form-input--has-icon-left config-home__form-input--has-icon-right" placeholder="••••••••••••••">
-              
-              <button type="button" class="config-home__password-toggle" title="Mostrar/Esconder senha">
-                <mat-icon class="config-home__input-icon config-home__input-icon--right">visibility_off</mat-icon>
-              </button>
+                <input 
+                  [type]="hideConfirmarSenha ? 'password' : 'text'" 
+                  formControlName="confirmarSenha"
+                  class="config-home__form-input config-home__form-input--has-icon-left config-home__form-input--has-icon-right">
+                
+                <button type="button" class="config-home__password-toggle" (click)="hideConfirmarSenha = !hideConfirmarSenha" title="Mostrar/Esconder senha">
+                  <mat-icon class="config-home__input-icon config-home__input-icon--right">
+                    {{ hideConfirmarSenha ? 'visibility_off' : 'visibility' }}
+                  </mat-icon>
+                </button>
             </div>
           </div>
         </div>
@@ -67,8 +74,14 @@
         <div class="config-home__form-group">
           <label class="config-home__form-label">Currículo Lattes</label>
           <div class="config-home__input-wrapper">
-            <input type="text" class="config-home__form-input config-home__form-input--has-icon-right" placeholder="lattes.cnpq.br/1234567890123456">
-            <mat-icon class="config-home__input-icon config-home__input-icon--right">open_in_new</mat-icon>
+            <input type="text" 
+              class="config-home__form-input config-home__form-input--has-icon-right" 
+              formControlName="lattes">
+            <div class="config-home__input-actions config-home__input-actions--right">
+              <button type="button" title="Abrir link">
+                <mat-icon>open_in_new</mat-icon>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -78,21 +91,21 @@
             <div class="config-home__input-icon config-home__input-icon--left config-home__input-icon--brand">
               <img src="https://orcid.org/sites/default/files/images/orcid_16x16.png" alt="ORCID logo">
             </div>
-            <input type="text" class="config-home__form-input config-home__form-input--has-icon-left config-home__form-input--has-actions-right" placeholder="0000-0002-1825-0097">
-            
-            <div class="config-home__input-actions config-home__input-actions--right">
-              <button type="button" title="Copiar"><mat-icon>content_copy</mat-icon></button>
-              <button type="button" title="Abrir link"><mat-icon>open_in_new</mat-icon></button>
-            </div>
+              <input type="text" 
+                class="config-home__form-input config-home__form-input--has-icon-left config-home__form-input--has-actions-right" 
+                formControlName="orcid">
+              <div class="config-home__input-actions config-home__input-actions--right">
+                <button type="button" title="Copiar"><mat-icon>content_copy</mat-icon></button>
+                <button type="button" title="Abrir link"><mat-icon>open_in_new</mat-icon></button>
+              </div>
           </div>
         </div>
-
       </form>
     </section>
   </div>
 
   <div class="config-home__actions">
     <button type="button" class="config-home__btn-cancel">Cancelar</button>
-    <button type="button" class="config-home__btn-save">Salvar Alterações</button>
+     <button type="button" (click)="salvarAlteracoes()" class="config-home__btn-save">Salvar Alterações</button>
   </div>
 </div>
