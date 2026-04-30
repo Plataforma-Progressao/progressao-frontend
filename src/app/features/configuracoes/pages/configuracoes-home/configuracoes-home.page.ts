@@ -19,13 +19,14 @@ export class ConfiguracoesHomePage implements OnInit {
 
   ngOnInit(): void {
     this.configForm = this.fb.group({
-      nome: [''],
-      email: [''],
-      senha: [''],
+      nome: ['Dra. Ana Souza'],
+      email: ['ana.souza@universidade.br'],
+      senha: ['123456'],
       confirmarSenha: [''],
-      lattes: [''],
-      orcid: ['']
+      lattes: ['lattes.cnpq.br/1234567890123456'],
+      orcid: ['0000-0002-1825-0097']
     });
+    
   }
 
   salvarAlteracoes(): void {
