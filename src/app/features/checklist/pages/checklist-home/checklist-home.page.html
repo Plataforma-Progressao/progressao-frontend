@@ -1,0 +1,94 @@
+<div class="checklist">
+  <header class="checklist__header">
+    <h1 class="checklist__title">Checklist de Documentação</h1>
+    <p class="checklist__subtitle">Organize os comprovantes de suas atividades acadêmicas. O progresso abaixo reflete os documentos validados pela comissão técnica.</p>
+  </header>
+
+  <section class="checklist__progress-card">
+    <div class="checklist__progress-info">
+      <div>
+        <h2 class="checklist__progress-label">Progresso Total</h2>
+        <p class="checklist__progress-detail">{{docsValidados}} de {{docsTotais}} documentos validados</p>
+      </div>
+      <span class="checklist__progress-percentage">{{progressoTotal}}%</span>
+    </div>
+    <div class="checklist__progress-bar">
+      <div class="checklist__progress-fill" [style.width.%]="progressoTotal"></div>
+    </div>
+    <div class="checklist__legend">
+      <span class="legend-item"><span class="dot dot--concluido"></span> Concluído</span>
+      <span class="legend-item"><span class="dot dot--atencao"></span> Atenção</span>
+      <span class="legend-item"><span class="dot dot--pendente"></span> Pendente</span>
+    </div>
+  </section>
+
+  <div class="checklist__content">
+    <main class="checklist__main">
+        <div class="checklist__list-header">
+            <h3>Documentos Obrigatórios</h3>
+            <button class="checklist__filter-btn" [matMenuTriggerFor]="menuFiltros">
+            <mat-icon>filter_list</mat-icon> Filtrar
+            </button>
+            <mat-menu #menuFiltros="matMenu">
+            <button mat-menu-item (click)="filtrarDocumentos('Todos')">Todos</button>
+            <button mat-menu-item (click)="filtrarDocumentos('Enviados')">Enviados</button>
+            <button mat-menu-item (click)="filtrarDocumentos('Pendentes')">Pendentes</button>
+            <button mat-menu-item (click)="filtrarDocumentos('Atenção')">Atenção</button>
+            </mat-menu>
+
+        </div>
+
+        <div class="checklist__doc-item" *ngFor="let doc of documentos" [ngClass]="'checklist__doc-item--' + doc.status.toLowerCase()">
+            <div class="checklist__doc-checkbox">
+                <mat-icon *ngIf="doc.status === 'Concluído'">check_box</mat-icon>
+                <mat-icon *ngIf="doc.status !== 'Concluído'">check_box_outline_blank</mat-icon>
+            </div>
+            
+            <div class="checklist__doc-info">
+                <h4>{{doc.titulo}}</h4>
+                <p class="checklist__doc-desc" [ngClass]="'text--' + doc.status.toLowerCase()">
+                    {{doc.descricao}}
+                </p>
+            </div>
+
+            <div class="checklist__doc-actions">
+                <span *ngIf="doc.status === 'Concluído'" class="checklist__doc-date">
+                Enviado em {{doc.dataEnvio || '12/10/23'}}
+                </span>
+                <button *ngIf="doc.status === 'Concluído'" class="btn-quick-action btn-quick-action--icon-only">
+                    <mat-icon>visibility</mat-icon>
+                </button>
+                <button *ngIf="doc.status === 'Pendente' || doc.status === 'Atenção'" class="btn-quick-action btn-quick-action--upload">
+                    <mat-icon>file_upload</mat-icon>
+                    Upload Rápido
+                </button>
+            </div>
+        </div>
+
+        <div class="checklist__empty-state" *ngIf="documentos.length === 0">
+            <p>Nenhum documento encontrado para o filtro atual.</p>
+        </div>
+    </main>
+
+    <aside class="checklist__sidebar">
+      <div class="checklist__resources">
+        <h3>Recursos e Ajuda</h3>
+        <div class="resource-item">
+          <mat-icon>description</mat-icon>
+          <span>Guia de Progressão 2024</span>
+          <mat-icon class="arrow">chevron_right</mat-icon>
+        </div>
+        <div class="resource-item">
+          <mat-icon>help_outline</mat-icon>
+          <span>Dúvidas Frequentes</span>
+          <mat-icon class="arrow">chevron_right</mat-icon>
+        </div>
+        <div class="resource-item">
+          <mat-icon>mail_outline</mat-icon>
+          <span>Suporte Técnico</span>
+          <mat-icon class="arrow">chevron_right</mat-icon>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
