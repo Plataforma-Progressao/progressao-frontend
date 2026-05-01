@@ -22,7 +22,7 @@
     }
   </nav>
 
-  <div class="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1fr)_18rem]">
+  <div class="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_14rem_14rem]">
     <app-input
       [formControl]="queryControl"
       label="Buscar por título ou palavra-chave"
@@ -37,6 +37,16 @@
         @for (option of statusOptions; track option.value) {
         <mat-option [value]="option.value">{{ option.label }}</mat-option>
         }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>Ano</mat-label>
+      <mat-select>
+        <mat-option value="2026">2026</mat-option>
+        <mat-option value="2025">2025</mat-option>
+        <mat-option value="2024">2024</mat-option>
+        <mat-option value="2023">2023</mat-option>
       </mat-select>
     </mat-form-field>
   </div>
@@ -175,18 +185,11 @@
           em congressos comunitários o quanto antes."
         </blockquote>
       </div>
-
-      <div class="relative pt-6">
-        <a class="inline-flex items-center gap-1 text-sm font-bold text-[color:var(--mat-sys-primary)]" href="#">
-          Ver regras de pontuação
-          <mat-icon class="!text-[1rem]">arrow_forward</mat-icon>
-        </a>
-      </div>
     </div>
   </section>
 
   <app-button
-    class="fixed bottom-8 right-8"
+    class="fixed bottom-8 right-8 rounded-full bg-[color:var(--mat-sys-primary)] text-white ring-[6px] ring-indigo-100"
     variant="icon"
     icon="add"
     label="Adicionar atividade"
