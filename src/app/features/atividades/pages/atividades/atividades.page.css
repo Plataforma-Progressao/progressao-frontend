@@ -1,0 +1,81 @@
+:host {
+  display: block;
+}
+
+.activities-table {
+  width: 100%;
+  border-spacing: 0;
+}
+
+.activities-table.mat-mdc-table {
+  background: var(--mat-sys-surface-container);
+}
+
+.activities-table .mat-mdc-header-row {
+  background: rgb(243 243 245);
+}
+
+.activities-table .mat-mdc-header-cell {
+  border-bottom: 1px solid rgb(198 197 212 / 18%);
+  color: rgb(69 70 82);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.0375rem;
+  line-height: 1rem;
+  padding: 1rem 1.5rem;
+  text-transform: uppercase;
+}
+
+.activities-table .mat-mdc-cell {
+  border-bottom-color: rgb(198 197 212 / 10%);
+  padding: 0;
+}
+
+.activities-table .mat-mdc-row {
+  background: white;
+}
+
+.activities-table .mat-mdc-row:hover {
+  background: rgb(249 249 251);
+}
+
+.activities-table .mat-mdc-row:last-child .mat-mdc-cell {
+  border-bottom-color: transparent;
+}
+
+.activities-table .mat-column-title .activities-title-cell {
+  padding: 1.40625rem 1.5rem;
+}
+
+.activities-table .mat-column-categoria,
+.activities-table .mat-column-score,
+.activities-table .mat-column-status,
+.activities-table .mat-column-actions {
+  padding-inline: 1.5rem;
+}
+
+.activities-table .mat-column-categoria,
+.activities-table .mat-column-score,
+.activities-table .mat-column-status {
+  text-align: center;
+}
+
+.activities-table .mat-column-score {
+  font-family: 'Manrope', sans-serif;
+}
+
+.activities-table .mat-column-actions {
+  text-align: right;
+}
+
+.activities-table .mat-mdc-no-data-row td {
+  border-bottom: 0;
+}
+
+.activities-action-button {
+  color: rgb(69 70 82);
+}
+
+.activities-action-button:hover {
+  background: rgb(69 70 82 / 6%);
+}

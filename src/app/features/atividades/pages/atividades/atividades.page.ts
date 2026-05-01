@@ -1,40 +1,82 @@
-import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
-import { RouterLink } from '@angular/router';
+import { MatSelectModule } from '@angular/material/select';
+import { MatTableModule } from '@angular/material/table';
+import { Router } from '@angular/router';
+import { BadgeComponent } from '../../../../shared/components/base/badge/badge.component';
+import { ButtonComponent } from '../../../../shared/components/base/button/button.component';
+import { InputComponent } from '../../../../shared/components/base/input/input.component';
+import { StatusIndicatorComponent } from '../../../../shared/components/base/status-indicator/status-indicator.component';
 
-type AtividadeCategoria = 'Pesquisa' | 'Ensino' | 'Extensão' | 'Gestão';
-type AtividadeStatus = 'Validado' | 'Pendente' | 'Erro';
+type UiActivityCategory = 'Pesquisa' | 'Ensino' | 'Extensão' | 'Gestão';
+type UiActivityStatus = 'Validado' | 'Pendente' | 'Erro';
 
-interface AtividadeRow {
+interface ActivityListRow {
   readonly id: string;
   readonly title: string;
   readonly subtitle: string;
-  readonly categoria: AtividadeCategoria;
+  readonly categoria: UiActivityCategory;
   readonly score: number;
-  readonly status: AtividadeStatus;
+  readonly status: UiActivityStatus;
 }
 
 const ALL_TABS = ['Todas Atividades', 'Ensino', 'Pesquisa', 'Extensão', 'Gestão'] as const;
-type AtividadesTab = (typeof ALL_TABS)[number];
+type ActivitiesListTab = (typeof ALL_TABS)[number];
+
+const STATUS_OPTIONS: readonly { label: string; value: 'Todos' | UiActivityStatus }[] = [
+  { label: 'Todos', value: 'Todos' },
+  { label: 'Validado', value: 'Validado' },
+  { label: 'Pendente', value: 'Pendente' },
+  { label: 'Erro', value: 'Erro' },
+];
 
 @Component({
-  selector: 'app-atividades-page',
-  imports: [MatIconModule, RouterLink],
+  selector: 'app-activities-page',
+  imports: [
+    ReactiveFormsModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatIconModule,
+    MatSelectModule,
+    MatTableModule,
+    ButtonComponent,
+    InputComponent,
+    BadgeComponent,
+    StatusIndicatorComponent,
+  ],
   templateUrl: './atividades.page.html',
+  styleUrls: ['./atividades.page.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AtividadesPage {
-  protected readonly tabs = ALL_TABS;
-  protected readonly activeTab = signal<AtividadesTab>('Todas Atividades');
+export class ActivitiesPage {
+  private readonly router = inject(Router);
 
-  protected readonly statusFilter = signal<'Todos' | AtividadeStatus>('Todos');
-  protected readonly query = signal('');
+  protected readonly tabs = ALL_TABS;
+  protected readonly statusOptions = STATUS_OPTIONS;
+
+  protected readonly activeTab = signal<ActivitiesListTab>('Todas Atividades');
+
+  protected readonly queryControl = new FormControl('', { nonNullable: true });
+  protected readonly statusControl = new FormControl<'Todos' | UiActivityStatus>('Todos', { nonNullable: true });
+
+  protected readonly query = toSignal(this.queryControl.valueChanges, {
+    initialValue: this.queryControl.value,
+  });
+
+  protected readonly statusFilter = toSignal(this.statusControl.valueChanges, {
+    initialValue: this.statusControl.value,
+  });
 
   protected readonly pageIndex = signal(1);
   protected readonly totalPages = signal(3);
   protected readonly totalItems = signal(42);
+  protected readonly displayedColumns = ['title', 'categoria', 'score', 'status', 'actions'] as const;
 
-  protected readonly rows = signal<readonly AtividadeRow[]>([
+  protected readonly rows = signal<readonly ActivityListRow[]>([
     {
       id: 'artigo-deep-learning',
       title: 'Artigo: Deep Learning in Academic Workflows',
@@ -60,6 +102,12 @@ export class AtividadesPage {
       status: 'Erro',
     },
   ]);
+
+  private readonly resetPagination = effect(() => {
+    this.query();
+    this.statusFilter();
+    this.pageIndex.set(1);
+  });
 
   protected readonly filteredRows = computed(() => {
     const activeTab = this.activeTab();
@@ -87,75 +135,48 @@ export class AtividadesPage {
     });
   });
 
-  protected tabButtonClass(tab: AtividadesTab): string {
-    const base = 'relative -mb-px px-6 py-4 text-center text-sm leading-5 transition';
-    if (this.activeTab() === tab) {
-      return `${base} border-b-2 border-b-[color:var(--mat-sys-primary)] font-bold text-[color:var(--mat-sys-primary)]`;
-    }
-
-    return `${base} font-semibold text-[color:rgb(69_70_82)]`;
+  protected tabButtonVariant(tab: ActivitiesListTab): 'secondary' | 'tertiary' {
+    return this.activeTab() === tab ? 'secondary' : 'tertiary';
   }
 
-  protected categoriaBadgeClass(categoria: AtividadeCategoria): string {
-    const base = 'inline-flex items-center rounded px-2 py-1 text-[0.625rem] font-bold uppercase leading-3';
+  protected tabButtonCurrent(tab: ActivitiesListTab): string | null {
+    return this.activeTab() === tab ? 'page' : null;
+  }
+
+  protected categoriaBadgeVariant(categoria: UiActivityCategory): 'success' | 'info' | 'warning' | 'secondary' {
     switch (categoria) {
       case 'Pesquisa':
-        return `${base} bg-[rgb(20,180,139)] text-white`;
+        return 'success';
       case 'Ensino':
-        return `${base} bg-[rgb(90,84,234)] text-white`;
+        return 'info';
       case 'Extensão':
-        return `${base} bg-[rgb(245,158,11)] text-white`;
+        return 'warning';
       case 'Gestão':
-        return `${base} bg-[rgb(156,163,175)] text-[color:rgb(26_28_29)]`;
+        return 'secondary';
     }
   }
 
-  protected statusDotClass(status: AtividadeStatus): string {
-    const base = 'inline-flex size-4 items-center justify-center rounded-full';
+  protected statusToIndicatorStatus(status: UiActivityStatus): 'success' | 'pending' | 'error' {
     switch (status) {
       case 'Validado':
-        return `${base} bg-[color:rgb(0_83_18)]`;
+        return 'success';
       case 'Pendente':
-        return `${base} bg-[color:rgb(65_68_103)]`;
+        return 'pending';
       case 'Erro':
-        return `${base} bg-[color:var(--mat-sys-error)]`;
+        return 'error';
     }
   }
 
-  protected statusTextClass(status: AtividadeStatus): string {
-    const base = 'text-sm font-medium';
-    switch (status) {
-      case 'Validado':
-        return `${base} text-[color:rgb(0_83_18)]`;
-      case 'Pendente':
-        return `${base} text-[color:rgb(65_68_103)]`;
-      case 'Erro':
-        return `${base} text-[color:var(--mat-sys-error)]`;
-    }
+  protected pageButtonVariant(page: number): 'secondary' | 'tertiary' {
+    return this.pageIndex() === page ? 'secondary' : 'tertiary';
   }
 
-  protected paginationButtonClass(page: number): string {
-    const base = 'rounded px-3 py-1 text-xs font-bold';
-    if (this.pageIndex() === page) {
-      return `${base} bg-[color:var(--mat-sys-primary)] text-white`;
-    }
-
-    return `${base} text-[color:var(--mat-sys-on-surface)]`;
+  protected pageButtonCurrent(page: number): string | null {
+    return this.pageIndex() === page ? 'page' : null;
   }
 
-  protected setTab(tab: AtividadesTab): void {
+  protected setTab(tab: ActivitiesListTab): void {
     this.activeTab.set(tab);
-    this.pageIndex.set(1);
-  }
-
-  protected updateQuery(event: Event): void {
-    const target = event.target as HTMLInputElement | null;
-    this.query.set(target?.value ?? '');
-    this.pageIndex.set(1);
-  }
-
-  protected setStatusFilter(value: 'Todos' | AtividadeStatus): void {
-    this.statusFilter.set(value);
     this.pageIndex.set(1);
   }
 
@@ -171,5 +192,8 @@ export class AtividadesPage {
     const clamped = Math.min(this.totalPages(), Math.max(1, page));
     this.pageIndex.set(clamped);
   }
-}
 
+  protected openCreateActivity(): void {
+    void this.router.navigate(['/atividades/nova']);
+  }
+}

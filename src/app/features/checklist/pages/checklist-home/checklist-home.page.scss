@@ -1,3 +1,5 @@
+@use 'sass:color';
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Manrope:wght@400;500;600;700&display=swap');
 
 $color-primary: #1A1A40;
@@ -230,13 +232,13 @@ $color-red-alert: #BA1A1A;
     &--upload {
       background-color: #000066;
       color: #FFF;
-      &:hover { background-color: lighten(#000066, 10%); }
+      &:hover { background-color: color.adjust(#000066, $lightness: 10%); }
     }
 
     &--view {
       background-color: #E5E7EB;
       color: #374151;
-      &:hover { background-color: darken(#E5E7EB, 5%); }
+      &:hover { background-color: color.adjust(#E5E7EB, $lightness: -5%); }
     }
 
     &--icon-only {

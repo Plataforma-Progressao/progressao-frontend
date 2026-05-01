@@ -31,7 +31,7 @@ export const routes: Routes = [
       },
       {
         path: 'relatorios',
-        loadChildren: () => import('../relatorios/relatorios.routes').then((m) => m.routes),
+        loadChildren: () => import('../reports/reports.routes').then((m) => m.routes),
       },
       {
         path: 'configuracoes',
