@@ -1,5 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpContext } from '@angular/common/http';
+import { SKIP_ERROR_TOAST } from '../http/interceptors/http-error-context.tokens';
 import { map, Observable } from 'rxjs';
 import { ApiSuccessResponse } from '../http/api-envelope.types';
 import {
@@ -10,6 +11,7 @@ import {
   LogoutResponse,
   RegisterPayload,
   TokenPair,
+  UpdateProfileRequest,
 } from './auth.models';
 import { SKIP_AUTH } from './interceptors/auth-context.tokens';
 import { getApiUrl } from '../config/runtime-config';
@@ -63,6 +65,15 @@ export class AuthApiService {
   me(): Observable<AuthResponseUser> {
     return this.http
       .get<ApiSuccessResponse<AuthResponseUser>>(`${this.apiBaseUrl}/users/me`)
+      .pipe(map((response) => response.data));
+  }
+
+  updateProfile(body: UpdateProfileRequest): Observable<AuthResponseUser> {
+    const context = new HttpContext().set(SKIP_ERROR_TOAST, true);
+    return this.http
+      .patch<ApiSuccessResponse<AuthResponseUser>>(`${this.apiBaseUrl}/users/me`, body, {
+        context,
+      })
       .pipe(map((response) => response.data));
   }
 }

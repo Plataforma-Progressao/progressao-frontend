@@ -4,47 +4,46 @@ import { map, Observable } from 'rxjs';
 import { ApiSuccessResponse } from '../../core/http/api-envelope.types';
 import { getApiUrl } from '../../core/config/runtime-config';
 import {
-  AtividadeComprovanteUploadResponse,
-  AtividadeCreatePayload,
-  AtividadeCreateResponse,
-  AtividadeScoreEstimate,
-  AtividadeScoreEstimateRequest,
-} from './models/atividade-create.models';
+  ActivityCreatePayload,
+  ActivityCreateResponse,
+  ActivityEvidenceUploadResponse,
+  ActivityScoreEstimate,
+  ActivityScoreEstimateRequest,
+} from './models/activity-create.models';
 
 @Injectable({ providedIn: 'root' })
-export class AtividadesApiService {
+export class ActivitiesApiService {
   private readonly http = inject(HttpClient);
   private readonly apiBaseUrl = `${getApiUrl().replace(/\/+$/, '')}/api`;
 
-  createAtividade(payload: AtividadeCreatePayload): Observable<AtividadeCreateResponse> {
+  createActivity(payload: ActivityCreatePayload): Observable<ActivityCreateResponse> {
     return this.http
-      .post<ApiSuccessResponse<AtividadeCreateResponse>>(`${this.apiBaseUrl}/atividades`, payload)
+      .post<ApiSuccessResponse<ActivityCreateResponse>>(`${this.apiBaseUrl}/atividades`, payload)
       .pipe(map((response) => response.data));
   }
 
-  uploadComprovante(file: File): Observable<AtividadeComprovanteUploadResponse> {
+  uploadEvidence(file: File): Observable<ActivityEvidenceUploadResponse> {
     const formData = new FormData();
     formData.append('file', file);
 
     return this.http
-      .post<ApiSuccessResponse<AtividadeComprovanteUploadResponse>>(
+      .post<ApiSuccessResponse<ActivityEvidenceUploadResponse>>(
         `${this.apiBaseUrl}/atividades/comprovantes`,
         formData,
       )
       .pipe(map((response) => response.data));
   }
 
-  deleteComprovante(comprovanteId: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiBaseUrl}/atividades/comprovantes/${comprovanteId}`);
+  deleteEvidence(evidenceId: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiBaseUrl}/atividades/comprovantes/${evidenceId}`);
   }
 
-  estimatePontuacao(payload: AtividadeScoreEstimateRequest): Observable<AtividadeScoreEstimate> {
+  estimateScore(payload: ActivityScoreEstimateRequest): Observable<ActivityScoreEstimate> {
     return this.http
-      .post<ApiSuccessResponse<AtividadeScoreEstimate>>(
+      .post<ApiSuccessResponse<ActivityScoreEstimate>>(
         `${this.apiBaseUrl}/atividades/pontuacao/estimativa`,
         payload,
       )
       .pipe(map((response) => response.data));
   }
 }
-

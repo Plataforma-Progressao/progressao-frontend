@@ -12,22 +12,22 @@ import { ButtonComponent } from '../../../../shared/components/base/button/butto
 import { InputComponent } from '../../../../shared/components/base/input/input.component';
 import { StatusIndicatorComponent } from '../../../../shared/components/base/status-indicator/status-indicator.component';
 
-type AtividadeCategoria = 'Pesquisa' | 'Ensino' | 'Extensão' | 'Gestão';
-type AtividadeStatus = 'Validado' | 'Pendente' | 'Erro';
+type UiActivityCategory = 'Pesquisa' | 'Ensino' | 'Extensão' | 'Gestão';
+type UiActivityStatus = 'Validado' | 'Pendente' | 'Erro';
 
-interface AtividadeRow {
+interface ActivityListRow {
   readonly id: string;
   readonly title: string;
   readonly subtitle: string;
-  readonly categoria: AtividadeCategoria;
+  readonly categoria: UiActivityCategory;
   readonly score: number;
-  readonly status: AtividadeStatus;
+  readonly status: UiActivityStatus;
 }
 
 const ALL_TABS = ['Todas Atividades', 'Ensino', 'Pesquisa', 'Extensão', 'Gestão'] as const;
-type AtividadesTab = (typeof ALL_TABS)[number];
+type ActivitiesListTab = (typeof ALL_TABS)[number];
 
-const STATUS_OPTIONS: ReadonlyArray<{ label: string; value: 'Todos' | AtividadeStatus }> = [
+const STATUS_OPTIONS: readonly { label: string; value: 'Todos' | UiActivityStatus }[] = [
   { label: 'Todos', value: 'Todos' },
   { label: 'Validado', value: 'Validado' },
   { label: 'Pendente', value: 'Pendente' },
@@ -35,7 +35,7 @@ const STATUS_OPTIONS: ReadonlyArray<{ label: string; value: 'Todos' | AtividadeS
 ];
 
 @Component({
-  selector: 'app-atividades-page',
+  selector: 'app-activities-page',
   imports: [
     ReactiveFormsModule,
     MatButtonModule,
@@ -52,16 +52,16 @@ const STATUS_OPTIONS: ReadonlyArray<{ label: string; value: 'Todos' | AtividadeS
   styleUrls: ['./atividades.page.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AtividadesPage {
+export class ActivitiesPage {
   private readonly router = inject(Router);
 
   protected readonly tabs = ALL_TABS;
   protected readonly statusOptions = STATUS_OPTIONS;
 
-  protected readonly activeTab = signal<AtividadesTab>('Todas Atividades');
+  protected readonly activeTab = signal<ActivitiesListTab>('Todas Atividades');
 
   protected readonly queryControl = new FormControl('', { nonNullable: true });
-  protected readonly statusControl = new FormControl<'Todos' | AtividadeStatus>('Todos', { nonNullable: true });
+  protected readonly statusControl = new FormControl<'Todos' | UiActivityStatus>('Todos', { nonNullable: true });
 
   protected readonly query = toSignal(this.queryControl.valueChanges, {
     initialValue: this.queryControl.value,
@@ -76,7 +76,7 @@ export class AtividadesPage {
   protected readonly totalItems = signal(42);
   protected readonly displayedColumns = ['title', 'categoria', 'score', 'status', 'actions'] as const;
 
-  protected readonly rows = signal<readonly AtividadeRow[]>([
+  protected readonly rows = signal<readonly ActivityListRow[]>([
     {
       id: 'artigo-deep-learning',
       title: 'Artigo: Deep Learning in Academic Workflows',
@@ -135,15 +135,15 @@ export class AtividadesPage {
     });
   });
 
-  protected tabButtonVariant(tab: AtividadesTab): 'secondary' | 'tertiary' {
+  protected tabButtonVariant(tab: ActivitiesListTab): 'secondary' | 'tertiary' {
     return this.activeTab() === tab ? 'secondary' : 'tertiary';
   }
 
-  protected tabButtonCurrent(tab: AtividadesTab): string | null {
+  protected tabButtonCurrent(tab: ActivitiesListTab): string | null {
     return this.activeTab() === tab ? 'page' : null;
   }
 
-  protected categoriaBadgeVariant(categoria: AtividadeCategoria): 'success' | 'info' | 'warning' | 'secondary' {
+  protected categoriaBadgeVariant(categoria: UiActivityCategory): 'success' | 'info' | 'warning' | 'secondary' {
     switch (categoria) {
       case 'Pesquisa':
         return 'success';
@@ -156,7 +156,7 @@ export class AtividadesPage {
     }
   }
 
-  protected statusToIndicatorStatus(status: AtividadeStatus): 'success' | 'pending' | 'error' {
+  protected statusToIndicatorStatus(status: UiActivityStatus): 'success' | 'pending' | 'error' {
     switch (status) {
       case 'Validado':
         return 'success';
@@ -175,7 +175,7 @@ export class AtividadesPage {
     return this.pageIndex() === page ? 'page' : null;
   }
 
-  protected setTab(tab: AtividadesTab): void {
+  protected setTab(tab: ActivitiesListTab): void {
     this.activeTab.set(tab);
     this.pageIndex.set(1);
   }

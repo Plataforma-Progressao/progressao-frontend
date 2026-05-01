@@ -27,8 +27,18 @@ export interface AuthResponseUser {
   readonly email: string;
   readonly name: string;
   readonly role: AuthRole;
+  readonly lattesUrl: string | null;
+  readonly orcid: string | null;
   readonly createdAt: string;
   readonly updatedAt: string;
+}
+
+export interface UpdateProfileRequest {
+  readonly name?: string;
+  readonly lattesUrl?: string;
+  readonly orcid?: string;
+  readonly currentPassword?: string;
+  readonly newPassword?: string;
 }
 
 export interface AuthResponse {

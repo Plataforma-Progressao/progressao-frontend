@@ -6,12 +6,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router, RouterLink } from '@angular/router';
 import { catchError, EMPTY } from 'rxjs';
-import { AtividadesApiService } from '../../atividades-api.service';
+import { ActivitiesApiService } from '../../activities-api.service';
 import {
-  AtividadeCategoria,
-  AtividadeCreatePayload,
-  AtividadeScoreEstimate,
-} from '../../models/atividade-create.models';
+  ActivityCategoryCode,
+  ActivityCreatePayload,
+  ActivityScoreEstimate,
+} from '../../models/activity-create.models';
 
 interface UploadItem {
   readonly localId: string;
@@ -21,24 +21,24 @@ interface UploadItem {
   readonly serverId?: string;
 }
 
-interface CategoriaOption {
+interface CategoryOption {
   readonly label: string;
-  readonly value: AtividadeCategoria;
+  readonly value: ActivityCategoryCode;
 }
 
 @Component({
-  selector: 'app-atividade-create-page',
+  selector: 'app-activity-create-page',
   imports: [ReactiveFormsModule, MatIconModule, RouterLink],
   templateUrl: './atividade-create.page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AtividadeCreatePage {
+export class ActivityCreatePage {
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
   private readonly snackBar = inject(MatSnackBar);
-  private readonly atividadesApi = inject(AtividadesApiService);
+  private readonly activitiesApi = inject(ActivitiesApiService);
 
-  protected readonly categoriaOptions: readonly CategoriaOption[] = [
+  protected readonly categoriaOptions: readonly CategoryOption[] = [
     { label: 'Ensino', value: 'ENSINO' },
     { label: 'Pesquisa', value: 'PESQUISA' },
     { label: 'Extensão', value: 'EXTENSAO' },
@@ -47,7 +47,7 @@ export class AtividadeCreatePage {
 
   protected readonly form = this.fb.nonNullable.group({
     titulo: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(160)]],
-    categoria: ['' as AtividadeCategoria | '', [Validators.required]],
+    categoria: ['' as ActivityCategoryCode | '', [Validators.required]],
     cargaHoraria: [0, [Validators.required, Validators.min(0), Validators.max(999)]],
     descricao: ['', [Validators.required, Validators.minLength(20), Validators.maxLength(1200)]],
   });
@@ -55,7 +55,7 @@ export class AtividadeCreatePage {
   protected readonly uploads = signal<readonly UploadItem[]>([]);
   protected readonly dragging = signal(false);
   protected readonly submitting = signal(false);
-  protected readonly scoreEstimate = signal<AtividadeScoreEstimate>({
+  protected readonly scoreEstimate = signal<ActivityScoreEstimate>({
     baseCategoria: 15,
     fatorCargaHoraria: 2.5,
     impactoTotal: 17.5,
@@ -115,8 +115,8 @@ export class AtividadeCreatePage {
       return;
     }
 
-    this.atividadesApi
-      .deleteComprovante(item.serverId)
+    this.activitiesApi
+      .deleteEvidence(item.serverId)
       .pipe(
         catchError(() => {
           this.snackBar.open('Falha ao remover comprovante no servidor.', 'Fechar', { duration: 4000 });
@@ -140,9 +140,9 @@ export class AtividadeCreatePage {
     }
 
     const raw = this.form.getRawValue();
-    const payload: AtividadeCreatePayload = {
+    const payload: ActivityCreatePayload = {
       titulo: raw.titulo.trim(),
-      categoria: raw.categoria as AtividadeCategoria,
+      categoria: raw.categoria as ActivityCategoryCode,
       cargaHoraria: raw.cargaHoraria,
       descricao: raw.descricao.trim(),
       comprovantes: this.uploads()
@@ -151,7 +151,7 @@ export class AtividadeCreatePage {
     };
 
     this.submitting.set(true);
-    this.atividadesApi.createAtividade(payload).subscribe({
+    this.activitiesApi.createActivity(payload).subscribe({
       next: () => {
         this.submitting.set(false);
         this.snackBar.open('Atividade registrada com sucesso.', 'Fechar', { duration: 3000 });
@@ -206,7 +206,7 @@ export class AtividadeCreatePage {
 
       this.uploads.update((uploads) => [...uploads, pending]);
 
-      this.atividadesApi.uploadComprovante(file).subscribe({
+      this.activitiesApi.uploadEvidence(file).subscribe({
         next: (response) => {
           this.uploads.update((uploads) =>
             uploads.map((upload) =>
@@ -245,16 +245,16 @@ export class AtividadeCreatePage {
 
     if (!categoria || cargaHoraria <= 0) {
       this.scoreEstimate.set({
-        baseCategoria: this.baseScoreForCategory(categoria as AtividadeCategoria | ''),
+        baseCategoria: this.baseScoreForCategory(categoria as ActivityCategoryCode | ''),
         fatorCargaHoraria: 0,
-        impactoTotal: this.baseScoreForCategory(categoria as AtividadeCategoria | ''),
+        impactoTotal: this.baseScoreForCategory(categoria as ActivityCategoryCode | ''),
         percentualMeta: 0,
       });
       return;
     }
 
-    this.atividadesApi
-      .estimatePontuacao({ categoria, cargaHoraria })
+    this.activitiesApi
+      .estimateScore({ categoria, cargaHoraria })
       .pipe(
         catchError(() => {
           const fallback = this.calculateFallbackEstimate(categoria, cargaHoraria);
@@ -266,9 +266,9 @@ export class AtividadeCreatePage {
   }
 
   private calculateFallbackEstimate(
-    categoria: AtividadeCategoria,
+    categoria: ActivityCategoryCode,
     cargaHoraria: number,
-  ): AtividadeScoreEstimate {
+  ): ActivityScoreEstimate {
     const baseCategoria = this.baseScoreForCategory(categoria);
     const fatorCargaHoraria = Math.max(0, Number((cargaHoraria * 0.0625).toFixed(1)));
     const impactoTotal = Number((baseCategoria + fatorCargaHoraria).toFixed(1));
@@ -282,7 +282,7 @@ export class AtividadeCreatePage {
     };
   }
 
-  private baseScoreForCategory(categoria: AtividadeCategoria | ''): number {
+  private baseScoreForCategory(categoria: ActivityCategoryCode | ''): number {
     switch (categoria) {
       case 'ENSINO':
         return 10;

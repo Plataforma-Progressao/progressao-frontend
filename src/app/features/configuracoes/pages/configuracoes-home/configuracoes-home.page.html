@@ -1,111 +1,182 @@
 <div class="config-home">
   <h1 class="config-home__title">Configurações</h1>
 
-  <div class="config-home__card">
-    <aside class="config-home__info-side">
-      <div class="config-home__avatar-section">
-        <div class="config-home__avatar-wrapper">
-          <img src="https://ui-avatars.com/api/?name=Ana+Souza&background=1B2359&color=fff&size=200" alt="Avatar" class="config-home__avatar-img">
-        </div>
-        <button type="button" class="config-home__btn-edit-photo">
-          Editar Foto
-        </button>
-      </div>
-    </aside>
-
-    <section class="config-home__form-side">
-      <form [formGroup]="configForm" class="config-home__form">
-
-        <div class="config-home__form-group">
-          <label class="config-home__form-label">Nome completo </label>
-          <div class="config-home__input-wrapper">
-            <input type="text" 
-              class="config-home__form-input" 
-              formControlName="nome">
+  @if (isLoading()) {
+    <p class="config-home__status" role="status">Carregando seus dados...</p>
+  } @else if (loadError()) {
+    <div class="config-home__status config-home__status--error" role="alert">
+      Não foi possível carregar o perfil agora.
+      <button type="button" class="config-home__retry" (click)="profileResource.reload()">
+        Tentar novamente
+      </button>
+    </div>
+  } @else if (profileResource.hasValue()) {
+    <div class="config-home__card">
+      <div class="config-home__layout">
+        <aside class="config-home__aside" aria-label="Identificação do perfil">
+          <div class="config-home__avatar" aria-hidden="true">
+            {{ avatarInitials() }}
           </div>
-        </div>
+        </aside>
 
-        <div class="config-home__form-group">
-          <label class="config-home__form-label">E-mail institucional </label>
-          <div class="config-home__input-wrapper">
-            <input type="email" 
-              class="config-home__form-input config-home__form-input--has-icon-right" 
-              formControlName="email"
-              autocomplete="off">
-            <mat-icon class="config-home__input-icon config-home__input-icon--right">alternate_email</mat-icon>
-          </div>
-        </div>
+        <div class="config-home__main">
+          <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="config-home__form" novalidate>
+            <app-input
+              formControlName="name"
+              label="Nome completo"
+              placeholder="Seu nome como no cadastro"
+              prefixIcon="person_outline"
+              [control]="profileForm.controls.name"
+              errorMessage="Informe seu nome (mínimo 2 caracteres)."
+            />
 
-        <div class="config-home__form-grid">
-          <div class="config-home__form-group">
-            <label class="config-home__form-label">Senha</label>
-            <div class="config-home__input-wrapper">
-              <mat-icon class="config-home__input-icon config-home__input-icon--left">lock_outline</mat-icon>
-              <input 
-                [type]="hideSenha ? 'password' : 'text'" 
-                formControlName="senha"
-                class="config-home__form-input config-home__form-input--has-icon-left config-home__form-input--has-icon-right" >
-              <button type="button" class="config-home__password-toggle" (click)="hideSenha = !hideSenha" title="Mostrar/Esconder senha">
-                <mat-icon class="config-home__input-icon config-home__input-icon--right">
-                  {{ hideSenha ? 'visibility_off' : 'visibility' }}
-                </mat-icon>
-              </button>
+            <div
+              class="config-home__email-field"
+              [matTooltip]="emailFieldTooltip"
+              matTooltipPosition="above"
+              tabindex="0"
+            >
+              <app-input
+                formControlName="email"
+                label="E-mail institucional"
+                type="email"
+                prefixIcon="alternate_email"
+                [disabledInput]="true"
+                [control]="profileForm.controls.email"
+              />
             </div>
-          </div>
 
-          <div class="config-home__form-group">
-            <label class="config-home__form-label">Confirmar Senha</label>
-            <div class="config-home__input-wrapper">
-              <mat-icon class="config-home__input-icon config-home__input-icon--left">lock_outline</mat-icon>
-                <input 
-                  [type]="hideConfirmarSenha ? 'password' : 'text'" 
-                  formControlName="confirmarSenha"
-                  class="config-home__form-input config-home__form-input--has-icon-left config-home__form-input--has-icon-right">
-                
-                <button type="button" class="config-home__password-toggle" (click)="hideConfirmarSenha = !hideConfirmarSenha" title="Mostrar/Esconder senha">
-                  <mat-icon class="config-home__input-icon config-home__input-icon--right">
-                    {{ hideConfirmarSenha ? 'visibility_off' : 'visibility' }}
-                  </mat-icon>
-                </button>
-            </div>
-          </div>
-        </div>
+            <div class="config-home__password-block">
+              <h2 class="config-home__section-title">Alterar senha</h2>
+              <p class="config-home__section-hint">
+                Preencha apenas se quiser definir uma nova senha.
+              </p>
 
-        <div class="config-home__form-group">
-          <label class="config-home__form-label">Currículo Lattes</label>
-          <div class="config-home__input-wrapper">
-            <input type="text" 
-              class="config-home__form-input config-home__form-input--has-icon-right" 
-              formControlName="lattes">
-            <div class="config-home__input-actions config-home__input-actions--right">
-              <button type="button" title="Abrir link">
-                <mat-icon>open_in_new</mat-icon>
-              </button>
-            </div>
-          </div>
-        </div>
+              <app-input
+                formControlName="currentPassword"
+                label="Senha atual"
+                [type]="hideCurrentPassword() ? 'password' : 'text'"
+                placeholder="••••••••"
+                prefixIcon="lock_outline"
+                [suffixIcon]="hideCurrentPassword() ? 'visibility' : 'visibility_off'"
+                [suffixIconAriaLabel]="
+                  hideCurrentPassword() ? 'Mostrar senha atual' : 'Ocultar senha atual'
+                "
+                [suffixAction]="true"
+                (suffixClicked)="toggleCurrentPasswordVisibility()"
+                [control]="profileForm.controls.currentPassword"
+              />
 
-        <div class="config-home__form-group">
-          <label class="config-home__form-label">ORCID</label>
-          <div class="config-home__input-wrapper">
-            <div class="config-home__input-icon config-home__input-icon--left config-home__input-icon--brand">
-              <img src="https://orcid.org/sites/default/files/images/orcid_16x16.png" alt="ORCID logo">
-            </div>
-              <input type="text" 
-                class="config-home__form-input config-home__form-input--has-icon-left config-home__form-input--has-actions-right" 
-                formControlName="orcid">
-              <div class="config-home__input-actions config-home__input-actions--right">
-                <button type="button" title="Copiar"><mat-icon>content_copy</mat-icon></button>
-                <button type="button" title="Abrir link"><mat-icon>open_in_new</mat-icon></button>
+              <div class="config-home__form-grid">
+                <app-input
+                  formControlName="newPassword"
+                  label="Nova senha"
+                  [type]="hideNewPassword() ? 'password' : 'text'"
+                  placeholder="Mínimo 8 caracteres"
+                  prefixIcon="lock_outline"
+                  [suffixIcon]="hideNewPassword() ? 'visibility' : 'visibility_off'"
+                  [suffixIconAriaLabel]="
+                    hideNewPassword() ? 'Mostrar nova senha' : 'Ocultar nova senha'
+                  "
+                  [suffixAction]="true"
+                  (suffixClicked)="toggleNewPasswordVisibility()"
+                  [control]="profileForm.controls.newPassword"
+                />
+
+                <app-input
+                  formControlName="confirmNewPassword"
+                  label="Confirmar nova senha"
+                  [type]="hideConfirmPassword() ? 'password' : 'text'"
+                  placeholder="Repita a nova senha"
+                  prefixIcon="lock_outline"
+                  [suffixIcon]="hideConfirmPassword() ? 'visibility' : 'visibility_off'"
+                  [suffixIconAriaLabel]="
+                    hideConfirmPassword() ? 'Mostrar confirmação' : 'Ocultar confirmação'
+                  "
+                  [suffixAction]="true"
+                  (suffixClicked)="toggleConfirmPasswordVisibility()"
+                  [control]="profileForm.controls.confirmNewPassword"
+                />
               </div>
-          </div>
-        </div>
-      </form>
-    </section>
-  </div>
+            </div>
 
-  <div class="config-home__actions">
-    <button type="button" class="config-home__btn-cancel">Cancelar</button>
-     <button type="button" (click)="salvarAlteracoes()" class="config-home__btn-save">Salvar Alterações</button>
-  </div>
+            <div class="config-home__field-row">
+              <app-input
+                class="config-home__field-grow"
+                formControlName="lattesUrl"
+                label="Currículo Lattes"
+                placeholder="URL do seu Currículo Lattes"
+                prefixIcon="link"
+                hint="Cole o endereço completo ou o caminho após o domínio."
+                [control]="profileForm.controls.lattesUrl"
+              />
+              <button
+                mat-icon-button
+                type="button"
+                class="config-home__action-icon"
+                matTooltip="Abrir o Currículo Lattes em uma nova aba"
+                matTooltipPosition="above"
+                aria-label="Abrir Currículo Lattes em nova aba"
+                (click)="openLattesInNewTab()"
+              >
+                <mat-icon aria-hidden="true">open_in_new</mat-icon>
+              </button>
+            </div>
+
+            <div class="config-home__field-row">
+              <app-input
+                class="config-home__field-grow"
+                formControlName="orcid"
+                label="ORCID iD"
+                placeholder="0000-0000-0000-0000"
+                prefixIcon="badge"
+                hint="Identificador ORCID (números e hífens)."
+                [control]="profileForm.controls.orcid"
+              />
+              <button
+                mat-icon-button
+                type="button"
+                class="config-home__action-icon"
+                matTooltip="Copiar o ORCID iD"
+                matTooltipPosition="above"
+                aria-label="Copiar ORCID"
+                (click)="copyOrcid()"
+              >
+                <mat-icon aria-hidden="true">content_copy</mat-icon>
+              </button>
+              <button
+                mat-icon-button
+                type="button"
+                class="config-home__action-icon"
+                matTooltip="Abrir o perfil ORCID em uma nova aba"
+                matTooltipPosition="above"
+                aria-label="Abrir perfil ORCID em nova aba"
+                (click)="openOrcidInNewTab()"
+              >
+                <mat-icon aria-hidden="true">open_in_new</mat-icon>
+              </button>
+            </div>
+
+            <div class="config-home__actions">
+              <app-button
+                variant="tertiary"
+                type="button"
+                label="Cancelar"
+                [disabled]="saving()"
+                (clicked)="onCancel()"
+              />
+              <app-button
+                variant="primary"
+                type="submit"
+                label="Salvar alterações"
+                icon="check"
+                [loading]="saving()"
+                [disabled]="saving()"
+              />
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  }
 </div>
