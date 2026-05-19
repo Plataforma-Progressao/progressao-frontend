@@ -12,9 +12,11 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
 import { Router } from '@angular/router';
+import { finalize } from 'rxjs';
 import { ActivitiesApiService } from '../../activities-api.service';
 import { ActivityListItem } from '../../models/activity-create.models';
 import { BadgeComponent } from '../../../../shared/components/base/badge/badge.component';
@@ -51,6 +53,7 @@ const STATUS_OPTIONS: readonly { label: string; value: 'Todos' | UiActivityStatu
     MatButtonModule,
     MatFormFieldModule,
     MatIconModule,
+    MatProgressSpinnerModule,
     MatSelectModule,
     MatTableModule,
     ButtonComponent,
@@ -89,6 +92,8 @@ export class ActivitiesPage {
   protected readonly pageIndex = signal(1);
   protected readonly totalPages = signal(3);
   protected readonly totalItems = signal(0);
+  protected readonly loadingActivities = signal(false);
+  protected readonly loadErrorMessage = signal<string | null>(null);
   protected readonly displayedColumns = [
     'title',
     'categoria',
@@ -128,6 +133,20 @@ export class ActivitiesPage {
       );
     });
   });
+
+  protected readonly isEmptyState = computed(
+    () => !this.loadingActivities() && this.rows().length === 0,
+  );
+
+  protected readonly emptyStateTitle = computed(() =>
+    this.rows().length === 0 ? 'Nenhuma atividade cadastrada' : 'Nenhuma atividade encontrada',
+  );
+
+  protected readonly emptyStateDescription = computed(() =>
+    this.rows().length === 0
+      ? 'Cadastre sua primeira atividade para começar a acompanhar a progressão funcional.'
+      : 'Ajuste a busca ou os filtros para encontrar atividades registradas anteriormente.',
+  );
 
   protected tabButtonVariant(tab: ActivitiesListTab): 'secondary' | 'tertiary' {
     return this.activeTab() === tab ? 'secondary' : 'tertiary';
@@ -194,6 +213,10 @@ export class ActivitiesPage {
     void this.router.navigate(['/atividades/nova']);
   }
 
+  protected retryLoadActivities(): void {
+    this.loadActivities();
+  }
+
   protected openEditActivity(activityId: string): void {
     void this.router.navigate(['/atividades/editar', activityId]);
   }
@@ -216,9 +239,15 @@ export class ActivitiesPage {
   }
 
   private loadActivities(): void {
+    this.loadingActivities.set(true);
+    this.loadErrorMessage.set(null);
+
     this.activitiesApiService
       .getActivities()
-      .pipe(takeUntilDestroyed(this.destroyRef))
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.loadingActivities.set(false)),
+      )
       .subscribe({
         next: (activities) => {
           const mapped = activities.map((activity) => this.mapActivity(activity));
@@ -227,9 +256,7 @@ export class ActivitiesPage {
           this.totalPages.set(Math.max(1, Math.ceil(mapped.length / 10)));
         },
         error: () => {
-          this.snackBar.open('Não foi possível carregar as atividades.', 'Fechar', {
-            duration: 4000,
-          });
+          this.loadErrorMessage.set('Não foi possível carregar as atividades no momento.');
         },
       });
   }

@@ -10,6 +10,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { EMPTY, catchError, firstValueFrom } from 'rxjs';
@@ -37,7 +38,7 @@ interface CategoryOption {
 
 @Component({
   selector: 'app-activity-create-page',
-  imports: [ReactiveFormsModule, MatIconModule, RouterLink],
+  imports: [ReactiveFormsModule, MatIconModule, MatProgressSpinnerModule, RouterLink],
   templateUrl: './atividade-create.page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -69,6 +70,7 @@ export class ActivityCreatePage {
   protected readonly dragging = signal(false);
   protected readonly submitting = signal(false);
   protected readonly loadingActivity = signal(false);
+  protected readonly loadErrorMessage = signal<string | null>(null);
   protected readonly scoreEstimate = signal<ActivityScoreEstimate>({
     baseCategory: 15,
     workloadFactor: 2.5,
@@ -86,7 +88,17 @@ export class ActivityCreatePage {
       : 'Registre suas atividades de pesquisa, ensino ou extensão para o cálculo do progresso funcional.',
   );
   protected readonly submitLabel = computed(() =>
-    this.isEditMode() ? 'Salvar Alterações' : 'Confirmar Registro',
+    this.loadingActivity()
+      ? 'Carregando...'
+      : this.submitting()
+        ? 'Salvando...'
+        : this.isEditMode()
+          ? 'Salvar Alterações'
+          : 'Confirmar Registro',
+  );
+
+  protected readonly isFormLocked = computed(
+    () => this.loadingActivity() || this.submitting() || Boolean(this.loadErrorMessage()),
   );
 
   protected readonly scoreBarWidth = computed(
@@ -94,7 +106,7 @@ export class ActivityCreatePage {
   );
 
   protected readonly canSubmit = computed(() => {
-    if (this.submitting() || this.loadingActivity() || this.form.invalid) {
+    if (this.isFormLocked() || this.form.invalid || this.loadErrorMessage()) {
       return false;
     }
 
@@ -147,6 +159,14 @@ export class ActivityCreatePage {
 
   protected cancel(): void {
     void this.router.navigate(['/atividades']);
+  }
+
+  protected retryLoadActivity(): void {
+    if (!this.activityId) {
+      return;
+    }
+
+    void this.loadActivity(this.activityId);
   }
 
   protected async submit(): Promise<void> {
@@ -313,8 +333,8 @@ export class ActivityCreatePage {
       return fallback;
     }
 
-    const apiMessage = error.error?.message;
-    if (typeof apiMessage === 'string' && apiMessage.trim()) {
+    const apiMessage = this.extractErrorMessage(error.error);
+    if (apiMessage) {
       return apiMessage;
     }
 
@@ -323,18 +343,44 @@ export class ActivityCreatePage {
 
   private async loadActivity(activityId: string): Promise<void> {
     this.loadingActivity.set(true);
+    this.loadErrorMessage.set(null);
 
     try {
       const activity = await firstValueFrom(this.activitiesApi.getActivity(activityId));
       this.patchForm(activity);
-    } catch {
-      this.snackBar.open('Não foi possível carregar a atividade para edição.', 'Fechar', {
-        duration: 4000,
-      });
-      void this.router.navigate(['/atividades']);
+    } catch (error: unknown) {
+      this.loadErrorMessage.set(
+        this.resolveHttpError(error, 'Não foi possível carregar a atividade para edição.'),
+      );
     } finally {
       this.loadingActivity.set(false);
     }
+  }
+
+  private extractErrorMessage(payload: unknown): string | null {
+    if (typeof payload === 'string' && payload.trim()) {
+      return payload.trim();
+    }
+
+    if (payload && typeof payload === 'object') {
+      const record = payload as Record<string, unknown>;
+
+      const directMessage = record['message'];
+      if (typeof directMessage === 'string' && directMessage.trim()) {
+        return directMessage.trim();
+      }
+
+      const nestedError = record['error'];
+      if (nestedError && typeof nestedError === 'object') {
+        const nestedRecord = nestedError as Record<string, unknown>;
+        const nestedMessage = nestedRecord['message'];
+        if (typeof nestedMessage === 'string' && nestedMessage.trim()) {
+          return nestedMessage.trim();
+        }
+      }
+    }
+
+    return null;
   }
 
   private patchForm(activity: ActivityListItem): void {

@@ -58,87 +58,156 @@
     class="overflow-hidden rounded-xl bg-[var(--mat-sys-surface-container)] shadow-[0_0_0_1px_rgba(198,197,212,0.1),0_1px_2px_rgba(0,0,0,0.05)]"
     aria-label="Tabela de atividades"
   >
-    <table mat-table [dataSource]="filteredRows()" class="activities-table w-full">
-      <ng-container matColumnDef="title">
-        <th mat-header-cell *matHeaderCellDef>Título da Atividade</th>
-        <td mat-cell *matCellDef="let row">
-          <div class="activities-title-cell">
-            <div class="text-base font-semibold text-[var(--mat-sys-on-surface)]">
-              {{ row.title }}
+    @if (loadingActivities()) {
+      <div
+        class="flex min-h-[20rem] flex-col items-center justify-center gap-4 px-6 py-12 text-center"
+      >
+        <mat-progress-spinner diameter="44" mode="indeterminate"></mat-progress-spinner>
+        <div class="space-y-1">
+          <p class="text-base font-semibold text-[color:rgb(26_28_29)]">Carregando atividades</p>
+          <p class="text-sm text-[color:rgb(69_70_82)]">Buscando seus registros mais recentes.</p>
+        </div>
+      </div>
+    } @else if (loadErrorMessage()) {
+      <div
+        class="flex min-h-[20rem] flex-col items-center justify-center gap-4 px-6 py-12 text-center"
+      >
+        <div
+          class="grid size-14 place-items-center rounded-full bg-[color:rgba(186,26,26,0.08)] text-[color:var(--mat-sys-error)]"
+        >
+          <mat-icon>error_outline</mat-icon>
+        </div>
+        <div class="space-y-1">
+          <p class="text-base font-semibold text-[color:rgb(26_28_29)]">
+            Não foi possível carregar
+          </p>
+          <p class="max-w-[30rem] text-sm text-[color:rgb(69_70_82)]">
+            {{ loadErrorMessage() }}
+          </p>
+        </div>
+        <div class="flex items-center gap-3">
+          <button
+            type="button"
+            class="rounded-full bg-[var(--mat-sys-primary)] px-5 py-2 text-sm font-semibold text-white"
+            (click)="retryLoadActivities()"
+          >
+            Tentar novamente
+          </button>
+          <button
+            type="button"
+            class="rounded-full px-5 py-2 text-sm font-semibold text-[color:var(--mat-sys-primary)]"
+            (click)="openCreateActivity()"
+          >
+            Adicionar atividade
+          </button>
+        </div>
+      </div>
+    } @else if (isEmptyState()) {
+      <div
+        class="flex min-h-[20rem] flex-col items-center justify-center gap-4 px-6 py-12 text-center"
+      >
+        <div
+          class="grid size-14 place-items-center rounded-full bg-[color:rgba(0,6,102,0.08)] text-[color:var(--mat-sys-primary)]"
+        >
+          <mat-icon>assignment</mat-icon>
+        </div>
+        <div class="space-y-1">
+          <p class="text-base font-semibold text-[color:rgb(26_28_29)]">{{ emptyStateTitle() }}</p>
+          <p class="max-w-[30rem] text-sm text-[color:rgb(69_70_82)]">
+            {{ emptyStateDescription() }}
+          </p>
+        </div>
+        <button
+          type="button"
+          class="rounded-full bg-[var(--mat-sys-primary)] px-5 py-2 text-sm font-semibold text-white"
+          (click)="openCreateActivity()"
+        >
+          Adicionar atividade
+        </button>
+      </div>
+    } @else {
+      <table mat-table [dataSource]="filteredRows()" class="activities-table w-full">
+        <ng-container matColumnDef="title">
+          <th mat-header-cell *matHeaderCellDef>Título da Atividade</th>
+          <td mat-cell *matCellDef="let row">
+            <div class="activities-title-cell">
+              <div class="text-base font-semibold text-[var(--mat-sys-on-surface)]">
+                {{ row.title }}
+              </div>
+              <div class="text-xs leading-4 text-[color:rgb(69_70_82)]">{{ row.subtitle }}</div>
             </div>
-            <div class="text-xs leading-4 text-[color:rgb(69_70_82)]">{{ row.subtitle }}</div>
-          </div>
-        </td>
-      </ng-container>
+          </td>
+        </ng-container>
 
-      <ng-container matColumnDef="categoria">
-        <th mat-header-cell *matHeaderCellDef class="text-center">Categoria</th>
-        <td mat-cell *matCellDef="let row" class="text-center">
-          <app-badge [variant]="categoriaBadgeVariant(row.categoria)">
-            {{ row.categoria }}
-          </app-badge>
-        </td>
-      </ng-container>
+        <ng-container matColumnDef="categoria">
+          <th mat-header-cell *matHeaderCellDef class="text-center">Categoria</th>
+          <td mat-cell *matCellDef="let row" class="text-center">
+            <app-badge [variant]="categoriaBadgeVariant(row.categoria)">
+              {{ row.categoria }}
+            </app-badge>
+          </td>
+        </ng-container>
 
-      <ng-container matColumnDef="score">
-        <th mat-header-cell *matHeaderCellDef class="text-center">Pontuação</th>
-        <td
-          mat-cell
-          *matCellDef="let row"
-          class="text-center font-mono text-base font-bold text-[var(--mat-sys-on-surface)]"
-        >
-          {{ row.score.toFixed(1) }}
-        </td>
-      </ng-container>
+        <ng-container matColumnDef="score">
+          <th mat-header-cell *matHeaderCellDef class="text-center">Pontuação</th>
+          <td
+            mat-cell
+            *matCellDef="let row"
+            class="text-center font-mono text-base font-bold text-[var(--mat-sys-on-surface)]"
+          >
+            {{ row.score.toFixed(1) }}
+          </td>
+        </ng-container>
 
-      <ng-container matColumnDef="status">
-        <th mat-header-cell *matHeaderCellDef class="text-center">Status</th>
-        <td mat-cell *matCellDef="let row" class="text-center">
-          <app-status-indicator
-            [status]="statusToIndicatorStatus(row.status)"
-            [label]="row.status"
-          ></app-status-indicator>
-        </td>
-      </ng-container>
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef class="text-center">Status</th>
+          <td mat-cell *matCellDef="let row" class="text-center">
+            <app-status-indicator
+              [status]="statusToIndicatorStatus(row.status)"
+              [label]="row.status"
+            ></app-status-indicator>
+          </td>
+        </ng-container>
 
-      <ng-container matColumnDef="actions">
-        <th mat-header-cell *matHeaderCellDef class="text-right">Ações</th>
-        <td mat-cell *matCellDef="let row" class="text-right">
-          <div class="inline-flex items-center gap-1">
-            <button
-              mat-icon-button
-              type="button"
-              class="activities-action-button"
-              [attr.aria-label]="'Editar ' + row.title"
-              (click)="openEditActivity(row.id)"
-            >
-              <mat-icon>edit</mat-icon>
-            </button>
-            <button
-              mat-icon-button
-              type="button"
-              class="activities-action-button text-[color:var(--mat-sys-error)]"
-              [attr.aria-label]="'Excluir ' + row.title"
-              (click)="deleteActivity(row.id)"
-            >
-              <mat-icon>delete</mat-icon>
-            </button>
-          </div>
-        </td>
-      </ng-container>
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef class="text-right">Ações</th>
+          <td mat-cell *matCellDef="let row" class="text-right">
+            <div class="inline-flex items-center gap-1">
+              <button
+                mat-icon-button
+                type="button"
+                class="activities-action-button"
+                [attr.aria-label]="'Editar ' + row.title"
+                (click)="openEditActivity(row.id)"
+              >
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button
+                mat-icon-button
+                type="button"
+                class="activities-action-button text-[color:var(--mat-sys-error)]"
+                [attr.aria-label]="'Excluir ' + row.title"
+                (click)="deleteActivity(row.id)"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </td>
+        </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
 
-      <tr class="mat-mdc-no-data-row" *matNoDataRow>
-        <td
-          [attr.colspan]="displayedColumns.length"
-          class="px-6 py-8 text-sm text-[color:rgb(69_70_82)]"
-        >
-          Nenhuma atividade encontrada para os filtros atuais.
-        </td>
-      </tr>
-    </table>
+        <tr class="mat-mdc-no-data-row" *matNoDataRow>
+          <td
+            [attr.colspan]="displayedColumns.length"
+            class="px-6 py-8 text-sm text-[color:rgb(69_70_82)]"
+          >
+            Nenhuma atividade encontrada para os filtros atuais.
+          </td>
+        </tr>
+      </table>
+    }
 
     <footer
       class="flex flex-col gap-4 border-t border-t-[color:rgba(198,197,212,0.2)] bg-[color:rgba(243_243_245,0.5)] px-6 py-4 lg:flex-row lg:items-center lg:justify-between"
