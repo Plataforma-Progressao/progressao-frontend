@@ -1,19 +1,29 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
 import { Router } from '@angular/router';
+import { ActivitiesApiService } from '../../activities-api.service';
+import { ActivityListItem } from '../../models/activity-create.models';
 import { BadgeComponent } from '../../../../shared/components/base/badge/badge.component';
 import { ButtonComponent } from '../../../../shared/components/base/button/button.component';
 import { InputComponent } from '../../../../shared/components/base/input/input.component';
 import { StatusIndicatorComponent } from '../../../../shared/components/base/status-indicator/status-indicator.component';
 
 type UiActivityCategory = 'Pesquisa' | 'Ensino' | 'Extensão' | 'Gestão';
-type UiActivityStatus = 'Validado' | 'Pendente' | 'Erro';
+type UiActivityStatus = 'Rascunho' | 'Validado' | 'Pendente' | 'Erro';
 
 interface ActivityListRow {
   readonly id: string;
@@ -54,6 +64,9 @@ const STATUS_OPTIONS: readonly { label: string; value: 'Todos' | UiActivityStatu
 })
 export class ActivitiesPage {
   private readonly router = inject(Router);
+  private readonly activitiesApiService = inject(ActivitiesApiService);
+  private readonly snackBar = inject(MatSnackBar);
+  private readonly destroyRef = inject(DestroyRef);
 
   protected readonly tabs = ALL_TABS;
   protected readonly statusOptions = STATUS_OPTIONS;
@@ -61,7 +74,9 @@ export class ActivitiesPage {
   protected readonly activeTab = signal<ActivitiesListTab>('Todas Atividades');
 
   protected readonly queryControl = new FormControl('', { nonNullable: true });
-  protected readonly statusControl = new FormControl<'Todos' | UiActivityStatus>('Todos', { nonNullable: true });
+  protected readonly statusControl = new FormControl<'Todos' | UiActivityStatus>('Todos', {
+    nonNullable: true,
+  });
 
   protected readonly query = toSignal(this.queryControl.valueChanges, {
     initialValue: this.queryControl.value,
@@ -73,41 +88,20 @@ export class ActivitiesPage {
 
   protected readonly pageIndex = signal(1);
   protected readonly totalPages = signal(3);
-  protected readonly totalItems = signal(42);
-  protected readonly displayedColumns = ['title', 'categoria', 'score', 'status', 'actions'] as const;
+  protected readonly totalItems = signal(0);
+  protected readonly displayedColumns = [
+    'title',
+    'categoria',
+    'score',
+    'status',
+    'actions',
+  ] as const;
 
-  protected readonly rows = signal<readonly ActivityListRow[]>([
-    {
-      id: 'artigo-deep-learning',
-      title: 'Artigo: Deep Learning in Academic Workflows',
-      subtitle: 'Periódico Q1 • ISSN 1234-5678',
-      categoria: 'Pesquisa',
-      score: 45.0,
-      status: 'Validado',
-    },
-    {
-      id: 'calculo-diferencial-60h',
-      title: 'Cálculo Diferencial e Integral I (60h)',
-      subtitle: 'Graduação • Turma A',
-      categoria: 'Ensino',
-      score: 20.0,
-      status: 'Pendente',
-    },
-    {
-      id: 'workshop-dados-publicos',
-      title: 'Workshop: Curadoria de Dados Públicos',
-      subtitle: 'Evento Comunitário',
-      categoria: 'Extensão',
-      score: 15.0,
-      status: 'Erro',
-    },
-  ]);
+  protected readonly rows = signal<readonly ActivityListRow[]>([]);
 
-  private readonly resetPagination = effect(() => {
-    this.query();
-    this.statusFilter();
-    this.pageIndex.set(1);
-  });
+  constructor() {
+    this.loadActivities();
+  }
 
   protected readonly filteredRows = computed(() => {
     const activeTab = this.activeTab();
@@ -143,7 +137,9 @@ export class ActivitiesPage {
     return this.activeTab() === tab ? 'page' : null;
   }
 
-  protected categoriaBadgeVariant(categoria: UiActivityCategory): 'success' | 'info' | 'warning' | 'secondary' {
+  protected categoriaBadgeVariant(
+    categoria: UiActivityCategory,
+  ): 'success' | 'info' | 'warning' | 'secondary' {
     switch (categoria) {
       case 'Pesquisa':
         return 'success';
@@ -158,6 +154,7 @@ export class ActivitiesPage {
 
   protected statusToIndicatorStatus(status: UiActivityStatus): 'success' | 'pending' | 'error' {
     switch (status) {
+      case 'Rascunho':
       case 'Validado':
         return 'success';
       case 'Pendente':
@@ -195,5 +192,82 @@ export class ActivitiesPage {
 
   protected openCreateActivity(): void {
     void this.router.navigate(['/atividades/nova']);
+  }
+
+  protected openEditActivity(activityId: string): void {
+    void this.router.navigate(['/atividades/editar', activityId]);
+  }
+
+  protected deleteActivity(activityId: string): void {
+    this.activitiesApiService
+      .deleteActivity(activityId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.rows.update((rows) => rows.filter((row) => row.id !== activityId));
+          this.totalItems.set(this.rows().length);
+          this.totalPages.set(Math.max(1, Math.ceil(this.rows().length / 10)));
+          this.snackBar.open('Atividade removida com sucesso.', 'Fechar', { duration: 3000 });
+        },
+        error: () => {
+          this.snackBar.open('Não foi possível remover a atividade.', 'Fechar', { duration: 4000 });
+        },
+      });
+  }
+
+  private loadActivities(): void {
+    this.activitiesApiService
+      .getActivities()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (activities) => {
+          const mapped = activities.map((activity) => this.mapActivity(activity));
+          this.rows.set(mapped);
+          this.totalItems.set(mapped.length);
+          this.totalPages.set(Math.max(1, Math.ceil(mapped.length / 10)));
+        },
+        error: () => {
+          this.snackBar.open('Não foi possível carregar as atividades.', 'Fechar', {
+            duration: 4000,
+          });
+        },
+      });
+  }
+
+  private mapActivity(activity: ActivityListItem): ActivityListRow {
+    return {
+      id: activity.id,
+      title: activity.title,
+      subtitle: activity.description,
+      categoria: this.mapCategoryLabel(activity.category),
+      score: activity.score,
+      status: this.mapStatusLabel(activity.status),
+    };
+  }
+
+  private mapCategoryLabel(category: ActivityListItem['category']): UiActivityCategory {
+    switch (category) {
+      case 'RESEARCH':
+        return 'Pesquisa';
+      case 'TEACHING':
+        return 'Ensino';
+      case 'OUTREACH':
+        return 'Extensão';
+      case 'MANAGEMENT':
+        return 'Gestão';
+    }
+  }
+
+  private mapStatusLabel(status: ActivityListItem['status']): UiActivityStatus {
+    switch (status) {
+      case 'DRAFT':
+        return 'Rascunho';
+      case 'PENDING':
+        return 'Pendente';
+      case 'APPROVED':
+        return 'Validado';
+      case 'REJECTED':
+        return 'Erro';
+    }
   }
 }

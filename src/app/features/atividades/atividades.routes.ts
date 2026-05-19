@@ -16,10 +16,23 @@ export const routes: Routes = [
       {
         path: 'nova',
         loadComponent: () =>
-          import('./pages/atividade-create/atividade-create.page').then((m) => m.ActivityCreatePage),
+          import('./pages/atividade-create/atividade-create.page').then(
+            (m) => m.ActivityCreatePage,
+          ),
         data: {
           title: 'Nova Atividade Acadêmica',
           description: 'Registre uma nova atividade para cálculo do progresso funcional.',
+        },
+      },
+      {
+        path: 'editar/:id',
+        loadComponent: () =>
+          import('./pages/atividade-create/atividade-create.page').then(
+            (m) => m.ActivityCreatePage,
+          ),
+        data: {
+          title: 'Editar Atividade Acadêmica',
+          description: 'Atualize os dados de uma atividade já registrada.',
         },
       },
     ],

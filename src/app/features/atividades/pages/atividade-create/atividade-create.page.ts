@@ -1,15 +1,23 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Router, RouterLink } from '@angular/router';
-import { catchError, EMPTY } from 'rxjs';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { EMPTY, catchError, firstValueFrom } from 'rxjs';
 import { ActivitiesApiService } from '../../activities-api.service';
 import {
   ActivityCategoryCode,
   ActivityCreatePayload,
+  ActivityListItem,
   ActivityScoreEstimate,
 } from '../../models/activity-create.models';
 
@@ -17,7 +25,8 @@ interface UploadItem {
   readonly localId: string;
   readonly fileName: string;
   readonly sizeBytes: number;
-  readonly status: 'uploading' | 'uploaded' | 'error';
+  readonly file: File;
+  readonly status: 'queued' | 'uploading' | 'uploaded' | 'error';
   readonly serverId?: string;
 }
 
@@ -34,15 +43,19 @@ interface CategoryOption {
 })
 export class ActivityCreatePage {
   private readonly fb = inject(FormBuilder);
+  private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly snackBar = inject(MatSnackBar);
   private readonly activitiesApi = inject(ActivitiesApiService);
+  private readonly destroyRef = inject(DestroyRef);
+
+  private readonly activityId = this.route.snapshot.paramMap.get('id');
 
   protected readonly categoriaOptions: readonly CategoryOption[] = [
-    { label: 'Ensino', value: 'ENSINO' },
-    { label: 'Pesquisa', value: 'PESQUISA' },
-    { label: 'Extensão', value: 'EXTENSAO' },
-    { label: 'Gestão', value: 'GESTAO' },
+    { label: 'Ensino', value: 'TEACHING' },
+    { label: 'Pesquisa', value: 'RESEARCH' },
+    { label: 'Extensão', value: 'OUTREACH' },
+    { label: 'Gestão', value: 'MANAGEMENT' },
   ];
 
   protected readonly form = this.fb.nonNullable.group({
@@ -55,27 +68,47 @@ export class ActivityCreatePage {
   protected readonly uploads = signal<readonly UploadItem[]>([]);
   protected readonly dragging = signal(false);
   protected readonly submitting = signal(false);
+  protected readonly loadingActivity = signal(false);
   protected readonly scoreEstimate = signal<ActivityScoreEstimate>({
-    baseCategoria: 15,
-    fatorCargaHoraria: 2.5,
-    impactoTotal: 17.5,
-    percentualMeta: 12,
+    baseCategory: 15,
+    workloadFactor: 2.5,
+    totalImpact: 17.5,
+    progressPercentage: 12,
   });
 
-  protected readonly scoreBarWidth = computed(() =>
-    `${Math.min(100, Math.max(0, this.scoreEstimate().percentualMeta))}%`,
+  protected readonly isEditMode = computed(() => Boolean(this.activityId));
+  protected readonly pageTitle = computed(() =>
+    this.isEditMode() ? 'Editar Atividade Acadêmica' : 'Nova Atividade Acadêmica',
+  );
+  protected readonly pageDescription = computed(() =>
+    this.isEditMode()
+      ? 'Atualize os dados da atividade e reenvie comprovantes, se necessário.'
+      : 'Registre suas atividades de pesquisa, ensino ou extensão para o cálculo do progresso funcional.',
+  );
+  protected readonly submitLabel = computed(() =>
+    this.isEditMode() ? 'Salvar Alterações' : 'Confirmar Registro',
+  );
+
+  protected readonly scoreBarWidth = computed(
+    () => `${Math.min(100, Math.max(0, this.scoreEstimate().progressPercentage))}%`,
   );
 
   protected readonly canSubmit = computed(() => {
-    if (this.submitting() || this.form.invalid) {
+    if (this.submitting() || this.loadingActivity() || this.form.invalid) {
       return false;
     }
 
-    return this.uploads().every((upload) => upload.status === 'uploaded');
+    return this.uploads().every((upload) => upload.status !== 'error');
   });
 
   constructor() {
-    this.form.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => this.recomputeEstimate());
+    this.form.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.recomputeEstimate());
+
+    if (this.activityId) {
+      void this.loadActivity(this.activityId);
+    }
   }
 
   protected onDragOver(event: DragEvent): void {
@@ -110,27 +143,13 @@ export class ActivityCreatePage {
 
   protected removeUpload(item: UploadItem): void {
     this.uploads.update((uploads) => uploads.filter((upload) => upload.localId !== item.localId));
-
-    if (!item.serverId) {
-      return;
-    }
-
-    this.activitiesApi
-      .deleteEvidence(item.serverId)
-      .pipe(
-        catchError(() => {
-          this.snackBar.open('Falha ao remover comprovante no servidor.', 'Fechar', { duration: 4000 });
-          return EMPTY;
-        }),
-      )
-      .subscribe();
   }
 
   protected cancel(): void {
     void this.router.navigate(['/atividades']);
   }
 
-  protected submit(): void {
+  protected async submit(): Promise<void> {
     if (!this.canSubmit()) {
       this.form.markAllAsTouched();
       this.snackBar.open('Revise os campos obrigatórios antes de confirmar o registro.', 'Fechar', {
@@ -141,33 +160,45 @@ export class ActivityCreatePage {
 
     const raw = this.form.getRawValue();
     const payload: ActivityCreatePayload = {
-      titulo: raw.titulo.trim(),
-      categoria: raw.categoria as ActivityCategoryCode,
-      cargaHoraria: raw.cargaHoraria,
-      descricao: raw.descricao.trim(),
-      comprovantes: this.uploads()
-        .filter((upload) => upload.status === 'uploaded' && upload.serverId)
-        .map((upload) => upload.serverId as string),
+      title: raw.titulo.trim(),
+      category: raw.categoria as ActivityCategoryCode,
+      workloadHours: raw.cargaHoraria,
+      description: raw.descricao.trim(),
     };
 
     this.submitting.set(true);
-    this.activitiesApi.createActivity(payload).subscribe({
-      next: () => {
-        this.submitting.set(false);
-        this.snackBar.open('Atividade registrada com sucesso.', 'Fechar', { duration: 3000 });
-        void this.router.navigate(['/atividades']);
-      },
-      error: (error: unknown) => {
-        this.submitting.set(false);
-        const message = this.resolveHttpError(error, 'Não foi possível confirmar o registro da atividade.');
-        this.snackBar.open(message, 'Fechar', { duration: 4500 });
-      },
-    });
+
+    try {
+      const activity = this.activityId
+        ? await firstValueFrom(this.activitiesApi.updateActivity(this.activityId, payload))
+        : await firstValueFrom(this.activitiesApi.createActivity(payload));
+
+      await this.uploadQueuedFiles(activity);
+
+      this.snackBar.open(
+        this.activityId ? 'Atividade atualizada com sucesso.' : 'Atividade registrada com sucesso.',
+        'Fechar',
+        { duration: 3000 },
+      );
+      void this.router.navigate(['/atividades']);
+    } catch (error: unknown) {
+      const message = this.resolveHttpError(
+        error,
+        this.activityId
+          ? 'Não foi possível salvar as alterações da atividade.'
+          : 'Não foi possível confirmar o registro da atividade.',
+      );
+      this.snackBar.open(message, 'Fechar', { duration: 4500 });
+    } finally {
+      this.submitting.set(false);
+    }
   }
 
   protected uploadStatusClass(status: UploadItem['status']): string {
     const base = 'text-[0.8125rem] leading-[1.125rem]';
     switch (status) {
+      case 'queued':
+        return `${base} text-[color:rgb(118_118_131)]`;
       case 'uploading':
         return `${base} text-[color:rgb(65_68_103)]`;
       case 'uploaded':
@@ -179,6 +210,8 @@ export class ActivityCreatePage {
 
   protected uploadStatusLabel(status: UploadItem['status']): string {
     switch (status) {
+      case 'queued':
+        return 'Pronto para envio';
       case 'uploading':
         return 'Enviando...';
       case 'uploaded':
@@ -191,7 +224,9 @@ export class ActivityCreatePage {
   private handleFiles(files: readonly File[]): void {
     const acceptedFiles = files.filter((file) => this.isAllowedFile(file));
     if (acceptedFiles.length === 0) {
-      this.snackBar.open('Selecione arquivos PDF, PNG ou JPG com até 10MB.', 'Fechar', { duration: 4000 });
+      this.snackBar.open('Selecione arquivos PDF, PNG ou JPG com até 10MB.', 'Fechar', {
+        duration: 4000,
+      });
       return;
     }
 
@@ -201,41 +236,11 @@ export class ActivityCreatePage {
         localId,
         fileName: file.name,
         sizeBytes: file.size,
-        status: 'uploading',
+        file,
+        status: 'queued',
       };
 
       this.uploads.update((uploads) => [...uploads, pending]);
-
-      this.activitiesApi.uploadEvidence(file).subscribe({
-        next: (response) => {
-          this.uploads.update((uploads) =>
-            uploads.map((upload) =>
-              upload.localId === localId
-                ? {
-                    ...upload,
-                    status: 'uploaded',
-                    serverId: response.id,
-                    fileName: response.originalName || response.filename,
-                    sizeBytes: response.size || upload.sizeBytes,
-                  }
-                : upload,
-            ),
-          );
-        },
-        error: () => {
-          this.uploads.update((uploads) =>
-            uploads.map((upload) =>
-              upload.localId === localId
-                ? {
-                    ...upload,
-                    status: 'error',
-                  }
-                : upload,
-            ),
-          );
-          this.snackBar.open(`Falha ao enviar "${file.name}".`, 'Fechar', { duration: 4000 });
-        },
-      });
     }
   }
 
@@ -245,16 +250,16 @@ export class ActivityCreatePage {
 
     if (!categoria || cargaHoraria <= 0) {
       this.scoreEstimate.set({
-        baseCategoria: this.baseScoreForCategory(categoria as ActivityCategoryCode | ''),
-        fatorCargaHoraria: 0,
-        impactoTotal: this.baseScoreForCategory(categoria as ActivityCategoryCode | ''),
-        percentualMeta: 0,
+        baseCategory: this.baseScoreForCategory(categoria as ActivityCategoryCode | ''),
+        workloadFactor: 0,
+        totalImpact: this.baseScoreForCategory(categoria as ActivityCategoryCode | ''),
+        progressPercentage: 0,
       });
       return;
     }
 
     this.activitiesApi
-      .estimateScore({ categoria, cargaHoraria })
+      .estimateScore({ category: categoria, workloadHours: cargaHoraria })
       .pipe(
         catchError(() => {
           const fallback = this.calculateFallbackEstimate(categoria, cargaHoraria);
@@ -269,28 +274,28 @@ export class ActivityCreatePage {
     categoria: ActivityCategoryCode,
     cargaHoraria: number,
   ): ActivityScoreEstimate {
-    const baseCategoria = this.baseScoreForCategory(categoria);
-    const fatorCargaHoraria = Math.max(0, Number((cargaHoraria * 0.0625).toFixed(1)));
-    const impactoTotal = Number((baseCategoria + fatorCargaHoraria).toFixed(1));
-    const percentualMeta = Math.min(100, Math.round((impactoTotal / 150) * 100));
+    const baseCategory = this.baseScoreForCategory(categoria);
+    const workloadFactor = Math.max(0, Number((cargaHoraria * 0.0625).toFixed(1)));
+    const totalImpact = Number((baseCategory + workloadFactor).toFixed(1));
+    const progressPercentage = Math.min(100, Math.round((totalImpact / 150) * 100));
 
     return {
-      baseCategoria,
-      fatorCargaHoraria,
-      impactoTotal,
-      percentualMeta,
+      baseCategory,
+      workloadFactor,
+      totalImpact,
+      progressPercentage,
     };
   }
 
   private baseScoreForCategory(categoria: ActivityCategoryCode | ''): number {
     switch (categoria) {
-      case 'ENSINO':
+      case 'TEACHING':
         return 10;
-      case 'PESQUISA':
+      case 'RESEARCH':
         return 15;
-      case 'EXTENSAO':
+      case 'OUTREACH':
         return 12;
-      case 'GESTAO':
+      case 'MANAGEMENT':
         return 8;
       default:
         return 0;
@@ -315,5 +320,65 @@ export class ActivityCreatePage {
 
     return fallback;
   }
-}
 
+  private async loadActivity(activityId: string): Promise<void> {
+    this.loadingActivity.set(true);
+
+    try {
+      const activity = await firstValueFrom(this.activitiesApi.getActivity(activityId));
+      this.patchForm(activity);
+    } catch {
+      this.snackBar.open('Não foi possível carregar a atividade para edição.', 'Fechar', {
+        duration: 4000,
+      });
+      void this.router.navigate(['/atividades']);
+    } finally {
+      this.loadingActivity.set(false);
+    }
+  }
+
+  private patchForm(activity: ActivityListItem): void {
+    this.form.patchValue({
+      titulo: activity.title,
+      categoria: activity.category,
+      cargaHoraria: activity.workloadHours,
+      descricao: activity.description,
+    });
+  }
+
+  private async uploadQueuedFiles(activity: ActivityListItem): Promise<void> {
+    for (const upload of this.uploads().filter((item) => item.status === 'queued')) {
+      this.uploads.update((current) =>
+        current.map((item) =>
+          item.localId === upload.localId ? { ...item, status: 'uploading' } : item,
+        ),
+      );
+
+      try {
+        const response = await firstValueFrom(
+          this.activitiesApi.uploadEvidence(activity.id, upload.file),
+        );
+        this.uploads.update((current) =>
+          current.map((item) =>
+            item.localId === upload.localId
+              ? {
+                  ...item,
+                  status: 'uploaded',
+                  serverId: response.id,
+                  fileName: response.originalName || response.filename,
+                  sizeBytes: response.size || item.sizeBytes,
+                }
+              : item,
+          ),
+        );
+      } catch {
+        this.uploads.update((current) =>
+          current.map((item) =>
+            item.localId === upload.localId ? { ...item, status: 'error' } : item,
+          ),
+        );
+        this.snackBar.open(`Falha ao enviar "${upload.fileName}".`, 'Fechar', { duration: 4000 });
+      }
+    }
+  }
+}

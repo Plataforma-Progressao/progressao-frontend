@@ -1,18 +1,33 @@
-/** Category codes as sent to / accepted from the API (legacy Portuguese enum values). */
-export type ActivityCategoryCode = 'ENSINO' | 'PESQUISA' | 'EXTENSAO' | 'GESTAO';
+export type ActivityCategoryCode = 'TEACHING' | 'RESEARCH' | 'OUTREACH' | 'MANAGEMENT';
+export type ActivityStatusCode = 'DRAFT' | 'PENDING' | 'APPROVED' | 'REJECTED';
+
+export interface ActivityListItem {
+  readonly id: string;
+  readonly title: string;
+  readonly description: string;
+  readonly category: ActivityCategoryCode;
+  readonly workloadHours: number;
+  readonly score: number;
+  readonly status: ActivityStatusCode;
+  readonly term: string;
+  readonly kind: string;
+}
 
 export interface ActivityCreatePayload {
-  readonly titulo: string;
-  readonly categoria: ActivityCategoryCode;
-  readonly cargaHoraria: number;
-  readonly descricao: string;
-  readonly comprovantes: readonly string[];
+  readonly title: string;
+  readonly category: ActivityCategoryCode;
+  readonly workloadHours: number;
+  readonly description: string;
 }
 
-export interface ActivityCreateResponse {
-  readonly id: string;
-  readonly titulo: string;
+export interface ActivityUpdatePayload {
+  readonly title?: string;
+  readonly category?: ActivityCategoryCode;
+  readonly workloadHours?: number;
+  readonly description?: string;
 }
+
+export interface ActivityCreateResponse extends ActivityListItem {}
 
 export interface ActivityEvidenceUploadResponse {
   readonly id: string;
@@ -23,13 +38,13 @@ export interface ActivityEvidenceUploadResponse {
 }
 
 export interface ActivityScoreEstimate {
-  readonly baseCategoria: number;
-  readonly fatorCargaHoraria: number;
-  readonly impactoTotal: number;
-  readonly percentualMeta: number;
+  readonly baseCategory: number;
+  readonly workloadFactor: number;
+  readonly totalImpact: number;
+  readonly progressPercentage: number;
 }
 
 export interface ActivityScoreEstimateRequest {
-  readonly categoria: ActivityCategoryCode;
-  readonly cargaHoraria: number;
+  readonly category: ActivityCategoryCode;
+  readonly workloadHours: number;
 }

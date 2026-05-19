@@ -4,21 +4,24 @@
       Atividades Docente
     </h1>
     <p class="m-0 max-w-[44rem] leading-[1.55] text-[#6b7280]">
-      Gerencie sua produção acadêmica, publicações e atividades administrativas do ciclo atual. Mantenha seu currículo
-      atualizado para progressão funcional.
+      Gerencie sua produção acadêmica, publicações e atividades administrativas do ciclo atual.
+      Mantenha seu currículo atualizado para progressão funcional.
     </p>
   </header>
 
-  <nav class="flex flex-wrap gap-2 border-b border-b-[color:rgba(198,197,212,0.3)] pb-2" aria-label="Categorias de atividades">
+  <nav
+    class="flex flex-wrap gap-2 border-b border-b-[color:rgba(198,197,212,0.3)] pb-2"
+    aria-label="Categorias de atividades"
+  >
     @for (tab of tabs; track tab) {
-    <app-button
-      [variant]="tabButtonVariant(tab)"
-      size="small"
-      [compact]="true"
-      [label]="tab"
-      [ariaCurrent]="tabButtonCurrent(tab)"
-      (clicked)="setTab(tab)"
-    ></app-button>
+      <app-button
+        [variant]="tabButtonVariant(tab)"
+        size="small"
+        [compact]="true"
+        [label]="tab"
+        [ariaCurrent]="tabButtonCurrent(tab)"
+        (clicked)="setTab(tab)"
+      ></app-button>
     }
   </nav>
 
@@ -35,7 +38,7 @@
       <mat-label>Status</mat-label>
       <mat-select [formControl]="statusControl">
         @for (option of statusOptions; track option.value) {
-        <mat-option [value]="option.value">{{ option.label }}</mat-option>
+          <mat-option [value]="option.value">{{ option.label }}</mat-option>
         }
       </mat-select>
     </mat-form-field>
@@ -51,13 +54,18 @@
     </mat-form-field>
   </div>
 
-  <section class="overflow-hidden rounded-xl bg-[var(--mat-sys-surface-container)] shadow-[0_0_0_1px_rgba(198,197,212,0.1),0_1px_2px_rgba(0,0,0,0.05)]" aria-label="Tabela de atividades">
+  <section
+    class="overflow-hidden rounded-xl bg-[var(--mat-sys-surface-container)] shadow-[0_0_0_1px_rgba(198,197,212,0.1),0_1px_2px_rgba(0,0,0,0.05)]"
+    aria-label="Tabela de atividades"
+  >
     <table mat-table [dataSource]="filteredRows()" class="activities-table w-full">
       <ng-container matColumnDef="title">
         <th mat-header-cell *matHeaderCellDef>Título da Atividade</th>
         <td mat-cell *matCellDef="let row">
           <div class="activities-title-cell">
-            <div class="text-base font-semibold text-[var(--mat-sys-on-surface)]">{{ row.title }}</div>
+            <div class="text-base font-semibold text-[var(--mat-sys-on-surface)]">
+              {{ row.title }}
+            </div>
             <div class="text-xs leading-4 text-[color:rgb(69_70_82)]">{{ row.subtitle }}</div>
           </div>
         </td>
@@ -74,7 +82,11 @@
 
       <ng-container matColumnDef="score">
         <th mat-header-cell *matHeaderCellDef class="text-center">Pontuação</th>
-        <td mat-cell *matCellDef="let row" class="text-center font-mono text-base font-bold text-[var(--mat-sys-on-surface)]">
+        <td
+          mat-cell
+          *matCellDef="let row"
+          class="text-center font-mono text-base font-bold text-[var(--mat-sys-on-surface)]"
+        >
           {{ row.score.toFixed(1) }}
         </td>
       </ng-container>
@@ -82,21 +94,36 @@
       <ng-container matColumnDef="status">
         <th mat-header-cell *matHeaderCellDef class="text-center">Status</th>
         <td mat-cell *matCellDef="let row" class="text-center">
-          <app-status-indicator [status]="statusToIndicatorStatus(row.status)" [label]="row.status"></app-status-indicator>
+          <app-status-indicator
+            [status]="statusToIndicatorStatus(row.status)"
+            [label]="row.status"
+          ></app-status-indicator>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef class="text-right">Ações</th>
         <td mat-cell *matCellDef="let row" class="text-right">
-          <button
-            mat-icon-button
-            type="button"
-            class="activities-action-button"
-            [attr.aria-label]="'Mais ações para ' + row.title"
-          >
-            <mat-icon>more_vert</mat-icon>
-          </button>
+          <div class="inline-flex items-center gap-1">
+            <button
+              mat-icon-button
+              type="button"
+              class="activities-action-button"
+              [attr.aria-label]="'Editar ' + row.title"
+              (click)="openEditActivity(row.id)"
+            >
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button
+              mat-icon-button
+              type="button"
+              class="activities-action-button text-[color:var(--mat-sys-error)]"
+              [attr.aria-label]="'Excluir ' + row.title"
+              (click)="deleteActivity(row.id)"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
         </td>
       </ng-container>
 
@@ -104,13 +131,18 @@
       <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
 
       <tr class="mat-mdc-no-data-row" *matNoDataRow>
-        <td [attr.colspan]="displayedColumns.length" class="px-6 py-8 text-sm text-[color:rgb(69_70_82)]">
+        <td
+          [attr.colspan]="displayedColumns.length"
+          class="px-6 py-8 text-sm text-[color:rgb(69_70_82)]"
+        >
           Nenhuma atividade encontrada para os filtros atuais.
         </td>
       </tr>
     </table>
 
-    <footer class="flex flex-col gap-4 border-t border-t-[color:rgba(198,197,212,0.2)] bg-[color:rgba(243_243_245,0.5)] px-6 py-4 lg:flex-row lg:items-center lg:justify-between">
+    <footer
+      class="flex flex-col gap-4 border-t border-t-[color:rgba(198,197,212,0.2)] bg-[color:rgba(243_243_245,0.5)] px-6 py-4 lg:flex-row lg:items-center lg:justify-between"
+    >
       <p class="text-xs font-medium text-[color:rgb(69_70_82)]">
         Mostrando {{ filteredRows().length }} de {{ totalItems() }} atividades
       </p>
@@ -126,14 +158,14 @@
         ></app-button>
 
         @for (p of [1, 2, 3]; track p) {
-        <app-button
-          [variant]="pageButtonVariant(p)"
-          size="small"
-          [compact]="true"
-          [label]="p.toString()"
-          [ariaCurrent]="pageButtonCurrent(p)"
-          (clicked)="goToPage(p)"
-        ></app-button>
+          <app-button
+            [variant]="pageButtonVariant(p)"
+            size="small"
+            [compact]="true"
+            [label]="p.toString()"
+            [ariaCurrent]="pageButtonCurrent(p)"
+            (clicked)="goToPage(p)"
+          ></app-button>
         }
 
         <app-button
@@ -149,21 +181,25 @@
   </section>
 
   <section class="grid grid-cols-1 gap-8 pt-4 lg:grid-cols-12" aria-label="Cards de apoio">
-    <div class="relative overflow-hidden rounded-[1.75rem] bg-[var(--mat-sys-primary)] p-8 text-white lg:col-span-7">
+    <div
+      class="relative overflow-hidden rounded-[1.75rem] bg-[var(--mat-sys-primary)] p-8 text-white lg:col-span-7"
+    >
       <div class="absolute -bottom-10 -right-10 size-48 rounded-full bg-white/10 blur-3xl"></div>
 
       <div class="space-y-4">
         <h2 class="text-2xl font-normal leading-8">Meta de Progressão Atual</h2>
         <p class="max-w-[28rem] text-base leading-6 opacity-80">
-          Você atingiu 65% da pontuação necessária para a próxima categoria funcional. Continue publicando e registrando
-          suas atividades!
+          Você atingiu 65% da pontuação necessária para a próxima categoria funcional. Continue
+          publicando e registrando suas atividades!
         </p>
 
         <div class="h-4 w-full overflow-hidden rounded-full bg-white/20">
           <div class="h-full w-[65%] bg-[color:rgb(163_246_156)]"></div>
         </div>
 
-        <div class="flex items-center justify-between text-xs font-bold uppercase tracking-[0.0375rem]">
+        <div
+          class="flex items-center justify-between text-xs font-bold uppercase tracking-[0.0375rem]"
+        >
           <span>Atual: 245 PTS</span>
           <span>Meta: 380 PTS</span>
         </div>
@@ -173,7 +209,9 @@
     <div
       class="relative flex flex-col justify-between overflow-hidden rounded-[1.75rem] bg-[color:rgb(243_243_245)] p-8 lg:col-span-5"
     >
-      <div class="absolute inset-0 rounded-[1.75rem] shadow-[0_0_0_1px_rgba(198,197,212,0.1)]"></div>
+      <div
+        class="absolute inset-0 rounded-[1.75rem] shadow-[0_0_0_1px_rgba(198,197,212,0.1)]"
+      ></div>
 
       <div class="relative space-y-4">
         <div class="flex items-center gap-2">
@@ -181,8 +219,8 @@
           <h3 class="text-lg font-normal leading-7 text-[color:rgb(49_46_129)]">Curator Tip</h3>
         </div>
         <blockquote class="text-sm italic leading-5 text-[color:rgb(69_70_82)]">
-          "Atividades de Extensão têm peso dobrado neste semestre. Considere validar seus certificados de participação
-          em congressos comunitários o quanto antes."
+          "Atividades de Extensão têm peso dobrado neste semestre. Considere validar seus
+          certificados de participação em congressos comunitários o quanto antes."
         </blockquote>
       </div>
     </div>

@@ -7,8 +7,10 @@ import {
   ActivityCreatePayload,
   ActivityCreateResponse,
   ActivityEvidenceUploadResponse,
+  ActivityListItem,
   ActivityScoreEstimate,
   ActivityScoreEstimateRequest,
+  ActivityUpdatePayload,
 } from './models/activity-create.models';
 
 @Injectable({ providedIn: 'root' })
@@ -16,34 +18,62 @@ export class ActivitiesApiService {
   private readonly http = inject(HttpClient);
   private readonly apiBaseUrl = `${getApiUrl().replace(/\/+$/, '')}/api`;
 
-  createActivity(payload: ActivityCreatePayload): Observable<ActivityCreateResponse> {
+  getActivities(): Observable<readonly ActivityListItem[]> {
     return this.http
-      .post<ApiSuccessResponse<ActivityCreateResponse>>(`${this.apiBaseUrl}/atividades`, payload)
+      .get<ApiSuccessResponse<readonly ActivityListItem[]>>(`${this.apiBaseUrl}/activities`)
       .pipe(map((response) => response.data));
   }
 
-  uploadEvidence(file: File): Observable<ActivityEvidenceUploadResponse> {
+  getActivity(id: string): Observable<ActivityCreateResponse> {
+    return this.http
+      .get<ApiSuccessResponse<ActivityCreateResponse>>(`${this.apiBaseUrl}/activities/${id}`)
+      .pipe(map((response) => response.data));
+  }
+
+  createActivity(payload: ActivityCreatePayload): Observable<ActivityCreateResponse> {
+    return this.http
+      .post<ApiSuccessResponse<ActivityCreateResponse>>(`${this.apiBaseUrl}/activities`, payload)
+      .pipe(map((response) => response.data));
+  }
+
+  updateActivity(id: string, payload: ActivityUpdatePayload): Observable<ActivityCreateResponse> {
+    return this.http
+      .patch<
+        ApiSuccessResponse<ActivityCreateResponse>
+      >(`${this.apiBaseUrl}/activities/${id}`, payload)
+      .pipe(map((response) => response.data));
+  }
+
+  deleteActivity(id: string): Observable<{ id: string }> {
+    return this.http
+      .delete<ApiSuccessResponse<{ id: string }>>(`${this.apiBaseUrl}/activities/${id}`)
+      .pipe(map((response) => response.data));
+  }
+
+  uploadEvidence(activityId: string, file: File): Observable<ActivityEvidenceUploadResponse> {
     const formData = new FormData();
     formData.append('file', file);
 
     return this.http
-      .post<ApiSuccessResponse<ActivityEvidenceUploadResponse>>(
-        `${this.apiBaseUrl}/atividades/comprovantes`,
-        formData,
-      )
+      .post<
+        ApiSuccessResponse<ActivityEvidenceUploadResponse>
+      >(`${this.apiBaseUrl}/activities/${activityId}/evidences`, formData)
       .pipe(map((response) => response.data));
   }
 
   deleteEvidence(evidenceId: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiBaseUrl}/atividades/comprovantes/${evidenceId}`);
+    return this.http
+      .delete<
+        ApiSuccessResponse<{ id: string }>
+      >(`${this.apiBaseUrl}/activities/evidences/${evidenceId}`)
+      .pipe(map(() => void 0));
   }
 
   estimateScore(payload: ActivityScoreEstimateRequest): Observable<ActivityScoreEstimate> {
     return this.http
-      .post<ApiSuccessResponse<ActivityScoreEstimate>>(
-        `${this.apiBaseUrl}/atividades/pontuacao/estimativa`,
-        payload,
-      )
+      .post<
+        ApiSuccessResponse<ActivityScoreEstimate>
+      >(`${this.apiBaseUrl}/activities/estimate`, payload)
       .pipe(map((response) => response.data));
   }
 }
