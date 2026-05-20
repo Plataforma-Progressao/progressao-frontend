@@ -8,10 +8,11 @@
       Voltar para listagem
     </a>
     <h1 class="m-0 text-[clamp(1.8rem,3vw,2.5rem)] tracking-[-0.04em] text-[#1a1c1d]">
-      {{ pageTitle() }}
+      Nova Atividade Acadêmica
     </h1>
     <p class="m-0 max-w-[44rem] leading-[1.55] text-[#6b7280]">
-      {{ pageDescription() }}
+      Registre suas atividades de pesquisa, ensino ou extensão para o cálculo do progresso
+      funcional.
     </p>
   </header>
 
@@ -20,241 +21,191 @@
       class="flex flex-col gap-8 lg:col-span-8"
       aria-label="Formulário de cadastro de atividade"
     >
-      @if (loadingActivity()) {
-        <div
-          class="flex items-center gap-4 rounded-[1.75rem] border border-[color:rgba(198,197,212,0.15)] bg-white px-6 py-5 shadow-[0_1px_2px_rgba(0,0,0,0.05)]"
-        >
-          <mat-progress-spinner diameter="32" mode="indeterminate"></mat-progress-spinner>
-          <div>
-            <p class="text-sm font-semibold text-[color:rgb(26_28_29)]">Carregando atividade</p>
-            <p class="text-xs text-[color:rgb(69_70_82)]">
-              Aguarde enquanto buscamos os dados salvos.
-            </p>
-          </div>
-        </div>
-      }
-
-      @if (loadErrorMessage()) {
-        <div
-          class="flex flex-col gap-4 rounded-[1.75rem] border border-[color:rgba(186,26,26,0.12)] bg-[color:rgba(186,26,26,0.04)] px-6 py-5"
-        >
-          <div class="flex items-start gap-3">
-            <mat-icon class="mt-0.5 !text-[color:var(--mat-sys-error)]">error_outline</mat-icon>
-            <div class="space-y-1">
-              <p class="text-sm font-semibold text-[color:rgb(26_28_29)]">
-                Falha ao carregar a atividade
-              </p>
-              <p class="text-sm leading-6 text-[color:rgb(69_70_82)]">
-                {{ loadErrorMessage() }}
-              </p>
-            </div>
-          </div>
-          <div class="flex flex-wrap gap-3">
-            <button
-              type="button"
-              class="rounded-full bg-[var(--mat-sys-primary)] px-5 py-2 text-sm font-semibold text-white"
-              (click)="retryLoadActivity()"
-            >
-              Tentar novamente
-            </button>
-            <button
-              type="button"
-              class="rounded-full px-5 py-2 text-sm font-semibold text-[color:var(--mat-sys-primary)]"
-              (click)="cancel()"
-            >
-              Voltar para listagem
-            </button>
-          </div>
-        </div>
-      }
-
       <form
         class="flex flex-col gap-6 rounded-[1.75rem] bg-[var(--mat-sys-surface-container)] p-8 shadow-[0_1px_2px_rgba(0,0,0,0.05)]"
         [formGroup]="form"
         (ngSubmit)="submit()"
       >
-        <fieldset class="contents" [disabled]="isFormLocked()">
+        <div class="flex flex-col gap-2">
+          <label
+            class="text-sm font-semibold leading-5 text-[color:rgb(69_70_82)]"
+            for="tituloAtividade"
+          >
+            Título da Atividade
+          </label>
+          <input
+            id="tituloAtividade"
+            class="h-12 w-full border border-b-2 border-[color:rgb(198_197_212)] bg-[color:rgb(243_243_245)] px-4 text-base text-[color:rgb(26_28_29)] outline-none focus:border-[color:var(--mat-sys-primary)]"
+            type="text"
+            placeholder="Ex: Publicação de Artigo em Revista Qualis A1"
+            formControlName="titulo"
+          />
+          @if (form.controls.titulo.invalid && form.controls.titulo.touched) {
+            <p class="text-xs text-[color:var(--mat-sys-error)]">
+              Informe um título com pelo menos 8 caracteres.
+            </p>
+          }
+        </div>
+
+        <div class="grid gap-6 md:grid-cols-[minmax(0,1fr)_12.8125rem]">
           <div class="flex flex-col gap-2">
             <label
               class="text-sm font-semibold leading-5 text-[color:rgb(69_70_82)]"
-              for="tituloAtividade"
+              for="categoriaAtividade"
             >
-              Título da Atividade
+              Tipo de Atividade
             </label>
-            <input
-              id="tituloAtividade"
+            <select
+              id="categoriaAtividade"
               class="h-12 w-full border border-b-2 border-[color:rgb(198_197_212)] bg-[color:rgb(243_243_245)] px-4 text-base text-[color:rgb(26_28_29)] outline-none focus:border-[color:var(--mat-sys-primary)]"
-              type="text"
-              placeholder="Ex: Publicação de Artigo em Revista Qualis A1"
-              formControlName="titulo"
-            />
-            @if (form.controls.titulo.invalid && form.controls.titulo.touched) {
-              <p class="text-xs text-[color:var(--mat-sys-error)]">
-                Informe um título com pelo menos 8 caracteres.
-              </p>
-            }
-          </div>
-
-          <div class="grid gap-6 md:grid-cols-[minmax(0,1fr)_12.8125rem]">
-            <div class="flex flex-col gap-2">
-              <label
-                class="text-sm font-semibold leading-5 text-[color:rgb(69_70_82)]"
-                for="categoriaAtividade"
-              >
-                Tipo de Atividade
-              </label>
-              <select
-                id="categoriaAtividade"
-                class="h-12 w-full border border-b-2 border-[color:rgb(198_197_212)] bg-[color:rgb(243_243_245)] px-4 text-base text-[color:rgb(26_28_29)] outline-none focus:border-[color:var(--mat-sys-primary)]"
-                formControlName="categoria"
-              >
-                <option value="">Selecione uma categoria</option>
-                @for (option of categoriaOptions; track option.value) {
-                  <option [value]="option.value">{{ option.label }}</option>
-                }
-              </select>
-            </div>
-
-            <div class="flex flex-col gap-2">
-              <label
-                class="text-sm font-semibold leading-5 text-[color:rgb(69_70_82)]"
-                for="cargaHorariaAtividade"
-              >
-                Carga Horária (horas)
-              </label>
-              <input
-                id="cargaHorariaAtividade"
-                class="h-12 w-full border border-b-2 border-[color:rgb(198_197_212)] bg-[color:rgb(243_243_245)] px-4 text-base text-[color:rgb(26_28_29)] outline-none focus:border-[color:var(--mat-sys-primary)]"
-                type="number"
-                min="0"
-                max="999"
-                step="0.1"
-                formControlName="cargaHoraria"
-              />
-            </div>
+              formControlName="categoria"
+            >
+              <option value="">Selecione uma categoria</option>
+              @for (option of categoriaOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
           </div>
 
           <div class="flex flex-col gap-2">
             <label
               class="text-sm font-semibold leading-5 text-[color:rgb(69_70_82)]"
-              for="descricaoAtividade"
+              for="cargaHorariaAtividade"
             >
-              Descrição e Detalhes
+              Carga Horária (horas)
             </label>
-            <textarea
-              id="descricaoAtividade"
-              class="min-h-24 w-full resize-none border border-b-2 border-[color:rgb(198_197_212)] bg-[color:rgb(243_243_245)] px-4 py-3 text-base leading-6 text-[color:rgb(26_28_29)] outline-none focus:border-[color:var(--mat-sys-primary)]"
-              placeholder="Descreva brevemente a atividade e sua relevância..."
-              formControlName="descricao"
-            ></textarea>
+            <input
+              id="cargaHorariaAtividade"
+              class="h-12 w-full border border-b-2 border-[color:rgb(198_197_212)] bg-[color:rgb(243_243_245)] px-4 text-base text-[color:rgb(26_28_29)] outline-none focus:border-[color:var(--mat-sys-primary)]"
+              type="number"
+              min="0"
+              max="999"
+              step="0.1"
+              formControlName="cargaHoraria"
+            />
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <label
+            class="text-sm font-semibold leading-5 text-[color:rgb(69_70_82)]"
+            for="descricaoAtividade"
+          >
+            Descrição e Detalhes
+          </label>
+          <textarea
+            id="descricaoAtividade"
+            class="min-h-24 w-full resize-none border border-b-2 border-[color:rgb(198_197_212)] bg-[color:rgb(243_243_245)] px-4 py-3 text-base leading-6 text-[color:rgb(26_28_29)] outline-none focus:border-[color:var(--mat-sys-primary)]"
+            placeholder="Descreva brevemente a atividade e sua relevância..."
+            formControlName="descricao"
+          ></textarea>
+        </div>
+
+        <div class="flex flex-col gap-4">
+          <label class="text-sm font-semibold leading-5 text-[color:rgb(69_70_82)]"
+            >Comprovantes e Arquivos (opcional)</label
+          >
+
+          <input
+            #filePicker
+            class="hidden"
+            type="file"
+            accept=".pdf,.png,.jpg,.jpeg"
+            multiple
+            (change)="onFileInputChange($event)"
+          />
+
+          <div
+            class="rounded-2xl border-2 border-dashed border-[color:rgb(198_197_212)] bg-[color:rgba(243,243,245,0.5)] px-8 py-[2.125rem] text-center"
+            [class.border-[color:var(--mat-sys-primary)]]="dragging()"
+            (dragover)="onDragOver($event)"
+            (dragleave)="onDragLeave($event)"
+            (drop)="onDrop($event)"
+          >
+            <div
+              class="mx-auto mb-4 grid size-12 place-items-center rounded-full bg-[color:rgb(224_224_255)]"
+            >
+              <mat-icon class="text-[color:var(--mat-sys-primary)]">upload_file</mat-icon>
+            </div>
+            <p class="text-base font-semibold leading-6 text-[color:rgb(26_28_29)]">
+              Clique para fazer upload ou arraste os arquivos
+            </p>
+            <p class="mt-1 text-xs leading-4 text-[color:rgb(118_118_131)]">
+              PDF, PNG ou JPG (máx. 10MB)
+            </p>
+            <button
+              type="button"
+              class="mt-4 inline-flex items-center justify-center rounded-full bg-white px-6 py-2 text-sm font-bold text-[color:var(--mat-sys-primary)] shadow-[0_1px_2px_rgba(0,0,0,0.05)]"
+              (click)="filePicker.click()"
+            >
+              Selecionar Arquivos
+            </button>
           </div>
 
-          <div class="flex flex-col gap-4">
-            <label class="text-sm font-semibold leading-5 text-[color:rgb(69_70_82)]"
-              >Comprovantes e Arquivos</label
-            >
-
-            <input
-              #filePicker
-              class="hidden"
-              type="file"
-              accept=".pdf,.png,.jpg,.jpeg"
-              multiple
-              (change)="onFileInputChange($event)"
-            />
-
+          @for (upload of uploads(); track upload.localId) {
             <div
-              class="rounded-2xl border-2 border-dashed border-[color:rgb(198_197_212)] bg-[color:rgba(243,243,245,0.5)] px-8 py-[2.125rem] text-center"
-              [class.border-[color:var(--mat-sys-primary)]]="dragging()"
-              (dragover)="onDragOver($event)"
-              (dragleave)="onDragLeave($event)"
-              (drop)="onDrop($event)"
+              class="flex items-center justify-between rounded-xl border border-[#c6c5d4]/10 bg-[#f3f3f5] p-[0.8125rem]"
             >
-              <div
-                class="mx-auto mb-4 grid size-12 place-items-center rounded-full bg-[color:rgb(224_224_255)]"
-              >
-                <mat-icon class="text-[color:var(--mat-sys-primary)]">upload_file</mat-icon>
+              <div class="flex items-center gap-3">
+                <svg
+                  class="h-5 w-4 shrink-0 text-[#000666]"
+                  viewBox="0 0 16 20"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M4 16H12V14H4V16V16M4 12H12V10H4V12V12M2 20C1.45 20 0.979167 19.8042 0.5875 19.4125C0.195833 19.0208 0 18.55 0 18V2C0 1.45 0.195833 0.979167 0.5875 0.5875C0.979167 0.195833 1.45 0 2 0H10L16 6V18C16 18.55 15.8042 19.0208 15.4125 19.4125C15.0208 19.8042 14.55 20 14 20H2V20M9 7V2H2V2V2V18V18V18H14V18V18V7H9V7M2 2V2V7V7V2V7V7V18V18V18V18V18V18V2V2V2V2"
+                    fill="currentColor"
+                  />
+                </svg>
+                <div>
+                  <p class="text-xs font-bold leading-4 text-[#1a1c1d]">{{ upload.fileName }}</p>
+                  <p [class]="uploadStatusClass(upload.status)">
+                    {{ (upload.sizeBytes / 1024 / 1024).toFixed(1) }} MB •
+                    {{ uploadStatusLabel(upload.status) }}
+                  </p>
+                </div>
               </div>
-              <p class="text-base font-semibold leading-6 text-[color:rgb(26_28_29)]">
-                Clique para fazer upload ou arraste os arquivos
-              </p>
-              <p class="mt-1 text-xs leading-4 text-[color:rgb(118_118_131)]">
-                PDF, PNG ou JPG (máx. 10MB)
-              </p>
               <button
                 type="button"
-                class="mt-4 inline-flex items-center justify-center rounded-full bg-white px-6 py-2 text-sm font-bold text-[color:var(--mat-sys-primary)] shadow-[0_1px_2px_rgba(0,0,0,0.05)]"
-                (click)="filePicker.click()"
+                class="rounded-full p-2 text-[#ba1a1a] hover:bg-black/5"
+                aria-label="Remover comprovante"
+                (click)="removeUpload(upload)"
               >
-                Selecionar Arquivos
+                <svg
+                  class="h-[0.84375rem] w-3 shrink-0"
+                  viewBox="0 0 12 13.5"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M2.25 13.5C1.8375 13.5 1.48437 13.3531 1.19062 13.0594C0.896875 12.7656 0.75 12.4125 0.75 12V2.25H0V0.75H3.75V0H8.25V0.75H12V2.25H11.25V12C11.25 12.4125 11.1031 12.7656 10.8094 13.0594C10.5156 13.3531 10.1625 13.5 9.75 13.5H2.25V13.5M9.75 2.25H2.25V12V12V12H9.75V12V12V2.25V2.25M3.75 10.5H5.25V3.75H3.75V10.5V10.5M6.75 10.5H8.25V3.75H6.75V10.5V10.5M2.25 2.25V2.25V12V12V12V12V12V12V2.25V2.25"
+                    fill="currentColor"
+                  />
+                </svg>
               </button>
             </div>
-
-            @for (upload of uploads(); track upload.localId) {
-              <div
-                class="flex items-center justify-between rounded-xl border border-[#c6c5d4]/10 bg-[#f3f3f5] p-[0.8125rem]"
-              >
-                <div class="flex items-center gap-3">
-                  <svg
-                    class="h-5 w-4 shrink-0 text-[#000666]"
-                    viewBox="0 0 16 20"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M4 16H12V14H4V16V16M4 12H12V10H4V12V12M2 20C1.45 20 0.979167 19.8042 0.5875 19.4125C0.195833 19.0208 0 18.55 0 18V2C0 1.45 0.195833 0.979167 0.5875 0.5875C0.979167 0.195833 1.45 0 2 0H10L16 6V18C16 18.55 15.8042 19.0208 15.4125 19.4125C15.0208 19.8042 14.55 20 14 20H2V20M9 7V2H2V2V2V18V18V18H14V18V18V7H9V7M2 2V2V7V7V2V7V7V18V18V18V18V18V18V2V2V2V2"
-                      fill="currentColor"
-                    />
-                  </svg>
-                  <div>
-                    <p class="text-xs font-bold leading-4 text-[#1a1c1d]">{{ upload.fileName }}</p>
-                    <p [class]="uploadStatusClass(upload.status)">
-                      {{ (upload.sizeBytes / 1024 / 1024).toFixed(1) }} MB •
-                      {{ uploadStatusLabel(upload.status) }}
-                    </p>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  class="rounded-full p-2 text-[#ba1a1a] hover:bg-black/5"
-                  aria-label="Remover comprovante"
-                  (click)="removeUpload(upload)"
-                >
-                  <svg
-                    class="h-[0.84375rem] w-3 shrink-0"
-                    viewBox="0 0 12 13.5"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M2.25 13.5C1.8375 13.5 1.48437 13.3531 1.19062 13.0594C0.896875 12.7656 0.75 12.4125 0.75 12V2.25H0V0.75H3.75V0H8.25V0.75H12V2.25H11.25V12C11.25 12.4125 11.1031 12.7656 10.8094 13.0594C10.5156 13.3531 10.1625 13.5 9.75 13.5H2.25V13.5M9.75 2.25H2.25V12V12V12H9.75V12V12V2.25V2.25M3.75 10.5H5.25V3.75H3.75V10.5V10.5M6.75 10.5H8.25V3.75H6.75V10.5V10.5M2.25 2.25V2.25V12V12V12V12V12V12V2.25V2.25"
-                      fill="currentColor"
-                    />
-                  </svg>
-                </button>
-              </div>
-            }
-          </div>
-
-          <div class="flex items-center justify-end gap-6 pt-2">
-            <button
-              type="button"
-              class="rounded-full px-8 py-3 text-base font-bold text-[color:var(--mat-sys-primary)]"
-              (click)="cancel()"
-            >
-              Cancelar
-            </button>
-            <button
-              type="button"
-              class="rounded-full bg-gradient-to-r from-[#000666] to-[#1a237e] px-10 py-4 text-base font-bold text-white shadow-[0_10px_15px_-3px_rgba(0,6,102,0.2),0_4px_6px_-4px_rgba(0,6,102,0.2)] disabled:opacity-60"
-              [disabled]="!canSubmit()"
-              (click)="submit()"
-            >
-              {{ submitLabel() }}
-            </button>
-          </div>
-        </fieldset>
+          }
+        </div>
       </form>
+
+      <div class="flex items-center justify-end gap-6 pt-2">
+        <button
+          type="button"
+          class="rounded-full px-8 py-3 text-base font-bold text-[color:var(--mat-sys-primary)]"
+          (click)="cancel()"
+        >
+          Cancelar
+        </button>
+        <button
+          type="button"
+          class="rounded-full bg-gradient-to-r from-[#000666] to-[#1a237e] px-10 py-4 text-base font-bold text-white shadow-[0_10px_15px_-3px_rgba(0,6,102,0.2),0_4px_6px_-4px_rgba(0,6,102,0.2)] disabled:opacity-60"
+          [disabled]="!canSubmit()"
+          (click)="submit()"
+        >
+          Confirmar Registro
+        </button>
+      </div>
     </section>
 
     <aside

@@ -1,31 +1,26 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  DestroyRef,
   computed,
+  effect,
   inject,
   signal,
 } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
 import { Router } from '@angular/router';
-import { finalize } from 'rxjs';
-import { ActivitiesApiService } from '../../activities-api.service';
-import { ActivityListItem } from '../../models/activity-create.models';
 import { BadgeComponent } from '../../../../shared/components/base/badge/badge.component';
 import { ButtonComponent } from '../../../../shared/components/base/button/button.component';
 import { InputComponent } from '../../../../shared/components/base/input/input.component';
 import { StatusIndicatorComponent } from '../../../../shared/components/base/status-indicator/status-indicator.component';
 
 type UiActivityCategory = 'Pesquisa' | 'Ensino' | 'Extensão' | 'Gestão';
-type UiActivityStatus = 'Rascunho' | 'Validado' | 'Pendente' | 'Erro';
+type UiActivityStatus = 'Validado' | 'Pendente' | 'Erro';
 
 interface ActivityListRow {
   readonly id: string;
@@ -53,7 +48,6 @@ const STATUS_OPTIONS: readonly { label: string; value: 'Todos' | UiActivityStatu
     MatButtonModule,
     MatFormFieldModule,
     MatIconModule,
-    MatProgressSpinnerModule,
     MatSelectModule,
     MatTableModule,
     ButtonComponent,
@@ -67,9 +61,6 @@ const STATUS_OPTIONS: readonly { label: string; value: 'Todos' | UiActivityStatu
 })
 export class ActivitiesPage {
   private readonly router = inject(Router);
-  private readonly activitiesApiService = inject(ActivitiesApiService);
-  private readonly snackBar = inject(MatSnackBar);
-  private readonly destroyRef = inject(DestroyRef);
 
   protected readonly tabs = ALL_TABS;
   protected readonly statusOptions = STATUS_OPTIONS;
@@ -91,9 +82,7 @@ export class ActivitiesPage {
 
   protected readonly pageIndex = signal(1);
   protected readonly totalPages = signal(3);
-  protected readonly totalItems = signal(0);
-  protected readonly loadingActivities = signal(false);
-  protected readonly loadErrorMessage = signal<string | null>(null);
+  protected readonly totalItems = signal(42);
   protected readonly displayedColumns = [
     'title',
     'categoria',
@@ -102,11 +91,38 @@ export class ActivitiesPage {
     'actions',
   ] as const;
 
-  protected readonly rows = signal<readonly ActivityListRow[]>([]);
+  protected readonly rows = signal<readonly ActivityListRow[]>([
+    {
+      id: 'artigo-deep-learning',
+      title: 'Artigo: Deep Learning in Academic Workflows',
+      subtitle: 'Periódico Q1 • ISSN 1234-5678',
+      categoria: 'Pesquisa',
+      score: 45.0,
+      status: 'Validado',
+    },
+    {
+      id: 'calculo-diferencial-60h',
+      title: 'Cálculo Diferencial e Integral I (60h)',
+      subtitle: 'Graduação • Turma A',
+      categoria: 'Ensino',
+      score: 20.0,
+      status: 'Pendente',
+    },
+    {
+      id: 'workshop-dados-publicos',
+      title: 'Workshop: Curadoria de Dados Públicos',
+      subtitle: 'Evento Comunitário',
+      categoria: 'Extensão',
+      score: 15.0,
+      status: 'Erro',
+    },
+  ]);
 
-  constructor() {
-    this.loadActivities();
-  }
+  private readonly resetPagination = effect(() => {
+    this.query();
+    this.statusFilter();
+    this.pageIndex.set(1);
+  });
 
   protected readonly filteredRows = computed(() => {
     const activeTab = this.activeTab();
@@ -134,20 +150,6 @@ export class ActivitiesPage {
     });
   });
 
-  protected readonly isEmptyState = computed(
-    () => !this.loadingActivities() && this.rows().length === 0,
-  );
-
-  protected readonly emptyStateTitle = computed(() =>
-    this.rows().length === 0 ? 'Nenhuma atividade cadastrada' : 'Nenhuma atividade encontrada',
-  );
-
-  protected readonly emptyStateDescription = computed(() =>
-    this.rows().length === 0
-      ? 'Cadastre sua primeira atividade para começar a acompanhar a progressão funcional.'
-      : 'Ajuste a busca ou os filtros para encontrar atividades registradas anteriormente.',
-  );
-
   protected tabButtonVariant(tab: ActivitiesListTab): 'secondary' | 'tertiary' {
     return this.activeTab() === tab ? 'secondary' : 'tertiary';
   }
@@ -173,7 +175,6 @@ export class ActivitiesPage {
 
   protected statusToIndicatorStatus(status: UiActivityStatus): 'success' | 'pending' | 'error' {
     switch (status) {
-      case 'Rascunho':
       case 'Validado':
         return 'success';
       case 'Pendente':
@@ -211,90 +212,5 @@ export class ActivitiesPage {
 
   protected openCreateActivity(): void {
     void this.router.navigate(['/atividades/nova']);
-  }
-
-  protected retryLoadActivities(): void {
-    this.loadActivities();
-  }
-
-  protected openEditActivity(activityId: string): void {
-    void this.router.navigate(['/atividades/editar', activityId]);
-  }
-
-  protected deleteActivity(activityId: string): void {
-    this.activitiesApiService
-      .deleteActivity(activityId)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => {
-          this.rows.update((rows) => rows.filter((row) => row.id !== activityId));
-          this.totalItems.set(this.rows().length);
-          this.totalPages.set(Math.max(1, Math.ceil(this.rows().length / 10)));
-          this.snackBar.open('Atividade removida com sucesso.', 'Fechar', { duration: 3000 });
-        },
-        error: () => {
-          this.snackBar.open('Não foi possível remover a atividade.', 'Fechar', { duration: 4000 });
-        },
-      });
-  }
-
-  private loadActivities(): void {
-    this.loadingActivities.set(true);
-    this.loadErrorMessage.set(null);
-
-    this.activitiesApiService
-      .getActivities()
-      .pipe(
-        takeUntilDestroyed(this.destroyRef),
-        finalize(() => this.loadingActivities.set(false)),
-      )
-      .subscribe({
-        next: (activities) => {
-          const mapped = activities.map((activity) => this.mapActivity(activity));
-          this.rows.set(mapped);
-          this.totalItems.set(mapped.length);
-          this.totalPages.set(Math.max(1, Math.ceil(mapped.length / 10)));
-        },
-        error: () => {
-          this.loadErrorMessage.set('Não foi possível carregar as atividades no momento.');
-        },
-      });
-  }
-
-  private mapActivity(activity: ActivityListItem): ActivityListRow {
-    return {
-      id: activity.id,
-      title: activity.title,
-      subtitle: activity.description,
-      categoria: this.mapCategoryLabel(activity.category),
-      score: activity.score,
-      status: this.mapStatusLabel(activity.status),
-    };
-  }
-
-  private mapCategoryLabel(category: ActivityListItem['category']): UiActivityCategory {
-    switch (category) {
-      case 'RESEARCH':
-        return 'Pesquisa';
-      case 'TEACHING':
-        return 'Ensino';
-      case 'OUTREACH':
-        return 'Extensão';
-      case 'MANAGEMENT':
-        return 'Gestão';
-    }
-  }
-
-  private mapStatusLabel(status: ActivityListItem['status']): UiActivityStatus {
-    switch (status) {
-      case 'DRAFT':
-        return 'Rascunho';
-      case 'PENDING':
-        return 'Pendente';
-      case 'APPROVED':
-        return 'Validado';
-      case 'REJECTED':
-        return 'Erro';
-    }
   }
 }
