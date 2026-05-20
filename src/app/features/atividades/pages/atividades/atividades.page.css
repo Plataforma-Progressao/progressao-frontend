@@ -49,9 +49,12 @@
 
 .activities-table .mat-column-categoria,
 .activities-table .mat-column-score,
-.activities-table .mat-column-status,
-.activities-table .mat-column-actions {
+.activities-table .mat-column-status {
   padding-inline: 1.5rem;
+}
+
+.activities-table .mat-column-actions {
+  padding: 0;
 }
 
 .activities-table .mat-column-categoria,
@@ -66,6 +69,29 @@
 
 .activities-table .mat-column-actions {
   text-align: right;
+  vertical-align: middle;
+}
+
+.activities-actions-cell {
+  align-items: center;
+  display: inline-flex;
+  gap: 0.125rem;
+  justify-content: flex-end;
+  padding: 1rem 1.5rem;
+}
+
+.activities-actions-cell .mat-mdc-icon-button {
+  --mat-icon-button-state-layer-size: 40px;
+}
+
+.activities-actions-cell .mat-mdc-icon-button .mat-icon {
+  font-size: 24px;
+  height: 24px;
+  width: 24px;
+}
+
+.activities-delete-spinner {
+  display: inline-flex;
 }
 
 .activities-table .mat-mdc-no-data-row td {
@@ -78,4 +104,12 @@
 
 .activities-action-button:hover {
   background: rgb(69 70 82 / 6%);
+}
+
+.activities-delete-button mat-icon {
+  color: var(--mat-sys-error);
+}
+
+.activities-delete-button:hover:not([disabled]) {
+  background: rgb(186 26 26 / 8%);
 }

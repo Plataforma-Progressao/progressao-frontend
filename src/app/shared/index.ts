@@ -1,5 +1,6 @@
 export { ButtonComponent } from './components/base/button/button.component';
 export { InputComponent } from './components/base/input/input.component';
+export { TextareaComponent } from './components/base/textarea/textarea.component';
 export { CheckboxComponent } from './components/base/checkbox/checkbox.component';
 export { BadgeComponent, type BadgeVariant } from './components/base/badge/badge.component';
 export { StatusIndicatorComponent, type StatusIndicator } from './components/base/status-indicator/status-indicator.component';
@@ -8,3 +9,5 @@ export { CardComponent } from './components/base/card/card.component';
 export { PaginationComponent } from './components/base/pagination/pagination.component';
 export { TabsComponent } from './components/base/tabs/tabs.component';
 export { SelectComponent } from './components/base/select/select.component';
+export { ConfirmationDialogService } from './components/base/confirmation-dialog/confirmation-dialog.service';
+export type { ConfirmationDialogData } from './components/base/confirmation-dialog/confirmation-dialog.models';

@@ -54,13 +54,22 @@ export class PaginationComponent {
   protected pageNumbers(): number[] {
     const max = this.maxButtons();
     const total = this.totalPages();
-    const pages: number[] = [];
 
-    for (let i = 1; i <= Math.min(max, total); i++) {
-      pages.push(i);
+    if (total <= 0) {
+      return [];
     }
 
-    return pages;
+    if (total <= max) {
+      return Array.from({ length: total }, (_, index) => index + 1);
+    }
+
+    const current = this.currentPage();
+    let start = Math.max(1, current - Math.floor(max / 2));
+    const end = Math.min(total, start + max - 1);
+
+    start = Math.max(1, end - max + 1);
+
+    return Array.from({ length: end - start + 1 }, (_, index) => start + index);
   }
 
   protected getPageButtonClass(page: number): string {

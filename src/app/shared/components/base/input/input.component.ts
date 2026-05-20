@@ -13,9 +13,14 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { formatCpfValue, formatPhoneValue } from '../../../forms/br-form.utils';
+import {
+  formatCpfValue,
+  formatPhoneValue,
+  formatWorkloadHoursValue,
+  parseWorkloadHoursValue,
+} from '../../../forms/br-form.utils';
 
-type InputMask = 'none' | 'cpf' | 'phone';
+type InputMask = 'none' | 'cpf' | 'phone' | 'workloadHours';
 
 @Component({
   selector: 'app-input',
@@ -53,15 +58,35 @@ export class InputComponent implements ControlValueAccessor {
 
   protected value = '';
   protected disabled = false;
-  protected onChange: (value: string) => void = () => undefined;
+  protected onChange: (value: string | number) => void = () => undefined;
   protected onTouched: () => void = () => undefined;
 
-  writeValue(value: string | null): void {
-    this.value = this.applyMask(value ?? '');
+  writeValue(value: string | number | null): void {
+    if (this.mask() === 'workloadHours') {
+      const numeric =
+        value === null || value === undefined || value === ''
+          ? ''
+          : String(value);
+      this.value = numeric ? formatWorkloadHoursValue(numeric, true) : '';
+      this.cdr.markForCheck();
+      return;
+    }
+
+    if (this.type() === 'number') {
+      const numeric =
+        value === null || value === undefined || value === ''
+          ? ''
+          : String(value);
+      this.value = numeric;
+      this.cdr.markForCheck();
+      return;
+    }
+
+    this.value = this.applyMask(value === null || value === undefined ? '' : String(value));
     this.cdr.markForCheck();
   }
 
-  registerOnChange(fn: (value: string) => void): void {
+  registerOnChange(fn: (value: string | number) => void): void {
     this.onChange = fn;
   }
 
@@ -76,6 +101,27 @@ export class InputComponent implements ControlValueAccessor {
 
   protected onInput(event: Event): void {
     const target = event.target as HTMLInputElement;
+
+    if (this.mask() === 'workloadHours') {
+      const selectionStart = target.selectionStart ?? target.value.length;
+      const digitsBeforeCaret = this.countDigits(target.value.slice(0, selectionStart));
+      const maskedValue = formatWorkloadHoursValue(target.value);
+      this.value = maskedValue;
+      target.value = maskedValue;
+      const nextCaret = this.findCaretPosition(maskedValue, digitsBeforeCaret);
+      target.setSelectionRange(nextCaret, nextCaret);
+      this.onChange(parseWorkloadHoursValue(maskedValue));
+      return;
+    }
+
+    if (this.type() === 'number') {
+      const sanitized = target.value.replace(/[^\d]/g, '');
+      this.value = sanitized;
+      target.value = sanitized;
+      this.onChange(sanitized === '' ? 0 : Number(sanitized));
+      return;
+    }
+
     const selectionStart = target.selectionStart ?? target.value.length;
     const digitsBeforeCaret = this.countDigits(target.value.slice(0, selectionStart));
     const maskedValue = this.applyMask(target.value);
@@ -92,6 +138,13 @@ export class InputComponent implements ControlValueAccessor {
   }
 
   protected onBlur(event: FocusEvent): void {
+    if (this.mask() === 'workloadHours' && this.value) {
+      const finalized = formatWorkloadHoursValue(this.value, true);
+      this.value = finalized;
+      this.onChange(parseWorkloadHoursValue(finalized));
+      this.cdr.markForCheck();
+    }
+
     this.onTouched();
     this.blurred.emit(event);
   }
@@ -118,6 +171,10 @@ export class InputComponent implements ControlValueAccessor {
       return 15;
     }
 
+    if (this.mask() === 'workloadHours') {
+      return 7;
+    }
+
     return null;
   }
 
@@ -128,6 +185,10 @@ export class InputComponent implements ControlValueAccessor {
 
     if (this.mask() === 'phone') {
       return formatPhoneValue(value);
+    }
+
+    if (this.mask() === 'workloadHours') {
+      return formatWorkloadHoursValue(value, true);
     }
 
     return value;

@@ -1,0 +1,31 @@
+<div class="confirmation-dialog">
+  <div class="confirmation-dialog__header">
+    <div
+      class="confirmation-dialog__icon"
+      [class.confirmation-dialog__icon--danger]="confirmVariant === 'danger'"
+      aria-hidden="true"
+    >
+      <mat-icon>{{ icon }}</mat-icon>
+    </div>
+
+    <div class="confirmation-dialog__headings">
+      <h2 id="confirmation-dialog-title" class="confirmation-dialog__title">{{ data.title }}</h2>
+      <p id="confirmation-dialog-message" class="confirmation-dialog__message">{{ data.message }}</p>
+    </div>
+  </div>
+
+  <div class="confirmation-dialog__actions">
+    <app-button
+      variant="tertiary"
+      size="medium"
+      [label]="cancelLabel"
+      (clicked)="cancel()"
+    ></app-button>
+    <app-button
+      [variant]="confirmVariant"
+      size="medium"
+      [label]="confirmLabel"
+      (clicked)="confirm()"
+    ></app-button>
+  </div>
+</div>

@@ -1,0 +1,26 @@
+<mat-form-field [appearance]="appearance()" class="app-textarea-field">
+  @if (label()) {
+    <mat-label>{{ label() }}</mat-label>
+  }
+
+  <textarea
+    matInput
+    [rows]="rows()"
+    [placeholder]="placeholder()"
+    [value]="value"
+    [disabled]="isDisabled"
+    [attr.maxlength]="maxLength"
+    [attr.aria-label]="label() || placeholder()"
+    [attr.aria-invalid]="hasError"
+    (input)="onInput($event)"
+    (blur)="onBlur()"
+  ></textarea>
+
+  @if (hasError && resolvedErrorMessage) {
+    <mat-error>{{ resolvedErrorMessage }}</mat-error>
+  }
+
+  @if (hint() && !hasError) {
+    <mat-hint>{{ hint() }}</mat-hint>
+  }
+</mat-form-field>

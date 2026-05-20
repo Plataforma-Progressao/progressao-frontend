@@ -2,7 +2,6 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  effect,
   inject,
   signal,
 } from '@angular/core';
@@ -17,16 +16,30 @@ import { MatTableModule } from '@angular/material/table';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
-import { catchError, EMPTY, finalize } from 'rxjs';
+import {
+  catchError,
+  debounceTime,
+  distinctUntilChanged,
+  EMPTY,
+  filter,
+  finalize,
+  switchMap,
+  take,
+  tap,
+} from 'rxjs';
 import { ActivitiesApiService } from '../../activities-api.service';
 import { BadgeComponent } from '../../../../shared/components/base/badge/badge.component';
 import { ButtonComponent } from '../../../../shared/components/base/button/button.component';
 import { InputComponent } from '../../../../shared/components/base/input/input.component';
+import { ConfirmationDialogService } from '../../../../shared/components/base/confirmation-dialog/confirmation-dialog.service';
+import { PaginationComponent } from '../../../../shared/components/base/pagination/pagination.component';
 import { StatusIndicatorComponent } from '../../../../shared/components/base/status-indicator/status-indicator.component';
 import {
+  ActivityCategoryCode,
   ActivityListItemDto,
   ActivityListItemUi,
   ActivityStatusCode,
+  ActivitiesListQuery,
 } from '../../models/activity-create.models';
 
 type UiActivityCategory = 'Pesquisa' | 'Ensino' | 'Extensão' | 'Gestão';
@@ -51,6 +64,27 @@ const STATUS_OPTIONS: readonly { label: string; value: 'Todos' | UiActivityStatu
   { label: 'Erro', value: 'Erro' },
 ];
 
+const YEAR_OPTIONS = [
+  { label: 'Todos os anos', value: '' },
+  { label: '2026', value: '2026' },
+  { label: '2025', value: '2025' },
+  { label: '2024', value: '2024' },
+  { label: '2023', value: '2023' },
+] as const;
+
+const TAB_TO_CATEGORY: Partial<Record<ActivitiesListTab, ActivityCategoryCode>> = {
+  Ensino: 'TEACHING',
+  Pesquisa: 'RESEARCH',
+  Extensão: 'OUTREACH',
+  Gestão: 'MANAGEMENT',
+};
+
+const STATUS_TO_API: Record<UiActivityStatus, ActivityStatusCode> = {
+  Validado: 'APPROVED',
+  Pendente: 'PENDING',
+  Erro: 'REJECTED',
+};
+
 @Component({
   selector: 'app-activities-page',
   imports: [
@@ -65,6 +99,7 @@ const STATUS_OPTIONS: readonly { label: string; value: 'Todos' | UiActivityStatu
     InputComponent,
     BadgeComponent,
     StatusIndicatorComponent,
+    PaginationComponent,
   ],
   templateUrl: './atividades.page.html',
   styleUrls: ['./atividades.page.css'],
@@ -72,11 +107,13 @@ const STATUS_OPTIONS: readonly { label: string; value: 'Todos' | UiActivityStatu
 })
 export class ActivitiesPage {
   private readonly activitiesApi = inject(ActivitiesApiService);
+  private readonly confirmationDialog = inject(ConfirmationDialogService);
   private readonly router = inject(Router);
   private readonly snackBar = inject(MatSnackBar);
 
   protected readonly tabs = ALL_TABS;
   protected readonly statusOptions = STATUS_OPTIONS;
+  protected readonly yearOptions = YEAR_OPTIONS;
 
   protected readonly activeTab = signal<ActivitiesListTab>('Todas Atividades');
 
@@ -84,21 +121,28 @@ export class ActivitiesPage {
   protected readonly statusControl = new FormControl<'Todos' | UiActivityStatus>('Todos', {
     nonNullable: true,
   });
+  protected readonly yearControl = new FormControl('', { nonNullable: true });
 
-  protected readonly query = toSignal(this.queryControl.valueChanges, {
-    initialValue: this.queryControl.value,
-  });
+  protected readonly debouncedQuery = toSignal(
+    this.queryControl.valueChanges.pipe(debounceTime(300), distinctUntilChanged()),
+    { initialValue: this.queryControl.value },
+  );
 
   protected readonly statusFilter = toSignal(this.statusControl.valueChanges, {
     initialValue: this.statusControl.value,
   });
 
+  protected readonly yearFilter = toSignal(this.yearControl.valueChanges, {
+    initialValue: this.yearControl.value,
+  });
+
   protected readonly pageIndex = signal(1);
-  protected readonly totalPages = signal(3);
+  protected readonly pageSize = signal(10);
+  protected readonly totalPages = signal(0);
+  protected readonly totalItems = signal(0);
   protected readonly loadingActivities = signal(true);
   protected readonly loadErrorMessage = signal<string | null>(null);
   protected readonly deletingActivityId = signal<string | null>(null);
-  protected readonly totalItems = computed(() => this.activities().length);
   protected readonly displayedColumns = [
     'title',
     'categoria',
@@ -107,54 +151,23 @@ export class ActivitiesPage {
     'actions',
   ] as const;
 
-  protected readonly activities = signal<readonly ActivityListItemUi[]>([]);
+  protected readonly rows = signal<readonly ActivityListRow[]>([]);
 
-  private readonly resetPagination = effect(() => {
-    this.query();
-    this.statusFilter();
-    this.pageIndex.set(1);
-  });
-
-  constructor() {
-    this.loadActivities();
-  }
-
-  protected readonly filteredRows = computed(() => {
-    const activeTab = this.activeTab();
-    const query = this.query().trim().toLowerCase();
-    const status = this.statusFilter();
-
-    return this.activities().filter((row) => {
-      if (activeTab !== 'Todas Atividades' && row.categoria !== activeTab) {
-        return false;
-      }
-
-      if (status !== 'Todos' && row.status !== status) {
-        return false;
-      }
-
-      if (!query) {
-        return true;
-      }
-
-      return (
-        row.title.toLowerCase().includes(query) ||
-        row.subtitle.toLowerCase().includes(query) ||
-        row.categoria.toLowerCase().includes(query)
-      );
-    });
+  protected readonly hasActiveFilters = computed(() => {
+    return (
+      this.activeTab() !== 'Todas Atividades' ||
+      this.statusFilter() !== 'Todos' ||
+      Boolean(this.debouncedQuery().trim()) ||
+      Boolean(this.yearFilter().trim())
+    );
   });
 
   protected readonly isEmptyState = computed(
-    () => !this.loadingActivities() && !this.loadErrorMessage() && this.filteredRows().length === 0,
+    () => !this.loadingActivities() && !this.loadErrorMessage() && this.rows().length === 0,
   );
 
   protected readonly emptyStateTitle = computed(() => {
-    if (
-      this.activeTab() !== 'Todas Atividades' ||
-      this.statusFilter() !== 'Todos' ||
-      this.query().trim()
-    ) {
+    if (this.hasActiveFilters()) {
       return 'Nenhuma atividade encontrada';
     }
 
@@ -162,16 +175,33 @@ export class ActivitiesPage {
   });
 
   protected readonly emptyStateDescription = computed(() => {
-    if (
-      this.activeTab() !== 'Todas Atividades' ||
-      this.statusFilter() !== 'Todos' ||
-      this.query().trim()
-    ) {
+    if (this.hasActiveFilters()) {
       return 'Ajuste os filtros acima para ver outras atividades ou limpe a busca atual.';
     }
 
     return 'Adicione a primeira atividade para começar a acompanhar sua progressão funcional.';
   });
+
+  constructor() {
+    this.queryControl.valueChanges
+      .pipe(debounceTime(300), distinctUntilChanged())
+      .subscribe(() => {
+        this.pageIndex.set(1);
+        this.loadActivities();
+      });
+
+    this.statusControl.valueChanges.subscribe(() => {
+      this.pageIndex.set(1);
+      this.loadActivities();
+    });
+
+    this.yearControl.valueChanges.subscribe(() => {
+      this.pageIndex.set(1);
+      this.loadActivities();
+    });
+
+    this.loadActivities();
+  }
 
   protected tabButtonVariant(tab: ActivitiesListTab): 'secondary' | 'tertiary' {
     return this.activeTab() === tab ? 'secondary' : 'tertiary';
@@ -207,30 +237,15 @@ export class ActivitiesPage {
     }
   }
 
-  protected pageButtonVariant(page: number): 'secondary' | 'tertiary' {
-    return this.pageIndex() === page ? 'secondary' : 'tertiary';
-  }
-
-  protected pageButtonCurrent(page: number): string | null {
-    return this.pageIndex() === page ? 'page' : null;
-  }
-
   protected setTab(tab: ActivitiesListTab): void {
     this.activeTab.set(tab);
     this.pageIndex.set(1);
+    this.loadActivities();
   }
 
-  protected previousPage(): void {
-    this.pageIndex.update((current) => Math.max(1, current - 1));
-  }
-
-  protected nextPage(): void {
-    this.pageIndex.update((current) => Math.min(this.totalPages(), current + 1));
-  }
-
-  protected goToPage(page: number): void {
-    const clamped = Math.min(this.totalPages(), Math.max(1, page));
-    this.pageIndex.set(clamped);
+  protected onPageChanged(page: number): void {
+    this.pageIndex.set(page);
+    this.loadActivities();
   }
 
   protected openCreateActivity(): void {
@@ -242,34 +257,45 @@ export class ActivitiesPage {
   }
 
   protected deleteActivity(activityId: string): void {
-    const shouldDelete =
-      typeof globalThis.confirm === 'function'
-        ? globalThis.confirm('Deseja excluir esta atividade?')
-        : true;
-
-    if (!shouldDelete) {
+    if (this.deletingActivityId()) {
       return;
     }
 
-    this.deletingActivityId.set(activityId);
-
-    this.activitiesApi
-      .removeActivity(activityId)
+    this.confirmationDialog
+      .open({
+        title: 'Excluir atividade?',
+        message:
+          'Esta ação não pode ser desfeita. A atividade e seus dados associados serão removidos permanentemente.',
+        confirmLabel: 'Excluir',
+        cancelLabel: 'Cancelar',
+        confirmVariant: 'danger',
+        icon: 'delete',
+      })
       .pipe(
-        catchError((error: unknown) => {
-          this.snackBar.open(
-            this.resolveHttpError(error, 'Não foi possível excluir a atividade.'),
-            'Fechar',
-            { duration: 4000 },
-          );
-          this.deletingActivityId.set(null);
-          return EMPTY;
-        }),
+        take(1),
+        filter((confirmed) => confirmed === true),
+        tap(() => this.deletingActivityId.set(activityId)),
+        switchMap(() =>
+          this.activitiesApi.removeActivity(activityId).pipe(
+            catchError((error: unknown) => {
+              this.snackBar.open(
+                this.resolveHttpError(error, 'Não foi possível excluir a atividade.'),
+                'Fechar',
+                { duration: 4000 },
+              );
+              return EMPTY;
+            }),
+          ),
+        ),
+        finalize(() => this.deletingActivityId.set(null)),
       )
-      .subscribe(() => {
-        this.activities.update((rows) => rows.filter((row) => row.id !== activityId));
-        this.deletingActivityId.set(null);
+      .subscribe((result) => {
+        if (!result) {
+          return;
+        }
+
         this.snackBar.open('Atividade excluída com sucesso.', 'Fechar', { duration: 3000 });
+        this.loadActivities();
       });
   }
 
@@ -285,8 +311,10 @@ export class ActivitiesPage {
     this.loadingActivities.set(true);
     this.loadErrorMessage.set(null);
 
+    const query = this.buildListQuery();
+
     this.activitiesApi
-      .findAllActivities()
+      .listActivities(query)
       .pipe(
         catchError((error: unknown) => {
           this.loadErrorMessage.set(
@@ -296,12 +324,35 @@ export class ActivitiesPage {
         }),
         finalize(() => this.loadingActivities.set(false)),
       )
-      .subscribe((activities) => {
-        this.activities.set(activities.map((activity) => this.toUiRow(activity)));
+      .subscribe((response) => {
+        if (!response) {
+          return;
+        }
+
+        this.rows.set(response.items.map((activity) => this.toUiRow(activity)));
+        this.totalItems.set(response.total);
+        this.totalPages.set(response.totalPages);
+        this.pageIndex.set(response.page);
       });
   }
 
-  private toUiRow(activity: ActivityListItemDto): ActivityListItemUi {
+  private buildListQuery(): ActivitiesListQuery {
+    const category = TAB_TO_CATEGORY[this.activeTab()];
+    const search = this.debouncedQuery().trim();
+    const status = this.statusFilter();
+    const term = this.yearFilter().trim();
+
+    return {
+      page: this.pageIndex(),
+      pageSize: this.pageSize(),
+      ...(category ? { category } : {}),
+      ...(search ? { search } : {}),
+      ...(status !== 'Todos' ? { status: STATUS_TO_API[status] } : {}),
+      ...(term ? { term } : {}),
+    };
+  }
+
+  private toUiRow(activity: ActivityListItemDto): ActivityListRow {
     return {
       id: activity.id,
       title: activity.title,

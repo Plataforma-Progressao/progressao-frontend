@@ -172,3 +172,8 @@ body {
 .mat-mdc-snack-bar-container.app-toast--info .mat-mdc-button.mat-mdc-snack-bar-action {
 	color: #eef2ff;
 }
+
+.app-confirmation-dialog-panel .mat-mdc-dialog-surface {
+	padding: 1.5rem 1.75rem;
+	border-radius: 1.25rem;
+}

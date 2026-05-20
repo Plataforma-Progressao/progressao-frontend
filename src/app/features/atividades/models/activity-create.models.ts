@@ -53,3 +53,20 @@ export interface ActivityListItemUi {
   readonly score: number;
   readonly status: 'Validado' | 'Pendente' | 'Erro';
 }
+
+export interface ActivitiesListQuery {
+  readonly page: number;
+  readonly pageSize: number;
+  readonly search?: string;
+  readonly category?: ActivityCategoryCode;
+  readonly status?: ActivityStatusCode;
+  readonly term?: string;
+}
+
+export interface PaginatedActivitiesResponse {
+  readonly items: readonly ActivityListItemDto[];
+  readonly total: number;
+  readonly page: number;
+  readonly pageSize: number;
+  readonly totalPages: number;
+}

@@ -3,6 +3,7 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideRouter } from '@angular/router';
 import { provideServiceWorker } from '@angular/service-worker';
+import { MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { authHeaderInterceptor } from './core/auth/interceptors/auth-header.interceptor';
 import { authRefreshInterceptor } from './core/auth/interceptors/auth-refresh.interceptor';
@@ -16,7 +17,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptors([httpErrorInterceptor, authHeaderInterceptor, authRefreshInterceptor])),
     provideRouter(routes),
     provideAnimations(),
-    importProvidersFrom(MatSnackBarModule),
+    importProvidersFrom(MatSnackBarModule, MatDialogModule),
     provideServiceWorker('ngsw-worker.js', {
       enabled: !isDevMode(),
       registrationStrategy: 'registerWhenStable:30000',

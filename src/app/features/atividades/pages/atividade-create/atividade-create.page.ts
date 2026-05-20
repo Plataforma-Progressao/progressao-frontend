@@ -2,7 +2,10 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -22,6 +25,9 @@ import {
   ActivityListItemDto,
   ActivityScoreEstimate,
 } from '../../models/activity-create.models';
+import { ButtonComponent } from '../../../../shared/components/base/button/button.component';
+import { InputComponent } from '../../../../shared/components/base/input/input.component';
+import { TextareaComponent } from '../../../../shared/components/base/textarea/textarea.component';
 
 interface UploadItem {
   readonly localId: string;
@@ -39,7 +45,18 @@ interface CategoryOption {
 
 @Component({
   selector: 'app-activity-create-page',
-  imports: [ReactiveFormsModule, MatIconModule, MatProgressSpinnerModule, RouterLink],
+  imports: [
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatIconModule,
+    MatInputModule,
+    MatProgressSpinnerModule,
+    MatSelectModule,
+    RouterLink,
+    ButtonComponent,
+    InputComponent,
+    TextareaComponent,
+  ],
   templateUrl: './atividade-create.page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -62,7 +79,7 @@ export class ActivityCreatePage {
     titulo: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(160)]],
     categoria: ['' as ActivityCategoryCode | '', [Validators.required]],
     cargaHoraria: [0, [Validators.required, Validators.min(0), Validators.max(999)]],
-    descricao: ['', [Validators.required, Validators.minLength(20), Validators.maxLength(1200)]],
+    descricao: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(1200)]],
   });
 
   protected readonly activityId = signal<string | null>(null);

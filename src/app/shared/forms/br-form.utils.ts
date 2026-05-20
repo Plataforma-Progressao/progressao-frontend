@@ -22,6 +22,26 @@ export function formatCpfValue(value: string): string {
   return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6, 9)}-${digits.slice(9)}`;
 }
 
+export function formatWorkloadHoursValue(value: string, finalizeMask = false): string {
+  const digits = onlyDigits(value).slice(0, 3);
+
+  if (!digits) {
+    return '';
+  }
+
+  if (!finalizeMask && digits.length <= 2) {
+    return digits;
+  }
+
+  const hours = Number.parseInt(digits, 10);
+  return `${hours}:00`;
+}
+
+export function parseWorkloadHoursValue(value: string): number {
+  const digits = onlyDigits(value).slice(0, 3);
+  return digits ? Number.parseInt(digits, 10) : 0;
+}
+
 export function formatPhoneValue(value: string): string {
   const digits = onlyDigits(value).slice(0, 11);
 

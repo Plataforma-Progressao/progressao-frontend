@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 import { ApiSuccessResponse } from '../../core/http/api-envelope.types';
 import { getApiUrl } from '../../core/config/runtime-config';
@@ -7,9 +7,11 @@ import {
   ActivityCreatePayload,
   ActivityCreateResponse,
   ActivityEvidenceUploadResponse,
+  ActivitiesListQuery,
   ActivityListItemDto,
   ActivityScoreEstimate,
   ActivityScoreEstimateRequest,
+  PaginatedActivitiesResponse,
 } from './models/activity-create.models';
 
 @Injectable({ providedIn: 'root' })
@@ -17,11 +19,31 @@ export class ActivitiesApiService {
   private readonly http = inject(HttpClient);
   private readonly apiBaseUrl = `${getApiUrl().replace(/\/+$/, '')}/api`;
 
-  findAllActivities(): Observable<readonly ActivityListItemDto[]> {
+  listActivities(query: ActivitiesListQuery): Observable<PaginatedActivitiesResponse> {
+    let params = new HttpParams()
+      .set('page', String(query.page))
+      .set('pageSize', String(query.pageSize));
+
+    if (query.search?.trim()) {
+      params = params.set('search', query.search.trim());
+    }
+
+    if (query.category) {
+      params = params.set('category', query.category);
+    }
+
+    if (query.status) {
+      params = params.set('status', query.status);
+    }
+
+    if (query.term?.trim()) {
+      params = params.set('term', query.term.trim());
+    }
+
     return this.http
       .get<
-        ApiSuccessResponse<readonly ActivityListItemDto[]> | readonly ActivityListItemDto[]
-      >(`${this.apiBaseUrl}/activities`)
+        ApiSuccessResponse<PaginatedActivitiesResponse> | PaginatedActivitiesResponse
+      >(`${this.apiBaseUrl}/activities`, { params })
       .pipe(map((response) => this.unwrapData(response)));
   }
 
