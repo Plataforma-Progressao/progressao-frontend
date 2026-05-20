@@ -18,11 +18,19 @@ export class ActivitiesApiService {
   private readonly apiBaseUrl = `${getApiUrl().replace(/\/+$/, '')}/api`;
 
   findAllActivities(): Observable<readonly ActivityListItemDto[]> {
-    return this.http.get<readonly ActivityListItemDto[]>(`${this.apiBaseUrl}/activities`);
+    return this.http
+      .get<
+        ApiSuccessResponse<readonly ActivityListItemDto[]> | readonly ActivityListItemDto[]
+      >(`${this.apiBaseUrl}/activities`)
+      .pipe(map((response) => this.unwrapData(response)));
   }
 
   findActivityById(activityId: string): Observable<ActivityListItemDto> {
-    return this.http.get<ActivityListItemDto>(`${this.apiBaseUrl}/activities/${activityId}`);
+    return this.http
+      .get<
+        ApiSuccessResponse<ActivityListItemDto> | ActivityListItemDto
+      >(`${this.apiBaseUrl}/activities/${activityId}`)
+      .pipe(map((response) => this.unwrapData(response)));
   }
 
   createActivity(payload: ActivityCreatePayload): Observable<ActivityCreateResponse> {
@@ -67,5 +75,13 @@ export class ActivitiesApiService {
         ApiSuccessResponse<ActivityScoreEstimate>
       >(`${this.apiBaseUrl}/activities/estimate`, payload)
       .pipe(map((response) => response.data));
+  }
+
+  private unwrapData<T>(response: ApiSuccessResponse<T> | T): T {
+    if (response && typeof response === 'object' && 'success' in response && 'data' in response) {
+      return (response as ApiSuccessResponse<T>).data;
+    }
+
+    return response as T;
   }
 }

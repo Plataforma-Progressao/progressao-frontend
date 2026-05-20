@@ -16,7 +16,8 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
-import { catchError, EMPTY } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
+import { catchError, EMPTY, finalize } from 'rxjs';
 import { ActivitiesApiService } from '../../activities-api.service';
 import { BadgeComponent } from '../../../../shared/components/base/badge/badge.component';
 import { ButtonComponent } from '../../../../shared/components/base/button/button.component';
@@ -291,13 +292,12 @@ export class ActivitiesPage {
           this.loadErrorMessage.set(
             this.resolveHttpError(error, 'Não foi possível carregar suas atividades.'),
           );
-          this.loadingActivities.set(false);
           return EMPTY;
         }),
+        finalize(() => this.loadingActivities.set(false)),
       )
       .subscribe((activities) => {
         this.activities.set(activities.map((activity) => this.toUiRow(activity)));
-        this.loadingActivities.set(false);
       });
   }
 
@@ -347,6 +347,17 @@ export class ActivitiesPage {
   }
 
   private resolveHttpError(error: unknown, fallback: string): string {
+    if (error instanceof HttpErrorResponse) {
+      const apiMessage = error.error?.message;
+      if (typeof apiMessage === 'string' && apiMessage.trim()) {
+        return apiMessage;
+      }
+
+      if (error.message.trim()) {
+        return error.message;
+      }
+    }
+
     if (error instanceof Error && error.message.trim()) {
       return error.message;
     }

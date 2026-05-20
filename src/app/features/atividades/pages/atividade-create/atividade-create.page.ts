@@ -6,7 +6,15 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { catchError, distinctUntilChanged, EMPTY, firstValueFrom, map } from 'rxjs';
+import {
+  catchError,
+  debounceTime,
+  distinctUntilChanged,
+  EMPTY,
+  firstValueFrom,
+  map,
+  startWith,
+} from 'rxjs';
 import { ActivitiesApiService } from '../../activities-api.service';
 import {
   ActivityCategoryCode,
@@ -63,6 +71,7 @@ export class ActivityCreatePage {
   protected readonly isLoadingActivity = signal(false);
   protected readonly isEstimating = signal(false);
   protected readonly submitting = signal(false);
+  protected readonly formIsValid = signal(this.form.valid);
   protected readonly loadErrorMessage = signal<string | null>(null);
   protected readonly scoreEstimate = signal<ActivityScoreEstimate>({
     baseCategory: 15,
@@ -89,11 +98,17 @@ export class ActivityCreatePage {
   );
 
   protected readonly canSubmit = computed(() => {
-    return !this.submitting() && !this.isLoadingActivity() && this.form.valid;
+    return !this.submitting() && !this.isLoadingActivity() && this.formIsValid();
   });
 
   constructor() {
-    this.form.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => this.recomputeEstimate());
+    this.form.statusChanges
+      .pipe(startWith(this.form.status), takeUntilDestroyed())
+      .subscribe(() => this.formIsValid.set(this.form.valid));
+
+    this.form.valueChanges
+      .pipe(debounceTime(350), takeUntilDestroyed())
+      .subscribe(() => this.recomputeEstimate());
 
     this.route.paramMap
       .pipe(
