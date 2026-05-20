@@ -11,6 +11,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
 import { Router } from '@angular/router';
@@ -48,6 +49,7 @@ const STATUS_OPTIONS: readonly { label: string; value: 'Todos' | UiActivityStatu
     MatButtonModule,
     MatFormFieldModule,
     MatIconModule,
+    MatProgressSpinnerModule,
     MatSelectModule,
     MatTableModule,
     ButtonComponent,
@@ -82,7 +84,9 @@ export class ActivitiesPage {
 
   protected readonly pageIndex = signal(1);
   protected readonly totalPages = signal(3);
-  protected readonly totalItems = signal(42);
+  protected readonly loadingActivities = signal(false);
+  protected readonly loadErrorMessage = signal<string | null>(null);
+  protected readonly totalItems = computed(() => this.rows().length);
   protected readonly displayedColumns = [
     'title',
     'categoria',
@@ -150,6 +154,34 @@ export class ActivitiesPage {
     });
   });
 
+  protected readonly isEmptyState = computed(
+    () => !this.loadingActivities() && !this.loadErrorMessage() && this.filteredRows().length === 0,
+  );
+
+  protected readonly emptyStateTitle = computed(() => {
+    if (
+      this.activeTab() !== 'Todas Atividades' ||
+      this.statusFilter() !== 'Todos' ||
+      this.query().trim()
+    ) {
+      return 'Nenhuma atividade encontrada';
+    }
+
+    return 'Ainda não há atividades cadastradas';
+  });
+
+  protected readonly emptyStateDescription = computed(() => {
+    if (
+      this.activeTab() !== 'Todas Atividades' ||
+      this.statusFilter() !== 'Todos' ||
+      this.query().trim()
+    ) {
+      return 'Ajuste os filtros acima para ver outras atividades ou limpe a busca atual.';
+    }
+
+    return 'Adicione a primeira atividade para começar a acompanhar sua progressão funcional.';
+  });
+
   protected tabButtonVariant(tab: ActivitiesListTab): 'secondary' | 'tertiary' {
     return this.activeTab() === tab ? 'secondary' : 'tertiary';
   }
@@ -212,5 +244,26 @@ export class ActivitiesPage {
 
   protected openCreateActivity(): void {
     void this.router.navigate(['/atividades/nova']);
+  }
+
+  protected openEditActivity(activityId: string): void {
+    void this.router.navigate(['/atividades/editar', activityId]);
+  }
+
+  protected deleteActivity(activityId: string): void {
+    const shouldDelete =
+      typeof globalThis.confirm === 'function'
+        ? globalThis.confirm('Deseja excluir esta atividade?')
+        : true;
+
+    if (!shouldDelete) {
+      return;
+    }
+
+    this.rows.update((rows) => rows.filter((row) => row.id !== activityId));
+  }
+
+  protected retryLoadActivities(): void {
+    this.loadErrorMessage.set(null);
   }
 }
