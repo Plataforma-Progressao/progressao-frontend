@@ -7,6 +7,7 @@ import {
   ActivityCreatePayload,
   ActivityCreateResponse,
   ActivityEvidenceUploadResponse,
+  ActivityListItemDto,
   ActivityScoreEstimate,
   ActivityScoreEstimateRequest,
 } from './models/activity-create.models';
@@ -16,10 +17,33 @@ export class ActivitiesApiService {
   private readonly http = inject(HttpClient);
   private readonly apiBaseUrl = `${getApiUrl().replace(/\/+$/, '')}/api`;
 
+  findAllActivities(): Observable<readonly ActivityListItemDto[]> {
+    return this.http.get<readonly ActivityListItemDto[]>(`${this.apiBaseUrl}/activities`);
+  }
+
+  findActivityById(activityId: string): Observable<ActivityListItemDto> {
+    return this.http.get<ActivityListItemDto>(`${this.apiBaseUrl}/activities/${activityId}`);
+  }
+
   createActivity(payload: ActivityCreatePayload): Observable<ActivityCreateResponse> {
     return this.http
       .post<ApiSuccessResponse<ActivityCreateResponse>>(`${this.apiBaseUrl}/activities`, payload)
       .pipe(map((response) => response.data));
+  }
+
+  updateActivity(
+    activityId: string,
+    payload: ActivityCreatePayload,
+  ): Observable<ActivityCreateResponse> {
+    return this.http
+      .patch<
+        ApiSuccessResponse<ActivityCreateResponse>
+      >(`${this.apiBaseUrl}/activities/${activityId}`, payload)
+      .pipe(map((response) => response.data));
+  }
+
+  removeActivity(activityId: string): Observable<{ id: string }> {
+    return this.http.delete<{ id: string }>(`${this.apiBaseUrl}/activities/${activityId}`);
   }
 
   uploadEvidence(activityId: string, file: File): Observable<ActivityEvidenceUploadResponse> {

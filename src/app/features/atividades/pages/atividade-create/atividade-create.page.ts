@@ -3,13 +3,15 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Router, RouterLink } from '@angular/router';
-import { catchError, EMPTY, firstValueFrom } from 'rxjs';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { catchError, distinctUntilChanged, EMPTY, firstValueFrom, map } from 'rxjs';
 import { ActivitiesApiService } from '../../activities-api.service';
 import {
   ActivityCategoryCode,
   ActivityCreatePayload,
+  ActivityListItemDto,
   ActivityScoreEstimate,
 } from '../../models/activity-create.models';
 
@@ -29,15 +31,17 @@ interface CategoryOption {
 
 @Component({
   selector: 'app-activity-create-page',
-  imports: [ReactiveFormsModule, MatIconModule, RouterLink],
+  imports: [ReactiveFormsModule, MatIconModule, MatProgressSpinnerModule, RouterLink],
   templateUrl: './atividade-create.page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ActivityCreatePage {
   private readonly fb = inject(FormBuilder);
+  private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly snackBar = inject(MatSnackBar);
   private readonly activitiesApi = inject(ActivitiesApiService);
+  private readonly estimateRequestToken = signal(0);
 
   protected readonly categoriaOptions: readonly CategoryOption[] = [
     { label: 'Ensino', value: 'TEACHING' },
@@ -53,9 +57,13 @@ export class ActivityCreatePage {
     descricao: ['', [Validators.required, Validators.minLength(20), Validators.maxLength(1200)]],
   });
 
+  protected readonly activityId = signal<string | null>(null);
   protected readonly uploads = signal<readonly UploadItem[]>([]);
   protected readonly dragging = signal(false);
+  protected readonly isLoadingActivity = signal(false);
+  protected readonly isEstimating = signal(false);
   protected readonly submitting = signal(false);
+  protected readonly loadErrorMessage = signal<string | null>(null);
   protected readonly scoreEstimate = signal<ActivityScoreEstimate>({
     baseCategory: 15,
     workloadFactor: 2.5,
@@ -63,16 +71,58 @@ export class ActivityCreatePage {
     progressPercentage: 12,
   });
 
+  protected readonly isEditing = computed(() => this.activityId() !== null);
+  protected readonly pageTitle = computed(() =>
+    this.isEditing() ? 'Editar Atividade Acadêmica' : 'Nova Atividade Acadêmica',
+  );
+  protected readonly pageDescription = computed(() =>
+    this.isEditing()
+      ? 'Atualize uma atividade já registrada e reenvie comprovantes quando necessário.'
+      : 'Registre suas atividades de pesquisa, ensino ou extensão para o cálculo do progresso funcional.',
+  );
+  protected readonly submitLabel = computed(() =>
+    this.isEditing() ? 'Salvar Alterações' : 'Confirmar Registro',
+  );
+
   protected readonly scoreBarWidth = computed(
     () => `${Math.min(100, Math.max(0, this.scoreEstimate().progressPercentage))}%`,
   );
 
   protected readonly canSubmit = computed(() => {
-    return !this.submitting() && this.form.valid;
+    return !this.submitting() && !this.isLoadingActivity() && this.form.valid;
   });
 
   constructor() {
     this.form.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => this.recomputeEstimate());
+
+    this.route.paramMap
+      .pipe(
+        map((params) => params.get('id')),
+        distinctUntilChanged(),
+        takeUntilDestroyed(),
+      )
+      .subscribe((activityId) => {
+        this.activityId.set(activityId);
+
+        if (activityId) {
+          this.loadActivity(activityId);
+          return;
+        }
+
+        this.loadErrorMessage.set(null);
+        this.isLoadingActivity.set(false);
+        this.form.reset(
+          {
+            titulo: '',
+            categoria: '',
+            cargaHoraria: 0,
+            descricao: '',
+          },
+          { emitEvent: false },
+        );
+        this.uploads.set([]);
+        this.recomputeEstimate();
+      });
   }
 
   protected onDragOver(event: DragEvent): void {
@@ -106,23 +156,19 @@ export class ActivityCreatePage {
   }
 
   protected removeUpload(item: UploadItem): void {
-    this.uploads.update((uploads) => uploads.filter((upload) => upload.localId !== item.localId));
-
     if (!item.serverId) {
+      this.uploads.update((uploads) => uploads.filter((upload) => upload.localId !== item.localId));
       return;
     }
 
     this.activitiesApi
       .deleteEvidence(item.serverId)
-      .pipe(
-        catchError(() => {
-          this.snackBar.open('Falha ao remover comprovante no servidor.', 'Fechar', {
-            duration: 4000,
-          });
-          return EMPTY;
-        }),
-      )
-      .subscribe();
+      .pipe(catchError((error: unknown) => this.handleRemoveEvidenceError(error)))
+      .subscribe(() => {
+        this.uploads.update((uploads) =>
+          uploads.filter((upload) => upload.localId !== item.localId),
+        );
+      });
   }
 
   protected cancel(): void {
@@ -142,14 +188,18 @@ export class ActivityCreatePage {
     const payload: ActivityCreatePayload = {
       title: raw.titulo.trim(),
       category: raw.categoria as ActivityCategoryCode,
-      workloadHours: raw.cargaHoraria,
+      workloadHours: Math.trunc(raw.cargaHoraria),
       description: raw.descricao.trim(),
       score: this.scoreEstimate().totalImpact,
     };
 
     this.submitting.set(true);
     try {
-      const activity = await firstValueFrom(this.activitiesApi.createActivity(payload));
+      const activity = this.isEditing()
+        ? await firstValueFrom(
+            this.activitiesApi.updateActivity(this.activityId() as string, payload),
+          )
+        : await firstValueFrom(this.activitiesApi.createActivity(payload));
       const uploadResult = await this.uploadQueuedFiles(activity.id);
 
       if (uploadResult.hasFailures) {
@@ -228,6 +278,15 @@ export class ActivityCreatePage {
     }
   }
 
+  protected retryLoadActivity(): void {
+    const activityId = this.activityId();
+    if (!activityId) {
+      return;
+    }
+
+    this.loadActivity(activityId);
+  }
+
   private async uploadQueuedFiles(activityId: string): Promise<{ hasFailures: boolean }> {
     const queuedUploads = this.uploads().filter((upload) => upload.status === 'queued');
     if (queuedUploads.length === 0) {
@@ -279,6 +338,7 @@ export class ActivityCreatePage {
     const cargaHoraria = Number(this.form.controls.cargaHoraria.value || 0);
 
     if (!category || cargaHoraria <= 0) {
+      this.isEstimating.set(false);
       this.scoreEstimate.set({
         baseCategory: this.baseScoreForCategory(category as ActivityCategoryCode | ''),
         workloadFactor: 0,
@@ -288,16 +348,78 @@ export class ActivityCreatePage {
       return;
     }
 
+    this.estimateRequestToken.update((token) => token + 1);
+    const currentToken = this.estimateRequestToken();
+    this.isEstimating.set(true);
+
     this.activitiesApi
-      .estimateScore({ category, workloadHours: cargaHoraria })
+      .estimateScore({ category, workloadHours: Math.trunc(cargaHoraria) })
       .pipe(
         catchError(() => {
           const fallback = this.calculateFallbackEstimate(category, cargaHoraria);
-          this.scoreEstimate.set(fallback);
+          if (this.estimateRequestToken() === currentToken) {
+            this.scoreEstimate.set(fallback);
+            this.isEstimating.set(false);
+          }
           return EMPTY;
         }),
       )
-      .subscribe((estimate) => this.scoreEstimate.set(estimate));
+      .subscribe((estimate) => {
+        if (this.estimateRequestToken() !== currentToken) {
+          return;
+        }
+
+        this.scoreEstimate.set(estimate);
+        this.isEstimating.set(false);
+      });
+  }
+
+  private loadActivity(activityId: string): void {
+    this.isLoadingActivity.set(true);
+    this.loadErrorMessage.set(null);
+
+    this.activitiesApi
+      .findActivityById(activityId)
+      .pipe(
+        catchError((error: unknown) => {
+          this.loadErrorMessage.set(
+            this.resolveHttpError(error, 'Não foi possível carregar os dados da atividade.'),
+          );
+          this.isLoadingActivity.set(false);
+          return EMPTY;
+        }),
+      )
+      .subscribe((activity) => {
+        this.applyActivityToForm(activity);
+        this.isLoadingActivity.set(false);
+      });
+  }
+
+  private applyActivityToForm(activity: ActivityListItemDto): void {
+    this.form.setValue(
+      {
+        titulo: activity.title,
+        categoria: activity.category,
+        cargaHoraria: activity.workloadHours,
+        descricao: activity.description,
+      },
+      { emitEvent: false },
+    );
+
+    this.scoreEstimate.set({
+      baseCategory: this.baseScoreForCategory(activity.category),
+      workloadFactor: Math.max(0, Number((activity.workloadHours * 0.0625).toFixed(1))),
+      totalImpact: Number(activity.score.toFixed(1)),
+      progressPercentage: Math.min(100, Math.round((activity.score / 150) * 100)),
+    });
+
+    this.recomputeEstimate();
+  }
+
+  private handleRemoveEvidenceError(error: unknown) {
+    const message = this.resolveHttpError(error, 'Falha ao remover comprovante no servidor.');
+    this.snackBar.open(message, 'Fechar', { duration: 4000 });
+    return EMPTY;
   }
 
   private calculateFallbackEstimate(

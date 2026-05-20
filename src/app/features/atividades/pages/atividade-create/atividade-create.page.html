@@ -8,11 +8,10 @@
       Voltar para listagem
     </a>
     <h1 class="m-0 text-[clamp(1.8rem,3vw,2.5rem)] tracking-[-0.04em] text-[#1a1c1d]">
-      Nova Atividade Acadêmica
+      {{ pageTitle() }}
     </h1>
     <p class="m-0 max-w-[44rem] leading-[1.55] text-[#6b7280]">
-      Registre suas atividades de pesquisa, ensino ou extensão para o cálculo do progresso
-      funcional.
+      {{ pageDescription() }}
     </p>
   </header>
 
@@ -21,173 +20,224 @@
       class="flex flex-col gap-8 lg:col-span-8"
       aria-label="Formulário de cadastro de atividade"
     >
-      <form
-        class="flex flex-col gap-6 rounded-[1.75rem] bg-[var(--mat-sys-surface-container)] p-8 shadow-[0_1px_2px_rgba(0,0,0,0.05)]"
-        [formGroup]="form"
-        (ngSubmit)="submit()"
-      >
-        <div class="flex flex-col gap-2">
-          <label
-            class="text-sm font-semibold leading-5 text-[color:rgb(69_70_82)]"
-            for="tituloAtividade"
-          >
-            Título da Atividade
-          </label>
-          <input
-            id="tituloAtividade"
-            class="h-12 w-full border border-b-2 border-[color:rgb(198_197_212)] bg-[color:rgb(243_243_245)] px-4 text-base text-[color:rgb(26_28_29)] outline-none focus:border-[color:var(--mat-sys-primary)]"
-            type="text"
-            placeholder="Ex: Publicação de Artigo em Revista Qualis A1"
-            formControlName="titulo"
-          />
-          @if (form.controls.titulo.invalid && form.controls.titulo.touched) {
-            <p class="text-xs text-[color:var(--mat-sys-error)]">
-              Informe um título com pelo menos 8 caracteres.
-            </p>
-          }
-        </div>
-
-        <div class="grid gap-6 md:grid-cols-[minmax(0,1fr)_12.8125rem]">
-          <div class="flex flex-col gap-2">
-            <label
-              class="text-sm font-semibold leading-5 text-[color:rgb(69_70_82)]"
-              for="categoriaAtividade"
-            >
-              Tipo de Atividade
-            </label>
-            <select
-              id="categoriaAtividade"
-              class="h-12 w-full border border-b-2 border-[color:rgb(198_197_212)] bg-[color:rgb(243_243_245)] px-4 text-base text-[color:rgb(26_28_29)] outline-none focus:border-[color:var(--mat-sys-primary)]"
-              formControlName="categoria"
-            >
-              <option value="">Selecione uma categoria</option>
-              @for (option of categoriaOptions; track option.value) {
-                <option [value]="option.value">{{ option.label }}</option>
-              }
-            </select>
-          </div>
-
-          <div class="flex flex-col gap-2">
-            <label
-              class="text-sm font-semibold leading-5 text-[color:rgb(69_70_82)]"
-              for="cargaHorariaAtividade"
-            >
-              Carga Horária (horas)
-            </label>
-            <input
-              id="cargaHorariaAtividade"
-              class="h-12 w-full border border-b-2 border-[color:rgb(198_197_212)] bg-[color:rgb(243_243_245)] px-4 text-base text-[color:rgb(26_28_29)] outline-none focus:border-[color:var(--mat-sys-primary)]"
-              type="number"
-              min="0"
-              max="999"
-              step="0.1"
-              formControlName="cargaHoraria"
-            />
+      @if (isLoadingActivity()) {
+        <div
+          class="flex min-h-[24rem] flex-col items-center justify-center gap-4 rounded-[1.75rem] bg-[var(--mat-sys-surface-container)] p-8 text-center shadow-[0_1px_2px_rgba(0,0,0,0.05)]"
+        >
+          <mat-progress-spinner diameter="44" mode="indeterminate"></mat-progress-spinner>
+          <div class="space-y-1">
+            <p class="text-base font-semibold text-[color:rgb(26_28_29)]">Carregando atividade</p>
+            <p class="text-sm text-[color:rgb(69_70_82)]">Buscando os dados atuais para edição.</p>
           </div>
         </div>
-
-        <div class="flex flex-col gap-2">
-          <label
-            class="text-sm font-semibold leading-5 text-[color:rgb(69_70_82)]"
-            for="descricaoAtividade"
-          >
-            Descrição e Detalhes
-          </label>
-          <textarea
-            id="descricaoAtividade"
-            class="min-h-24 w-full resize-none border border-b-2 border-[color:rgb(198_197_212)] bg-[color:rgb(243_243_245)] px-4 py-3 text-base leading-6 text-[color:rgb(26_28_29)] outline-none focus:border-[color:var(--mat-sys-primary)]"
-            placeholder="Descreva brevemente a atividade e sua relevância..."
-            formControlName="descricao"
-          ></textarea>
-        </div>
-
-        <div class="flex flex-col gap-4">
-          <label class="text-sm font-semibold leading-5 text-[color:rgb(69_70_82)]"
-            >Comprovantes e Arquivos (opcional)</label
-          >
-
-          <input
-            #filePicker
-            class="hidden"
-            type="file"
-            accept=".pdf,.png,.jpg,.jpeg"
-            multiple
-            (change)="onFileInputChange($event)"
-          />
-
+      } @else if (loadErrorMessage()) {
+        <div
+          class="flex min-h-[24rem] flex-col items-center justify-center gap-4 rounded-[1.75rem] bg-[var(--mat-sys-surface-container)] p-8 text-center shadow-[0_1px_2px_rgba(0,0,0,0.05)]"
+        >
           <div
-            class="rounded-2xl border-2 border-dashed border-[color:rgb(198_197_212)] bg-[color:rgba(243,243,245,0.5)] px-8 py-[2.125rem] text-center"
-            [class.border-[color:var(--mat-sys-primary)]]="dragging()"
-            (dragover)="onDragOver($event)"
-            (dragleave)="onDragLeave($event)"
-            (drop)="onDrop($event)"
+            class="grid size-14 place-items-center rounded-full bg-[color:rgba(186,26,26,0.08)] text-[color:var(--mat-sys-error)]"
           >
-            <div
-              class="mx-auto mb-4 grid size-12 place-items-center rounded-full bg-[color:rgb(224_224_255)]"
-            >
-              <mat-icon class="text-[color:var(--mat-sys-primary)]">upload_file</mat-icon>
-            </div>
-            <p class="text-base font-semibold leading-6 text-[color:rgb(26_28_29)]">
-              Clique para fazer upload ou arraste os arquivos
+            <mat-icon>error_outline</mat-icon>
+          </div>
+          <div class="space-y-1">
+            <p class="text-base font-semibold text-[color:rgb(26_28_29)]">
+              Não foi possível carregar
             </p>
-            <p class="mt-1 text-xs leading-4 text-[color:rgb(118_118_131)]">
-              PDF, PNG ou JPG (máx. 10MB)
-            </p>
+            <p class="max-w-[30rem] text-sm text-[color:rgb(69_70_82)]">{{ loadErrorMessage() }}</p>
+          </div>
+          <div class="flex items-center gap-3">
             <button
               type="button"
-              class="mt-4 inline-flex items-center justify-center rounded-full bg-white px-6 py-2 text-sm font-bold text-[color:var(--mat-sys-primary)] shadow-[0_1px_2px_rgba(0,0,0,0.05)]"
-              (click)="filePicker.click()"
+              class="rounded-full bg-[var(--mat-sys-primary)] px-5 py-2 text-sm font-semibold text-white"
+              (click)="retryLoadActivity()"
             >
-              Selecionar Arquivos
+              Tentar novamente
+            </button>
+            <button
+              type="button"
+              class="rounded-full px-5 py-2 text-sm font-semibold text-[color:var(--mat-sys-primary)]"
+              (click)="cancel()"
+            >
+              Voltar
             </button>
           </div>
-
-          @for (upload of uploads(); track upload.localId) {
-            <div
-              class="flex items-center justify-between rounded-xl border border-[#c6c5d4]/10 bg-[#f3f3f5] p-[0.8125rem]"
+        </div>
+      } @else {
+        <form
+          class="flex flex-col gap-6 rounded-[1.75rem] bg-[var(--mat-sys-surface-container)] p-8 shadow-[0_1px_2px_rgba(0,0,0,0.05)]"
+          [formGroup]="form"
+          (ngSubmit)="submit()"
+        >
+          <div class="flex flex-col gap-2">
+            <label
+              class="text-sm font-semibold leading-5 text-[color:rgb(69_70_82)]"
+              for="tituloAtividade"
             >
-              <div class="flex items-center gap-3">
-                <svg
-                  class="h-5 w-4 shrink-0 text-[#000666]"
-                  viewBox="0 0 16 20"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M4 16H12V14H4V16V16M4 12H12V10H4V12V12M2 20C1.45 20 0.979167 19.8042 0.5875 19.4125C0.195833 19.0208 0 18.55 0 18V2C0 1.45 0.195833 0.979167 0.5875 0.5875C0.979167 0.195833 1.45 0 2 0H10L16 6V18C16 18.55 15.8042 19.0208 15.4125 19.4125C15.0208 19.8042 14.55 20 14 20H2V20M9 7V2H2V2V2V18V18V18H14V18V18V7H9V7M2 2V2V7V7V2V7V7V18V18V18V18V18V18V2V2V2V2"
-                    fill="currentColor"
-                  />
-                </svg>
-                <div>
-                  <p class="text-xs font-bold leading-4 text-[#1a1c1d]">{{ upload.fileName }}</p>
-                  <p [class]="uploadStatusClass(upload.status)">
-                    {{ (upload.sizeBytes / 1024 / 1024).toFixed(1) }} MB •
-                    {{ uploadStatusLabel(upload.status) }}
-                  </p>
-                </div>
+              Título da Atividade
+            </label>
+            <input
+              id="tituloAtividade"
+              class="h-12 w-full border border-b-2 border-[color:rgb(198_197_212)] bg-[color:rgb(243_243_245)] px-4 text-base text-[color:rgb(26_28_29)] outline-none focus:border-[color:var(--mat-sys-primary)]"
+              type="text"
+              placeholder="Ex: Publicação de Artigo em Revista Qualis A1"
+              formControlName="titulo"
+              [disabled]="isLoadingActivity() || submitting()"
+            />
+            @if (form.controls.titulo.invalid && form.controls.titulo.touched) {
+              <p class="text-xs text-[color:var(--mat-sys-error)]">
+                Informe um título com pelo menos 8 caracteres.
+              </p>
+            }
+          </div>
+
+          <div class="grid gap-6 md:grid-cols-[minmax(0,1fr)_12.8125rem]">
+            <div class="flex flex-col gap-2">
+              <label
+                class="text-sm font-semibold leading-5 text-[color:rgb(69_70_82)]"
+                for="categoriaAtividade"
+              >
+                Tipo de Atividade
+              </label>
+              <select
+                id="categoriaAtividade"
+                class="h-12 w-full border border-b-2 border-[color:rgb(198_197_212)] bg-[color:rgb(243_243_245)] px-4 text-base text-[color:rgb(26_28_29)] outline-none focus:border-[color:var(--mat-sys-primary)]"
+                formControlName="categoria"
+                [disabled]="isLoadingActivity() || submitting()"
+              >
+                <option value="">Selecione uma categoria</option>
+                @for (option of categoriaOptions; track option.value) {
+                  <option [value]="option.value">{{ option.label }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <label
+                class="text-sm font-semibold leading-5 text-[color:rgb(69_70_82)]"
+                for="cargaHorariaAtividade"
+              >
+                Carga Horária (horas)
+              </label>
+              <input
+                id="cargaHorariaAtividade"
+                class="h-12 w-full border border-b-2 border-[color:rgb(198_197_212)] bg-[color:rgb(243_243_245)] px-4 text-base text-[color:rgb(26_28_29)] outline-none focus:border-[color:var(--mat-sys-primary)]"
+                type="number"
+                min="0"
+                max="999"
+                step="1"
+                formControlName="cargaHoraria"
+                [disabled]="isLoadingActivity() || submitting()"
+              />
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <label
+              class="text-sm font-semibold leading-5 text-[color:rgb(69_70_82)]"
+              for="descricaoAtividade"
+            >
+              Descrição e Detalhes
+            </label>
+            <textarea
+              id="descricaoAtividade"
+              class="min-h-24 w-full resize-none border border-b-2 border-[color:rgb(198_197_212)] bg-[color:rgb(243_243_245)] px-4 py-3 text-base leading-6 text-[color:rgb(26_28_29)] outline-none focus:border-[color:var(--mat-sys-primary)]"
+              placeholder="Descreva brevemente a atividade e sua relevância..."
+              formControlName="descricao"
+              [disabled]="isLoadingActivity() || submitting()"
+            ></textarea>
+          </div>
+
+          <div class="flex flex-col gap-4">
+            <label class="text-sm font-semibold leading-5 text-[color:rgb(69_70_82)]"
+              >Comprovantes e Arquivos (opcional)</label
+            >
+
+            <input
+              #filePicker
+              class="hidden"
+              type="file"
+              accept=".pdf,.png,.jpg,.jpeg"
+              multiple
+              (change)="onFileInputChange($event)"
+            />
+
+            <div
+              class="rounded-2xl border-2 border-dashed border-[color:rgb(198_197_212)] bg-[color:rgba(243,243,245,0.5)] px-8 py-[2.125rem] text-center"
+              [class.border-[color:var(--mat-sys-primary)]]="dragging()"
+              (dragover)="onDragOver($event)"
+              (dragleave)="onDragLeave($event)"
+              (drop)="onDrop($event)"
+            >
+              <div
+                class="mx-auto mb-4 grid size-12 place-items-center rounded-full bg-[color:rgb(224_224_255)]"
+              >
+                <mat-icon class="text-[color:var(--mat-sys-primary)]">upload_file</mat-icon>
               </div>
+              <p class="text-base font-semibold leading-6 text-[color:rgb(26_28_29)]">
+                Clique para fazer upload ou arraste os arquivos
+              </p>
+              <p class="mt-1 text-xs leading-4 text-[color:rgb(118_118_131)]">
+                PDF, PNG ou JPG (máx. 10MB)
+              </p>
               <button
                 type="button"
-                class="rounded-full p-2 text-[#ba1a1a] hover:bg-black/5"
-                aria-label="Remover comprovante"
-                (click)="removeUpload(upload)"
+                class="mt-4 inline-flex items-center justify-center rounded-full bg-white px-6 py-2 text-sm font-bold text-[color:var(--mat-sys-primary)] shadow-[0_1px_2px_rgba(0,0,0,0.05)]"
+                [disabled]="isLoadingActivity() || submitting()"
+                (click)="filePicker.click()"
               >
-                <svg
-                  class="h-[0.84375rem] w-3 shrink-0"
-                  viewBox="0 0 12 13.5"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M2.25 13.5C1.8375 13.5 1.48437 13.3531 1.19062 13.0594C0.896875 12.7656 0.75 12.4125 0.75 12V2.25H0V0.75H3.75V0H8.25V0.75H12V2.25H11.25V12C11.25 12.4125 11.1031 12.7656 10.8094 13.0594C10.5156 13.3531 10.1625 13.5 9.75 13.5H2.25V13.5M9.75 2.25H2.25V12V12V12H9.75V12V12V2.25V2.25M3.75 10.5H5.25V3.75H3.75V10.5V10.5M6.75 10.5H8.25V3.75H6.75V10.5V10.5M2.25 2.25V2.25V12V12V12V12V12V12V2.25V2.25"
-                    fill="currentColor"
-                  />
-                </svg>
+                Selecionar Arquivos
               </button>
             </div>
-          }
-        </div>
-      </form>
+
+            @for (upload of uploads(); track upload.localId) {
+              <div
+                class="flex min-w-0 items-center justify-between rounded-xl border border-[#c6c5d4]/10 bg-[#f3f3f5] p-[0.8125rem]"
+              >
+                <div class="flex min-w-0 flex-1 items-center gap-3">
+                  <svg
+                    class="h-5 w-4 shrink-0 text-[#000666]"
+                    viewBox="0 0 16 20"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M4 16H12V14H4V16V16M4 12H12V10H4V12V12M2 20C1.45 20 0.979167 19.8042 0.5875 19.4125C0.195833 19.0208 0 18.55 0 18V2C0 1.45 0.195833 0.979167 0.5875 0.5875C0.979167 0.195833 1.45 0 2 0H10L16 6V18C16 18.55 15.8042 19.0208 15.4125 19.4125C15.0208 19.8042 14.55 20 14 20H2V20M9 7V2H2V2V2V18V18V18H14V18V18V7H9V7M2 2V2V7V7V2V7V7V18V18V18V18V18V18V2V2V2V2"
+                      fill="currentColor"
+                    />
+                  </svg>
+                  <div class="min-w-0">
+                    <p class="truncate text-xs font-bold leading-4 text-[#1a1c1d]">
+                      {{ upload.fileName }}
+                    </p>
+                    <p [class]="uploadStatusClass(upload.status)">
+                      {{ (upload.sizeBytes / 1024 / 1024).toFixed(1) }} MB •
+                      {{ uploadStatusLabel(upload.status) }}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  class="shrink-0 rounded-full p-2 text-[#ba1a1a] hover:bg-black/5"
+                  aria-label="Remover comprovante"
+                  (click)="removeUpload(upload)"
+                >
+                  <svg
+                    class="h-[0.84375rem] w-3 shrink-0"
+                    viewBox="0 0 12 13.5"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M2.25 13.5C1.8375 13.5 1.48437 13.3531 1.19062 13.0594C0.896875 12.7656 0.75 12.4125 0.75 12V2.25H0V0.75H3.75V0H8.25V0.75H12V2.25H11.25V12C11.25 12.4125 11.1031 12.7656 10.8094 13.0594C10.5156 13.3531 10.1625 13.5 9.75 13.5H2.25V13.5M9.75 2.25H2.25V12V12V12H9.75V12V12V2.25V2.25M3.75 10.5H5.25V3.75H3.75V10.5V10.5M6.75 10.5H8.25V3.75H6.75V10.5V10.5M2.25 2.25V2.25V12V12V12V12V12V12V2.25V2.25"
+                      fill="currentColor"
+                    />
+                  </svg>
+                </button>
+              </div>
+            }
+          </div>
+        </form>
+      }
 
       <div class="flex items-center justify-end gap-6 pt-2">
         <button
@@ -203,7 +253,7 @@
           [disabled]="!canSubmit()"
           (click)="submit()"
         >
-          Confirmar Registro
+          {{ submitLabel() }}
         </button>
       </div>
     </section>

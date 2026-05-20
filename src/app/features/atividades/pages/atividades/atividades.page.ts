@@ -14,11 +14,19 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
+import { catchError, EMPTY } from 'rxjs';
+import { ActivitiesApiService } from '../../activities-api.service';
 import { BadgeComponent } from '../../../../shared/components/base/badge/badge.component';
 import { ButtonComponent } from '../../../../shared/components/base/button/button.component';
 import { InputComponent } from '../../../../shared/components/base/input/input.component';
 import { StatusIndicatorComponent } from '../../../../shared/components/base/status-indicator/status-indicator.component';
+import {
+  ActivityListItemDto,
+  ActivityListItemUi,
+  ActivityStatusCode,
+} from '../../models/activity-create.models';
 
 type UiActivityCategory = 'Pesquisa' | 'Ensino' | 'Extensão' | 'Gestão';
 type UiActivityStatus = 'Validado' | 'Pendente' | 'Erro';
@@ -62,7 +70,9 @@ const STATUS_OPTIONS: readonly { label: string; value: 'Todos' | UiActivityStatu
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ActivitiesPage {
+  private readonly activitiesApi = inject(ActivitiesApiService);
   private readonly router = inject(Router);
+  private readonly snackBar = inject(MatSnackBar);
 
   protected readonly tabs = ALL_TABS;
   protected readonly statusOptions = STATUS_OPTIONS;
@@ -84,9 +94,10 @@ export class ActivitiesPage {
 
   protected readonly pageIndex = signal(1);
   protected readonly totalPages = signal(3);
-  protected readonly loadingActivities = signal(false);
+  protected readonly loadingActivities = signal(true);
   protected readonly loadErrorMessage = signal<string | null>(null);
-  protected readonly totalItems = computed(() => this.rows().length);
+  protected readonly deletingActivityId = signal<string | null>(null);
+  protected readonly totalItems = computed(() => this.activities().length);
   protected readonly displayedColumns = [
     'title',
     'categoria',
@@ -95,32 +106,7 @@ export class ActivitiesPage {
     'actions',
   ] as const;
 
-  protected readonly rows = signal<readonly ActivityListRow[]>([
-    {
-      id: 'artigo-deep-learning',
-      title: 'Artigo: Deep Learning in Academic Workflows',
-      subtitle: 'Periódico Q1 • ISSN 1234-5678',
-      categoria: 'Pesquisa',
-      score: 45.0,
-      status: 'Validado',
-    },
-    {
-      id: 'calculo-diferencial-60h',
-      title: 'Cálculo Diferencial e Integral I (60h)',
-      subtitle: 'Graduação • Turma A',
-      categoria: 'Ensino',
-      score: 20.0,
-      status: 'Pendente',
-    },
-    {
-      id: 'workshop-dados-publicos',
-      title: 'Workshop: Curadoria de Dados Públicos',
-      subtitle: 'Evento Comunitário',
-      categoria: 'Extensão',
-      score: 15.0,
-      status: 'Erro',
-    },
-  ]);
+  protected readonly activities = signal<readonly ActivityListItemUi[]>([]);
 
   private readonly resetPagination = effect(() => {
     this.query();
@@ -128,12 +114,16 @@ export class ActivitiesPage {
     this.pageIndex.set(1);
   });
 
+  constructor() {
+    this.loadActivities();
+  }
+
   protected readonly filteredRows = computed(() => {
     const activeTab = this.activeTab();
     const query = this.query().trim().toLowerCase();
     const status = this.statusFilter();
 
-    return this.rows().filter((row) => {
+    return this.activities().filter((row) => {
       if (activeTab !== 'Todas Atividades' && row.categoria !== activeTab) {
         return false;
       }
@@ -260,10 +250,107 @@ export class ActivitiesPage {
       return;
     }
 
-    this.rows.update((rows) => rows.filter((row) => row.id !== activityId));
+    this.deletingActivityId.set(activityId);
+
+    this.activitiesApi
+      .removeActivity(activityId)
+      .pipe(
+        catchError((error: unknown) => {
+          this.snackBar.open(
+            this.resolveHttpError(error, 'Não foi possível excluir a atividade.'),
+            'Fechar',
+            { duration: 4000 },
+          );
+          this.deletingActivityId.set(null);
+          return EMPTY;
+        }),
+      )
+      .subscribe(() => {
+        this.activities.update((rows) => rows.filter((row) => row.id !== activityId));
+        this.deletingActivityId.set(null);
+        this.snackBar.open('Atividade excluída com sucesso.', 'Fechar', { duration: 3000 });
+      });
   }
 
   protected retryLoadActivities(): void {
+    this.loadActivities();
+  }
+
+  protected isDeleting(activityId: string): boolean {
+    return this.deletingActivityId() === activityId;
+  }
+
+  private loadActivities(): void {
+    this.loadingActivities.set(true);
     this.loadErrorMessage.set(null);
+
+    this.activitiesApi
+      .findAllActivities()
+      .pipe(
+        catchError((error: unknown) => {
+          this.loadErrorMessage.set(
+            this.resolveHttpError(error, 'Não foi possível carregar suas atividades.'),
+          );
+          this.loadingActivities.set(false);
+          return EMPTY;
+        }),
+      )
+      .subscribe((activities) => {
+        this.activities.set(activities.map((activity) => this.toUiRow(activity)));
+        this.loadingActivities.set(false);
+      });
+  }
+
+  private toUiRow(activity: ActivityListItemDto): ActivityListItemUi {
+    return {
+      id: activity.id,
+      title: activity.title,
+      subtitle: this.buildSubtitle(activity),
+      categoria: this.mapCategory(activity.category),
+      score: activity.score,
+      status: this.mapStatus(activity.status),
+    };
+  }
+
+  private buildSubtitle(activity: ActivityListItemDto): string {
+    const parts = [activity.kind, activity.term].filter(Boolean);
+
+    if (parts.length > 0) {
+      return parts.join(' • ');
+    }
+
+    return activity.description;
+  }
+
+  private mapCategory(category: ActivityListItemDto['category']): ActivityListItemUi['categoria'] {
+    switch (category) {
+      case 'RESEARCH':
+        return 'Pesquisa';
+      case 'TEACHING':
+        return 'Ensino';
+      case 'OUTREACH':
+        return 'Extensão';
+      case 'MANAGEMENT':
+        return 'Gestão';
+    }
+  }
+
+  private mapStatus(status: ActivityStatusCode): ActivityListItemUi['status'] {
+    switch (status) {
+      case 'APPROVED':
+        return 'Validado';
+      case 'PENDING':
+        return 'Pendente';
+      case 'REJECTED':
+        return 'Erro';
+    }
+  }
+
+  private resolveHttpError(error: unknown, fallback: string): string {
+    if (error instanceof Error && error.message.trim()) {
+      return error.message;
+    }
+
+    return fallback;
   }
 }

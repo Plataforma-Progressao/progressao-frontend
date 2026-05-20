@@ -178,6 +178,7 @@
                 type="button"
                 class="activities-action-button"
                 [attr.aria-label]="'Editar ' + row.title"
+                [disabled]="isDeleting(row.id)"
                 (click)="openEditActivity(row.id)"
               >
                 <mat-icon>edit</mat-icon>
@@ -187,9 +188,14 @@
                 type="button"
                 class="activities-action-button text-[color:var(--mat-sys-error)]"
                 [attr.aria-label]="'Excluir ' + row.title"
+                [disabled]="isDeleting(row.id)"
                 (click)="deleteActivity(row.id)"
               >
-                <mat-icon>delete</mat-icon>
+                @if (isDeleting(row.id)) {
+                  <mat-progress-spinner diameter="16" mode="indeterminate"></mat-progress-spinner>
+                } @else {
+                  <mat-icon>delete</mat-icon>
+                }
               </button>
             </div>
           </td>
