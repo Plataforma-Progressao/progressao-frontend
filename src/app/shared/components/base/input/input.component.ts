@@ -13,18 +13,14 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import {
-  formatCpfValue,
-  formatPhoneValue,
-  formatWorkloadHoursValue,
-  parseWorkloadHoursValue,
-} from '../../../forms/br-form.utils';
+import { NgxMaskDirective } from 'ngx-mask';
+import { formatCpfValue, formatPhoneValue } from '../../../forms/br-form.utils';
 
-type InputMask = 'none' | 'cpf' | 'phone' | 'workloadHours';
+type InputMask = 'none' | 'cpf' | 'phone';
 
 @Component({
   selector: 'app-input',
-  imports: [MatFormFieldModule, MatInputModule, MatIconModule, MatButtonModule],
+  imports: [MatFormFieldModule, MatInputModule, MatIconModule, MatButtonModule, NgxMaskDirective],
   templateUrl: './input.component.html',
   styleUrl: './input.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -52,6 +48,8 @@ export class InputComponent implements ControlValueAccessor {
   readonly control = input<AbstractControl | null>(null);
   readonly disabledInput = input(false, { transform: booleanAttribute });
   readonly mask = input<InputMask>('none');
+  /** ngx-mask pattern (ex.: `Hh:m0` para horas e minutos). */
+  readonly ngxMaskPattern = input<string | null>(null);
 
   readonly blurred = output<FocusEvent>();
   readonly suffixClicked = output<void>();
@@ -62,12 +60,8 @@ export class InputComponent implements ControlValueAccessor {
   protected onTouched: () => void = () => undefined;
 
   writeValue(value: string | number | null): void {
-    if (this.mask() === 'workloadHours') {
-      const numeric =
-        value === null || value === undefined || value === ''
-          ? ''
-          : String(value);
-      this.value = numeric ? formatWorkloadHoursValue(numeric, true) : '';
+    if (this.ngxMaskPattern()) {
+      this.value = value === null || value === undefined ? '' : String(value);
       this.cdr.markForCheck();
       return;
     }
@@ -102,15 +96,9 @@ export class InputComponent implements ControlValueAccessor {
   protected onInput(event: Event): void {
     const target = event.target as HTMLInputElement;
 
-    if (this.mask() === 'workloadHours') {
-      const selectionStart = target.selectionStart ?? target.value.length;
-      const digitsBeforeCaret = this.countDigits(target.value.slice(0, selectionStart));
-      const maskedValue = formatWorkloadHoursValue(target.value);
-      this.value = maskedValue;
-      target.value = maskedValue;
-      const nextCaret = this.findCaretPosition(maskedValue, digitsBeforeCaret);
-      target.setSelectionRange(nextCaret, nextCaret);
-      this.onChange(parseWorkloadHoursValue(maskedValue));
+    if (this.ngxMaskPattern()) {
+      this.value = target.value;
+      this.onChange(target.value);
       return;
     }
 
@@ -138,13 +126,6 @@ export class InputComponent implements ControlValueAccessor {
   }
 
   protected onBlur(event: FocusEvent): void {
-    if (this.mask() === 'workloadHours' && this.value) {
-      const finalized = formatWorkloadHoursValue(this.value, true);
-      this.value = finalized;
-      this.onChange(parseWorkloadHoursValue(finalized));
-      this.cdr.markForCheck();
-    }
-
     this.onTouched();
     this.blurred.emit(event);
   }
@@ -162,6 +143,10 @@ export class InputComponent implements ControlValueAccessor {
     return this.disabled || this.disabledInput();
   }
 
+  protected get usesNgxMask(): boolean {
+    return Boolean(this.ngxMaskPattern());
+  }
+
   protected get maxLength(): number | null {
     if (this.mask() === 'cpf') {
       return 14;
@@ -169,10 +154,6 @@ export class InputComponent implements ControlValueAccessor {
 
     if (this.mask() === 'phone') {
       return 15;
-    }
-
-    if (this.mask() === 'workloadHours') {
-      return 7;
     }
 
     return null;
@@ -185,10 +166,6 @@ export class InputComponent implements ControlValueAccessor {
 
     if (this.mask() === 'phone') {
       return formatPhoneValue(value);
-    }
-
-    if (this.mask() === 'workloadHours') {
-      return formatWorkloadHoursValue(value, true);
     }
 
     return value;

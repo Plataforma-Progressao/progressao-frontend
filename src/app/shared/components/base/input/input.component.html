@@ -7,20 +7,36 @@
     <mat-icon matPrefix aria-hidden="true">{{ prefixIcon() }}</mat-icon>
   }
 
-  <input
-    matInput
-    [type]="type() === 'number' ? 'text' : type()"
-    [attr.inputmode]="type() === 'number' ? 'numeric' : null"
-    [attr.pattern]="type() === 'number' ? '[0-9]*' : null"
-    [placeholder]="placeholder()"
-    [value]="value"
-    [disabled]="isDisabled"
-    [attr.maxlength]="maxLength"
-    [attr.aria-label]="label() || placeholder()"
-    [attr.aria-invalid]="hasError"
-    (input)="onInput($event)"
-    (blur)="onBlur($event)"
-  />
+  @if (usesNgxMask) {
+    <input
+      matInput
+      [mask]="ngxMaskPattern()!"
+      [dropSpecialCharacters]="false"
+      [showMaskTyped]="true"
+      [placeholder]="placeholder()"
+      [value]="value"
+      [disabled]="isDisabled"
+      [attr.aria-label]="label() || placeholder()"
+      [attr.aria-invalid]="hasError"
+      (input)="onInput($event)"
+      (blur)="onBlur($event)"
+    />
+  } @else {
+    <input
+      matInput
+      [type]="type() === 'number' ? 'text' : type()"
+      [attr.inputmode]="type() === 'number' ? 'numeric' : null"
+      [attr.pattern]="type() === 'number' ? '[0-9]*' : null"
+      [placeholder]="placeholder()"
+      [value]="value"
+      [disabled]="isDisabled"
+      [attr.maxlength]="maxLength"
+      [attr.aria-label]="label() || placeholder()"
+      [attr.aria-invalid]="hasError"
+      (input)="onInput($event)"
+      (blur)="onBlur($event)"
+    />
+  }
 
   @if (suffixIcon()) {
     <button

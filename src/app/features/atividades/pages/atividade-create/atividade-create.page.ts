@@ -18,6 +18,11 @@ import {
   map,
   startWith,
 } from 'rxjs';
+import {
+  durationValidator,
+  formatDurationFromHours,
+  parseDurationToHours,
+} from '../../../../shared/forms/br-form.utils';
 import { ActivitiesApiService } from '../../activities-api.service';
 import {
   ActivityCategoryCode,
@@ -78,7 +83,7 @@ export class ActivityCreatePage {
   protected readonly form = this.fb.nonNullable.group({
     titulo: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(160)]],
     categoria: ['' as ActivityCategoryCode | '', [Validators.required]],
-    cargaHoraria: [0, [Validators.required, Validators.min(0), Validators.max(999)]],
+    cargaHoraria: ['', [Validators.required, durationValidator()]],
     descricao: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(1200)]],
   });
 
@@ -147,7 +152,7 @@ export class ActivityCreatePage {
           {
             titulo: '',
             categoria: '',
-            cargaHoraria: 0,
+            cargaHoraria: '',
             descricao: '',
           },
           { emitEvent: false },
@@ -220,7 +225,7 @@ export class ActivityCreatePage {
     const payload: ActivityCreatePayload = {
       title: raw.titulo.trim(),
       category: raw.categoria as ActivityCategoryCode,
-      workloadHours: Math.trunc(raw.cargaHoraria),
+      workloadHours: parseDurationToHours(raw.cargaHoraria),
       description: raw.descricao.trim(),
       score: this.scoreEstimate().totalImpact,
     };
@@ -367,7 +372,7 @@ export class ActivityCreatePage {
 
   private recomputeEstimate(): void {
     const category = this.form.controls.categoria.value;
-    const cargaHoraria = Number(this.form.controls.cargaHoraria.value || 0);
+    const cargaHoraria = parseDurationToHours(this.form.controls.cargaHoraria.value);
 
     if (!category || cargaHoraria <= 0) {
       this.isEstimating.set(false);
@@ -385,7 +390,7 @@ export class ActivityCreatePage {
     this.isEstimating.set(true);
 
     this.activitiesApi
-      .estimateScore({ category, workloadHours: Math.trunc(cargaHoraria) })
+      .estimateScore({ category, workloadHours: cargaHoraria })
       .pipe(
         catchError(() => {
           const fallback = this.calculateFallbackEstimate(category, cargaHoraria);
@@ -432,7 +437,7 @@ export class ActivityCreatePage {
       {
         titulo: activity.title,
         categoria: activity.category,
-        cargaHoraria: activity.workloadHours,
+        cargaHoraria: formatDurationFromHours(activity.workloadHours),
         descricao: activity.description,
       },
       { emitEvent: false },

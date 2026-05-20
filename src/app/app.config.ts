@@ -9,10 +9,16 @@ import { authHeaderInterceptor } from './core/auth/interceptors/auth-header.inte
 import { authRefreshInterceptor } from './core/auth/interceptors/auth-refresh.interceptor';
 import { httpErrorInterceptor } from './core/http/interceptors/http-error.interceptor';
 
+import { provideEnvironmentNgxMask } from 'ngx-mask';
 import { routes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    provideEnvironmentNgxMask({
+      dropSpecialCharacters: false,
+      validation: true,
+      showMaskTyped: true,
+    }),
     provideBrowserGlobalErrorListeners(),
     provideHttpClient(withInterceptors([httpErrorInterceptor, authHeaderInterceptor, authRefreshInterceptor])),
     provideRouter(routes),

@@ -138,6 +138,22 @@ describe('InputComponent', () => {
     expect(emitted).toBe(40);
   });
 
+  it('should pass through ngx-mask values as strings', () => {
+    fixture.componentRef.setInput('ngxMaskPattern', 'Hh:m0');
+    fixture.detectChanges();
+
+    let emitted = '';
+    component.registerOnChange((value: string | number) => {
+      emitted = String(value);
+    });
+
+    const input = fixture.nativeElement.querySelector('input') as HTMLInputElement;
+    input.value = '01:30';
+    input.dispatchEvent(new Event('input'));
+
+    expect(emitted).toBe('01:30');
+  });
+
   it('should emit suffixClicked when suffix action button is clicked', () => {
     fixture.componentRef.setInput('suffixIcon', 'visibility');
     fixture.componentRef.setInput('suffixAction', true);

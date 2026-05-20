@@ -100,15 +100,15 @@
 
             <app-input
               formControlName="cargaHoraria"
-              label="Carga horária (horas)"
+              label="Carga horária"
               placeholder="00:00"
-              mask="workloadHours"
+              ngxMaskPattern="Hh:m0"
               appearance="outline"
               prefixIcon="schedule"
-              hint="Formato hh:mm (ex.: 04:00)"
+              hint="Horas e minutos (HH:MM). Ex.: 01:30 = 1h30min"
               [disabledInput]="isLoadingActivity() || submitting()"
               [control]="form.controls.cargaHoraria"
-              errorMessage="Informe uma carga horária válida entre 0 e 999 horas."
+              errorMessage="Informe a carga no formato HH:MM (máx. 999:59)."
             ></app-input>
           </div>
 
