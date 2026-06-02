@@ -81,10 +81,10 @@ export class ActivityCreatePage {
   ];
 
   protected readonly form = this.fb.nonNullable.group({
-    titulo: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(160)]],
+    titulo: ['', [Validators.required, Validators.minLength(4), Validators.maxLength(160)]],
     categoria: ['' as ActivityCategoryCode | '', [Validators.required]],
     cargaHoraria: ['', [Validators.required, durationValidator()]],
-    descricao: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(1200)]],
+    descricao: ['', [Validators.required, Validators.minLength(4), Validators.maxLength(1200)]],
   });
 
   protected readonly activityId = signal<string | null>(null);

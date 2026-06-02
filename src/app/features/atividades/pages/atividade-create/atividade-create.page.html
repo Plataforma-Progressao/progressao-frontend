@@ -75,7 +75,7 @@
             appearance="outline"
             [disabledInput]="isLoadingActivity() || submitting()"
             [control]="form.controls.titulo"
-            errorMessage="Informe um título com pelo menos 8 caracteres."
+            errorMessage="Informe um título com pelo menos 4 caracteres."
           ></app-input>
 
           <div class="grid gap-6 md:grid-cols-[minmax(0,1fr)_12.8125rem]">
@@ -105,7 +105,7 @@
               ngxMaskPattern="Hh:m0"
               appearance="outline"
               prefixIcon="schedule"
-              hint="Horas e minutos (HH:MM). Ex.: 01:30 = 1h30min"
+              hint="Ex.: 01:30 (hh:mm)"
               [disabledInput]="isLoadingActivity() || submitting()"
               [control]="form.controls.cargaHoraria"
               errorMessage="Informe a carga no formato HH:MM (máx. 999:59)."
@@ -121,7 +121,7 @@
             [disabledInput]="isLoadingActivity() || submitting()"
             [control]="form.controls.descricao"
             requiredErrorMessage="A descrição é obrigatória."
-            minLengthErrorMessage="A descrição precisa ter pelo menos 10 caracteres."
+            minLengthErrorMessage="A descrição precisa ter pelo menos 4 caracteres."
             maxLengthErrorMessage="A descrição deve ter no máximo 1200 caracteres."
           ></app-textarea>
 
