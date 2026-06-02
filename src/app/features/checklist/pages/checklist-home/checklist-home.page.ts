@@ -1,10 +1,12 @@
 
 import { Component, OnInit } from '@angular/core';
 
-import { CommonModule } from '@angular/common'; // Necessário para o *ngFor e [ngClass]
+import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 
 import { MatMenuModule } from '@angular/material/menu';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
 
 export interface DocumentoChecklist {
   id: number;
@@ -20,7 +22,7 @@ export interface DocumentoChecklist {
   templateUrl: './checklist-home.page.html',
   styleUrls: ['./checklist-home.page.scss'],
   
-  imports: [CommonModule, MatIconModule, MatMenuModule],
+  imports: [CommonModule, MatIconModule, MatMenuModule, MatFormFieldModule, MatSelectModule]
 })
 export class ChecklistHomePage implements OnInit {
     totalDocs = 10;
@@ -69,6 +71,24 @@ export class ChecklistHomePage implements OnInit {
 
   documentosOriginais: any[] = [];
 
+  //
+  documentoSelecionado: DocumentoChecklist | null = null;
+  onArquivoSelecionado(event: any) {
+      const arquivo: File = event.target.files[0];
+      if (arquivo && this.documentoSelecionado) {
+          const mensagem = `Você selecionou o arquivo: "${arquivo.name}".\n\nDeseja realmente enviá-lo como o documento "${this.documentoSelecionado.titulo}"?`;
+          const confirmacao = window.confirm(mensagem);
+          if (confirmacao) {
+              console.log(`Pronto para enviar ${arquivo.name} para o backend!`);
+              alert('Upload simulado com sucesso!'); 
+          }
+          event.target.value = '';
+          this.documentoSelecionado = null;
+      }
+  }
+  //
+
+  
   constructor() {}
   ngOnInit() {
 
@@ -77,14 +97,11 @@ export class ChecklistHomePage implements OnInit {
   }
 
     filtrarDocumentos(filtro: string) {
-        if (filtro === 'Todos') {
-            this.documentos = [...this.documentosOriginais];
-            return;
-        }
-        let statusBuscado = filtro;
-        if (filtro === 'Enviados') {
-            statusBuscado = 'Concluído';
-        }
-        this.documentos = this.documentosOriginais.filter(doc => doc.status === statusBuscado);
+    if (filtro === 'Todos') {
+        this.documentos = [...this.documentosOriginais];
+        return;
     }
+    // Filtra diretamente pela propriedade status
+    this.documentos = this.documentosOriginais.filter(doc => doc.status === filtro);
+  }
 }

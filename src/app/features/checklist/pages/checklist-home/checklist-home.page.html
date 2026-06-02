@@ -37,17 +37,20 @@
   <div class="checklist__content">
     <main class="checklist__main">
         <div class="checklist__list-header">
-            <h3>Documentos Obrigatórios</h3>
-            <button class="checklist__filter-btn"  title="Filtrar lista por status">
-                <mat-icon>filter_list</mat-icon> Filtrar
-            </button>
-                <mat-menu #menuFiltros="matMenu">
-                    <button mat-menu-item (click)="filtrarDocumentos('Todos')">Todos</button>
-                    <button mat-menu-item (click)="filtrarDocumentos('Enviados')">Enviados</button>
-                    <button mat-menu-item (click)="filtrarDocumentos('Pendentes')">Pendentes</button>
-                    <button mat-menu-item (click)="filtrarDocumentos('Atenção')">Atenção</button>
-                </mat-menu>
-        </div>
+          <h3>Documentos Obrigatórios</h3>
+          
+          <button class="checklist__filter-btn" [matMenuTriggerFor]="menuFiltros" title="Filtrar lista por status">
+              <mat-icon>filter_list</mat-icon> Filtrar
+          </button>
+          
+          <mat-menu #menuFiltros="matMenu">
+              <button mat-menu-item (click)="filtrarDocumentos('Todos')">Todos</button>
+              <button mat-menu-item (click)="filtrarDocumentos('Concluído')">Concluídos</button>
+              <button mat-menu-item (click)="filtrarDocumentos('Atenção')">Atenção</button>
+              <button mat-menu-item (click)="filtrarDocumentos('Pendente')">Pendentes</button>
+          </mat-menu>
+          
+      </div>
 
         <div class="checklist__doc-item" *ngFor="let doc of documentos" [ngClass]="'checklist__doc-item--' + doc.status.toLowerCase()">
             <div class="checklist__doc-checkbox" [attr.title]="doc.status === 'Concluído' ? 'Documento Validado' : 'Documento Pendente'">
@@ -67,10 +70,15 @@
                 <button *ngIf="doc.status === 'Concluído'" class="btn-quick-action btn-quick-action--icon-only" title="Visualizar arquivo enviado">
                     <mat-icon>visibility</mat-icon>
                 </button>
-                <button *ngIf="doc.status === 'Pendente' || doc.status === 'Atenção'" class="btn-quick-action btn-quick-action--upload" title="Clique para enviar o documento">
-                    <mat-icon>file_upload</mat-icon>
-                    Upload Rápido
+                <button *ngIf="doc.status === 'Pendente' || doc.status === 'Atenção'" class="btn-quick-action btn-quick-action--upload" 
+                  title="Clique para enviar o documento"
+                  (click)="fileInput.click(); documentoSelecionado = doc">
+                  <mat-icon>file_upload</mat-icon>
+                  Upload Rápido
                 </button>
+            <input type="file" #fileInput style="display: none;" 
+                  (change)="onArquivoSelecionado($event)" 
+                  accept=".pdf,.png,.jpg">
             </div>
         </div>
 
