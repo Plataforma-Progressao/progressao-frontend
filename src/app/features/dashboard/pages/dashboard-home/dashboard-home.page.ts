@@ -60,11 +60,8 @@ export class DashboardHomePage {
 
   protected readonly isLoading = computed(() => this.homeResource.status() === 'loading');
   protected readonly hasError = computed(() => this.homeResource.status() === 'error');
+  protected readonly hasHomeData = computed(() => this.homeResource.hasValue());
   protected readonly homeData = computed(() => {
-    if (!this.homeResource.hasValue()) {
-      return this.fallbackData;
-    }
-
     return this.homeResource.value() ?? this.fallbackData;
   });
 }

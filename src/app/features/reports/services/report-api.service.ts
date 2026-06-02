@@ -12,7 +12,15 @@ export class ReportApiService {
 
   getRadReport(): Observable<RadReportPayload> {
     return this.http
-      .get<ApiSuccessResponse<unknown>>(`${this.apiBaseUrl}/atividades`)
-      .pipe(map((response) => normalizeReportPayload(response.data)));
+      .get<ApiSuccessResponse<unknown> | unknown>(`${this.apiBaseUrl}/atividades`)
+      .pipe(map((response) => normalizeReportPayload(this.unwrapData(response))));
+  }
+
+  private unwrapData<T>(response: ApiSuccessResponse<T> | T): T {
+    if (response && typeof response === 'object' && 'success' in response && 'data' in response) {
+      return (response as ApiSuccessResponse<T>).data;
+    }
+
+    return response as T;
   }
 }

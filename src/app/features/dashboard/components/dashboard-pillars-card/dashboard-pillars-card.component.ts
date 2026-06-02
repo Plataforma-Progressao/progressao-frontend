@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { DashboardHomePillar } from '../../models/dashboard-home.models';
 
 @Component({
@@ -9,4 +9,8 @@ import { DashboardHomePillar } from '../../models/dashboard-home.models';
 })
 export class DashboardPillarsCardComponent {
   readonly pillars = input.required<readonly DashboardHomePillar[]>();
+
+  protected readonly hasApprovedScores = computed(() =>
+    this.pillars().some((pillar) => pillar.score > 0),
+  );
 }

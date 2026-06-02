@@ -4,6 +4,10 @@
     <button type="button" aria-label="Ver todas as notificações">Ver tudo</button>
   </header>
 
+  @if (notifications().length === 0) {
+    <p class="dashboard-card__empty">Nenhuma notificação no momento.</p>
+  }
+
   <div class="dashboard-card__notification-list">
     @for (
       notification of notifications();

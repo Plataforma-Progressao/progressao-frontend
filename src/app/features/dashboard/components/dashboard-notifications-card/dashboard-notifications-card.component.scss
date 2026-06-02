@@ -44,6 +44,12 @@ h2 {
   background-color: rgb(26 35 126 / 8%);
 }
 
+.dashboard-card__empty {
+  color: #64748b;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
 .dashboard-card__notification-list {
   display: grid;
   gap: 1rem;
