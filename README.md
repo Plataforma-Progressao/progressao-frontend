@@ -60,6 +60,8 @@ Se o seed da API foi executado no banco (local ou Supabase), o acesso de demonst
 Esses valores vêm do ambiente da API (`ADMIN_EMAIL`, `ADMIN_PASSWORD` e `ADMIN_NAME`).
 Não use essas credenciais padrão em produção real sem trocar senhas e segredos.
 
+Comprovantes e upload de arquivos em produção exigem object storage (R2, Supabase Storage, etc.) — veja a seção **Armazenamento de comprovantes** no [README do backend](../plataforma-progressao-backend/README.md).
+
 ## Execução local
 
 ```bash

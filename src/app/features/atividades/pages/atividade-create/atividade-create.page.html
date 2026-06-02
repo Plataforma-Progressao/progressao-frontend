@@ -112,6 +112,27 @@
             ></app-input>
           </div>
 
+          <div class="grid gap-6 md:grid-cols-2">
+            <app-input
+              formControlName="tipo"
+              label="Tipo (opcional)"
+              placeholder="Ex.: Publicação Qualis A1, Orientação de mestrado"
+              appearance="outline"
+              [disabledInput]="isLoadingActivity() || submitting()"
+              [control]="form.controls.tipo"
+              hint="Usado nas métricas de pesquisa e orientações no dashboard."
+            ></app-input>
+
+            <app-input
+              formControlName="periodo"
+              label="Período (opcional)"
+              placeholder="Ex.: 2025 ou 2025/1"
+              appearance="outline"
+              [disabledInput]="isLoadingActivity() || submitting()"
+              [control]="form.controls.periodo"
+            ></app-input>
+          </div>
+
           <app-textarea
             formControlName="descricao"
             label="Descrição e Detalhes"
@@ -193,9 +214,20 @@
                     </p>
                   </div>
                 </div>
+                <div class="flex shrink-0 items-center gap-1">
+                  @if (upload.persisted && upload.serverId) {
+                    <button
+                      type="button"
+                      class="rounded-full p-2 text-[color:var(--mat-sys-primary)] hover:bg-black/5"
+                      aria-label="Visualizar comprovante"
+                      (click)="openEvidence(upload)"
+                    >
+                      <mat-icon class="!text-[1.125rem]">visibility</mat-icon>
+                    </button>
+                  }
                 <button
                   type="button"
-                  class="shrink-0 rounded-full p-2 text-[#ba1a1a] hover:bg-black/5"
+                  class="rounded-full p-2 text-[#ba1a1a] hover:bg-black/5"
                   aria-label="Remover comprovante"
                   (click)="removeUpload(upload)"
                 >
@@ -211,6 +243,7 @@
                     />
                   </svg>
                 </button>
+                </div>
               </div>
             }
           </div>
@@ -377,20 +410,31 @@
         </div>
       </section>
 
-      <section
-        class="relative overflow-hidden rounded-[1.75rem] bg-[color:rgb(49_46_129)] p-6 text-white"
-        aria-label="Resumo da carreira"
-      >
-        <p class="text-[1.125rem] leading-7">Resumo da Carreira</p>
-        <p class="text-sm leading-5 text-white/70">Seu progresso atual na Classe IV:</p>
-        <p class="mt-2 text-[2.25rem] leading-10 font-semibold">
-          242
-          <span class="text-base font-normal text-white/70">/ 350 pts</span>
-        </p>
-        <mat-icon class="pointer-events-none absolute -bottom-2 -right-2 !text-[4rem] text-white/15"
-          >query_stats</mat-icon
+      @if (isEditing()) {
+        <app-activity-change-log
+          [entries]="changeLogEntries()"
+          [loading]="changeLogLoading()"
+          [errorMessage]="changeLogError()"
+        />
+      }
+
+      @if (isEditing() && careerSummary(); as summary) {
+        <section
+          class="relative overflow-hidden rounded-[1.75rem] bg-[color:rgb(49_46_129)] p-6 text-white"
+          aria-label="Resumo da carreira"
         >
-      </section>
+          <p class="text-[1.125rem] leading-7">Resumo da Carreira</p>
+          <p class="text-sm leading-5 text-white/70">{{ summary.level }}:</p>
+          <p class="mt-2 text-[2.25rem] leading-10 font-semibold">
+            {{ summary.current }}
+            <span class="text-base font-normal text-white/70">/ {{ summary.target }} pts</span>
+          </p>
+          <mat-icon
+            class="pointer-events-none absolute -bottom-2 -right-2 !text-[4rem] text-white/15"
+            >query_stats</mat-icon
+          >
+        </section>
+      }
     </aside>
   </div>
 </section>

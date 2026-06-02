@@ -1,103 +1,176 @@
 <div class="checklist">
   <header class="checklist__header">
     <h1 class="checklist__title">Checklist de Documentação</h1>
-    <p class="checklist__subtitle">Organize os comprovantes de suas atividades acadêmicas. O progresso abaixo reflete os documentos validados pela comissão técnica.</p>
+    <p class="checklist__subtitle">
+      Organize os comprovantes de suas atividades acadêmicas. O progresso abaixo reflete o
+      acompanhamento dos documentos do ciclo atual.
+    </p>
   </header>
 
-  <section class="checklist__progress-card">
-    <div class="checklist__progress-info">
-      <div>
-        <h2 class="checklist__progress-label">Progresso Total</h2>
-        <p class="checklist__progress-detail">{{concluidos}} de {{totalDocs}} documentos validados</p>
+  @if (isLoading()) {
+    <p class="checklist__status" role="status">Carregando checklist...</p>
+  } @else if (hasError()) {
+    <div class="checklist__status checklist__status--error" role="alert">
+      Não foi possível carregar o checklist.
+      <button type="button" (click)="reload()">Tentar novamente</button>
+    </div>
+  } @else {
+    <section class="checklist__progress-card">
+      <div class="checklist__progress-info">
+        <div>
+          <h2 class="checklist__progress-label">Progresso Total</h2>
+          <p class="checklist__progress-detail">
+            {{ concluidos() }} de {{ totalDocs() }} documentos validados
+          </p>
+        </div>
+        <span class="checklist__progress-percentage">{{ percentConcluido() }}%</span>
       </div>
-      <span class="checklist__progress-percentage">{{percentConcluido}}%</span>
-    </div>
-    <div class="checklist__progress-bar">
-        <div class="checklist__progress-fill checklist__progress-fill--concluido" 
-            [style.width.%]="percentConcluido"
-            title="Concluídos: {{concluidos}}">
-        </div>
-        <div class="checklist__progress-fill checklist__progress-fill--atencao" 
-            [style.width.%]="percentAtencao"
-            title="Em atenção: {{atencao}}">
-        </div>
-        <div class="checklist__progress-fill checklist__progress-fill--pendente" 
-            [style.width.%]="percentAtencao"
-            title="Pendentes: {{pendentes}}">
-        </div>
-            
-  </div>
-    <div class="checklist__legend">
-      <span class="legend-item"><span class="dot dot--concluido"></span> Concluído</span>
-      <span class="legend-item"><span class="dot dot--atencao"></span> Atenção</span>
-      <span class="legend-item"><span class="dot dot--pendente"></span> Pendente</span>
-    </div>
-  </section>
+      <div class="checklist__progress-bar">
+        <div
+          class="checklist__progress-fill checklist__progress-fill--concluido"
+          [style.width.%]="percentConcluido()"
+          [attr.title]="'Concluídos: ' + concluidos()"
+        ></div>
+        <div
+          class="checklist__progress-fill checklist__progress-fill--atencao"
+          [style.width.%]="percentAtencao()"
+          [attr.title]="'Em atenção: ' + atencao()"
+        ></div>
+        <div
+          class="checklist__progress-fill checklist__progress-fill--pendente"
+          [style.width.%]="percentPendente()"
+          [attr.title]="'Pendentes: ' + pendentes()"
+        ></div>
+      </div>
+      <div class="checklist__legend">
+        <span class="legend-item"><span class="dot dot--concluido"></span> Concluído</span>
+        <span class="legend-item"><span class="dot dot--atencao"></span> Atenção</span>
+        <span class="legend-item"><span class="dot dot--pendente"></span> Pendente</span>
+      </div>
+    </section>
 
-  <div class="checklist__content">
-    <main class="checklist__main">
+    <div class="checklist__content">
+      <main class="checklist__main">
         <div class="checklist__list-header">
-            <h3>Documentos Obrigatórios</h3>
-            <button class="checklist__filter-btn"  title="Filtrar lista por status">
-                <mat-icon>filter_list</mat-icon> Filtrar
+          <h3>Documentos Obrigatórios</h3>
+          <button
+            class="checklist__filter-btn"
+            type="button"
+            title="Filtrar lista por status"
+            [matMenuTriggerFor]="menuFiltros"
+          >
+            <mat-icon>filter_list</mat-icon>
+            Filtrar
+          </button>
+          <mat-menu #menuFiltros="matMenu">
+            <button mat-menu-item type="button" (click)="filtrarDocumentos('Todos')">
+              Todos
             </button>
-                <mat-menu #menuFiltros="matMenu">
-                    <button mat-menu-item (click)="filtrarDocumentos('Todos')">Todos</button>
-                    <button mat-menu-item (click)="filtrarDocumentos('Enviados')">Enviados</button>
-                    <button mat-menu-item (click)="filtrarDocumentos('Pendentes')">Pendentes</button>
-                    <button mat-menu-item (click)="filtrarDocumentos('Atenção')">Atenção</button>
-                </mat-menu>
+            <button mat-menu-item type="button" (click)="filtrarDocumentos('Concluído')">
+              Concluídos
+            </button>
+            <button mat-menu-item type="button" (click)="filtrarDocumentos('Pendente')">
+              Pendentes
+            </button>
+            <button mat-menu-item type="button" (click)="filtrarDocumentos('Atenção')">
+              Atenção
+            </button>
+          </mat-menu>
         </div>
 
-        <div class="checklist__doc-item" *ngFor="let doc of documentos" [ngClass]="'checklist__doc-item--' + doc.status.toLowerCase()">
-            <div class="checklist__doc-checkbox" [attr.title]="doc.status === 'Concluído' ? 'Documento Validado' : 'Documento Pendente'">
-                <mat-icon *ngIf="doc.status === 'Concluído'">check_box</mat-icon>
-                <mat-icon *ngIf="doc.status !== 'Concluído'">check_box_outline_blank</mat-icon>
+        @for (doc of documentos(); track doc.id) {
+          @let status = uiStatus(doc);
+          <div class="checklist__doc-item" [class]="statusClass(status)">
+            <div
+              class="checklist__doc-checkbox"
+              [attr.title]="status === 'Concluído' ? 'Documento validado' : 'Documento pendente'"
+            >
+              @if (status === 'Concluído') {
+                <mat-icon>check_box</mat-icon>
+              } @else {
+                <mat-icon>check_box_outline_blank</mat-icon>
+              }
             </div>
             <div class="checklist__doc-info">
-                <h4>{{doc.titulo}}</h4>
-                <p class="checklist__doc-desc" [ngClass]="'text--' + doc.status.toLowerCase()">
-                    {{doc.descricao}}
-                </p>
+              <h4>{{ doc.title }}</h4>
+              <p class="checklist__doc-desc" [class]="descClass(status)">
+                {{ doc.description || 'Sem descrição adicional.' }}
+              </p>
             </div>
             <div class="checklist__doc-actions">
-                <span *ngIf="doc.status === 'Concluído'" class="checklist__doc-date">
-                    Enviado em {{doc.dataEnvio || '12/10/23'}}
+              @if (status === 'Concluído' && doc.submittedAt) {
+                <span class="checklist__doc-date">
+                  Enviado em {{ formatSubmittedAt(doc.submittedAt) }}
                 </span>
-                <button *ngIf="doc.status === 'Concluído'" class="btn-quick-action btn-quick-action--icon-only" title="Visualizar arquivo enviado">
-                    <mat-icon>visibility</mat-icon>
+              }
+              <button
+                type="button"
+                class="btn-quick-action btn-quick-action--icon-only"
+                disabled
+                aria-disabled="true"
+                title="Visualização de arquivo disponível após configurar armazenamento em nuvem"
+              >
+                <mat-icon>visibility</mat-icon>
+              </button>
+              @if (status !== 'Concluído') {
+                <button
+                  type="button"
+                  class="btn-quick-action"
+                  [disabled]="updatingItemId() === doc.id"
+                  (click)="markAsCompleted(doc)"
+                >
+                  Marcar concluído
                 </button>
-                <button *ngIf="doc.status === 'Pendente' || doc.status === 'Atenção'" class="btn-quick-action btn-quick-action--upload" title="Clique para enviar o documento">
-                    <mat-icon>file_upload</mat-icon>
-                    Upload Rápido
+                <button
+                  type="button"
+                  class="btn-quick-action btn-quick-action--upload"
+                  disabled
+                  aria-disabled="true"
+                  title="Upload disponível após configurar armazenamento de arquivos"
+                >
+                  <mat-icon>file_upload</mat-icon>
+                  Upload
                 </button>
+              } @else {
+                <button
+                  type="button"
+                  class="btn-quick-action"
+                  [disabled]="updatingItemId() === doc.id"
+                  (click)="markAsAttention(doc)"
+                >
+                  Marcar atenção
+                </button>
+              }
             </div>
-        </div>
+          </div>
+        }
 
-        <div class="checklist__empty-state" *ngIf="documentos.length === 0">
+        @if (documentos().length === 0) {
+          <div class="checklist__empty-state">
             <p>Nenhum documento encontrado para o filtro atual.</p>
-        </div>
-    </main>
+          </div>
+        }
+      </main>
 
-    <aside class="checklist__sidebar mt-8">
-      <div class="checklist__resources">
-        <h3>Recursos e Ajuda</h3>
-        <div class="resource-item">
-          <mat-icon>description</mat-icon>
-          <span>Guia de Progressão 2024</span>
-          <mat-icon class="arrow">chevron_right</mat-icon>
+      <aside class="checklist__sidebar mt-8">
+        <div class="checklist__resources">
+          <h3>Recursos e Ajuda</h3>
+          <p class="checklist__storage-note">
+            O envio de arquivos será habilitado quando o armazenamento em nuvem (R2, Supabase
+            Storage, etc.) estiver configurado.
+          </p>
+          <div class="resource-item">
+            <mat-icon>description</mat-icon>
+            <span>Guia de Progressão</span>
+            <mat-icon class="arrow">chevron_right</mat-icon>
+          </div>
+          <div class="resource-item">
+            <mat-icon>help_outline</mat-icon>
+            <span>Dúvidas Frequentes</span>
+            <mat-icon class="arrow">chevron_right</mat-icon>
+          </div>
         </div>
-        <div class="resource-item">
-          <mat-icon>help_outline</mat-icon>
-          <span>Dúvidas Frequentes</span>
-          <mat-icon class="arrow">chevron_right</mat-icon>
-        </div>
-        <div class="resource-item">
-          <mat-icon>mail_outline</mat-icon>
-          <span>Suporte Técnico</span>
-          <mat-icon class="arrow">chevron_right</mat-icon>
-        </div>
-      </div>
-    </aside>
-  </div>
+      </aside>
+    </div>
+  }
 </div>

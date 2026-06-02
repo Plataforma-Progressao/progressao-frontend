@@ -1,5 +1,11 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -23,11 +29,14 @@ import {
   formatDurationFromHours,
   parseDurationToHours,
 } from '../../../../shared/forms/br-form.utils';
+import { DashboardApiService } from '../../../dashboard/dashboard-api.service';
 import { ActivitiesApiService } from '../../activities-api.service';
+import { ActivityChangeLogComponent } from '../../components/activity-change-log/activity-change-log.component';
 import {
   ActivityCategoryCode,
   ActivityCreatePayload,
-  ActivityListItemDto,
+  ActivityChangeLogEntry,
+  ActivityDetailDto,
   ActivityScoreEstimate,
 } from '../../models/activity-create.models';
 import { ButtonComponent } from '../../../../shared/components/base/button/button.component';
@@ -38,9 +47,10 @@ interface UploadItem {
   readonly localId: string;
   readonly fileName: string;
   readonly sizeBytes: number;
-  readonly file: File;
+  readonly file?: File;
   readonly status: 'queued' | 'uploading' | 'uploaded' | 'error';
   readonly serverId?: string;
+  readonly persisted?: boolean;
 }
 
 interface CategoryOption {
@@ -61,6 +71,7 @@ interface CategoryOption {
     ButtonComponent,
     InputComponent,
     TextareaComponent,
+    ActivityChangeLogComponent,
   ],
   templateUrl: './atividade-create.page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -71,6 +82,7 @@ export class ActivityCreatePage {
   private readonly router = inject(Router);
   private readonly snackBar = inject(MatSnackBar);
   private readonly activitiesApi = inject(ActivitiesApiService);
+  private readonly dashboardApi = inject(DashboardApiService);
   private readonly estimateRequestToken = signal(0);
 
   protected readonly categoriaOptions: readonly CategoryOption[] = [
@@ -84,6 +96,8 @@ export class ActivityCreatePage {
     titulo: ['', [Validators.required, Validators.minLength(4), Validators.maxLength(160)]],
     categoria: ['' as ActivityCategoryCode | '', [Validators.required]],
     cargaHoraria: ['', [Validators.required, durationValidator()]],
+    tipo: ['', [Validators.maxLength(120)]],
+    periodo: ['', [Validators.maxLength(32)]],
     descricao: ['', [Validators.required, Validators.minLength(4), Validators.maxLength(1200)]],
   });
 
@@ -95,6 +109,15 @@ export class ActivityCreatePage {
   protected readonly submitting = signal(false);
   protected readonly formIsValid = signal(this.form.valid);
   protected readonly loadErrorMessage = signal<string | null>(null);
+  protected readonly changeLogError = signal<string | null>(null);
+  protected readonly changeLogLoading = signal(false);
+  protected readonly changeLogEntries = signal<readonly ActivityChangeLogEntry[]>([]);
+
+  protected readonly careerSummary = signal<{
+    current: number;
+    target: number;
+    level: string;
+  } | null>(null);
   protected readonly scoreEstimate = signal<ActivityScoreEstimate>({
     baseCategory: 15,
     workloadFactor: 2.5,
@@ -153,13 +176,25 @@ export class ActivityCreatePage {
             titulo: '',
             categoria: '',
             cargaHoraria: '',
+            tipo: '',
+            periodo: '',
             descricao: '',
           },
           { emitEvent: false },
         );
         this.uploads.set([]);
+        this.changeLogError.set(null);
+        this.changeLogEntries.set([]);
+        this.careerSummary.set(null);
         this.recomputeEstimate();
       });
+  }
+
+  protected reloadChangeLog(): void {
+    const activityId = this.activityId();
+    if (activityId) {
+      void this.loadChangeLog(activityId);
+    }
   }
 
   protected onDragOver(event: DragEvent): void {
@@ -228,6 +263,8 @@ export class ActivityCreatePage {
       workloadHours: parseDurationToHours(raw.cargaHoraria),
       description: raw.descricao.trim(),
       score: this.scoreEstimate().totalImpact,
+      kind: raw.tipo.trim() || undefined,
+      term: raw.periodo.trim() || undefined,
     };
 
     this.submitting.set(true);
@@ -247,6 +284,10 @@ export class ActivityCreatePage {
         );
       } else {
         this.snackBar.open('Atividade registrada com sucesso.', 'Fechar', { duration: 3000 });
+      }
+
+      if (this.isEditing()) {
+        void this.loadChangeLog(activity.id);
       }
 
       void this.router.navigate(['/atividades']);
@@ -324,8 +365,27 @@ export class ActivityCreatePage {
     this.loadActivity(activityId);
   }
 
+  protected openEvidence(upload: UploadItem): void {
+    if (!upload.serverId || !upload.persisted) {
+      return;
+    }
+
+    this.activitiesApi.downloadEvidenceFile(upload.serverId).subscribe({
+      next: (blob) => {
+        const objectUrl = URL.createObjectURL(blob);
+        window.open(objectUrl, '_blank', 'noopener,noreferrer');
+        setTimeout(() => URL.revokeObjectURL(objectUrl), 60_000);
+      },
+      error: () => {
+        this.snackBar.open('Não foi possível abrir o comprovante.', 'Fechar', { duration: 4000 });
+      },
+    });
+  }
+
   private async uploadQueuedFiles(activityId: string): Promise<{ hasFailures: boolean }> {
-    const queuedUploads = this.uploads().filter((upload) => upload.status === 'queued');
+    const queuedUploads = this.uploads().filter(
+      (upload) => upload.status === 'queued' && upload.file,
+    );
     if (queuedUploads.length === 0) {
       return { hasFailures: false };
     }
@@ -341,7 +401,7 @@ export class ActivityCreatePage {
 
       try {
         const response = await firstValueFrom(
-          this.activitiesApi.uploadEvidence(activityId, upload.file),
+          this.activitiesApi.uploadEvidence(activityId, upload.file as File),
         );
 
         this.uploads.update((uploads) =>
@@ -429,18 +489,61 @@ export class ActivityCreatePage {
       .subscribe((activity) => {
         this.applyActivityToForm(activity);
         this.isLoadingActivity.set(false);
+        void this.loadChangeLog(activity.id);
+        void this.loadCareerSummary();
       });
   }
 
-  private applyActivityToForm(activity: ActivityListItemDto): void {
+  private async loadCareerSummary(): Promise<void> {
+    try {
+      const home = await firstValueFrom(this.dashboardApi.getHome());
+      this.careerSummary.set({
+        current: home.score.current,
+        target: home.score.target,
+        level: home.career.currentLevelLabel,
+      });
+    } catch {
+      this.careerSummary.set(null);
+    }
+  }
+
+  private async loadChangeLog(activityId: string): Promise<void> {
+    this.changeLogLoading.set(true);
+    this.changeLogError.set(null);
+
+    try {
+      const response = await firstValueFrom(this.activitiesApi.getActivityChanges(activityId));
+      this.changeLogEntries.set(response.items);
+    } catch {
+      this.changeLogError.set('Não foi possível carregar o histórico de alterações.');
+      this.changeLogEntries.set([]);
+    } finally {
+      this.changeLogLoading.set(false);
+    }
+  }
+
+  private applyActivityToForm(activity: ActivityDetailDto): void {
     this.form.setValue(
       {
         titulo: activity.title,
         categoria: activity.category,
         cargaHoraria: formatDurationFromHours(activity.workloadHours),
+        tipo: activity.kind ?? '',
+        periodo: activity.term ?? '',
         descricao: activity.description,
       },
       { emitEvent: false },
+    );
+
+    this.uploads.set(
+      activity.evidences.map((evidence) => ({
+        localId: evidence.id,
+        serverId: evidence.id,
+        fileName: evidence.originalName,
+        sizeBytes: evidence.sizeBytes,
+        status: 'uploaded' as const,
+        persisted: true,
+      })),
     );
 
     this.scoreEstimate.set({

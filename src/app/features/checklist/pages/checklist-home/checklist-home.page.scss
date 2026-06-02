@@ -8,6 +8,27 @@ $color-gray-bg: #F8F9FC;
 $color-green-light: #A3F69C;
 $color-red-alert: #BA1A1A;
 
+.checklist__status {
+  margin: 1rem 0;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  background: var(--mat-sys-surface-container);
+}
+
+.checklist__status--error {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.checklist__storage-note {
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: #6b7280;
+  margin: 0 0 1rem;
+}
+
 .checklist {
   font-family: 'Manrope', sans-serif;
   padding: 2rem;

@@ -4,8 +4,10 @@ import { map, Observable } from 'rxjs';
 import { ApiSuccessResponse } from '../../core/http/api-envelope.types';
 import { getApiUrl } from '../../core/config/runtime-config';
 import {
+  ActivityChangeLogList,
   ActivityCreatePayload,
   ActivityCreateResponse,
+  ActivityDetailDto,
   ActivityEvidenceUploadResponse,
   ActivitiesListQuery,
   ActivityListItemDto,
@@ -47,12 +49,26 @@ export class ActivitiesApiService {
       .pipe(map((response) => this.unwrapData(response)));
   }
 
-  findActivityById(activityId: string): Observable<ActivityListItemDto> {
+  findActivityById(activityId: string): Observable<ActivityDetailDto> {
     return this.http
-      .get<
-        ApiSuccessResponse<ActivityListItemDto> | ActivityListItemDto
-      >(`${this.apiBaseUrl}/activities/${activityId}`)
+      .get<ApiSuccessResponse<ActivityDetailDto> | ActivityDetailDto>(
+        `${this.apiBaseUrl}/activities/${activityId}`,
+      )
       .pipe(map((response) => this.unwrapData(response)));
+  }
+
+  getActivityChanges(activityId: string): Observable<ActivityChangeLogList> {
+    return this.http
+      .get<ApiSuccessResponse<ActivityChangeLogList> | ActivityChangeLogList>(
+        `${this.apiBaseUrl}/activities/${activityId}/changes`,
+      )
+      .pipe(map((response) => this.unwrapData(response)));
+  }
+
+  downloadEvidenceFile(evidenceId: string): Observable<Blob> {
+    return this.http.get(`${this.apiBaseUrl}/activities/evidences/${evidenceId}/file`, {
+      responseType: 'blob',
+    });
   }
 
   createActivity(payload: ActivityCreatePayload): Observable<ActivityCreateResponse> {

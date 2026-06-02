@@ -1,5 +1,7 @@
 # Relatório Analítico do Épico - Plataforma de Progressão Docente (UF)
 
+> **Nota (jun/2026):** vários gaps deste relatório foram parcialmente superados (checklist com API real, histórico de alterações na edição de atividades, comprovantes com metadados, remoção de mocks de dashboard/RAD/cadastro). Consulte o código e o README do backend sobre armazenamento de arquivos.
+
 Data da análise: 18/04/2026  
 Escopo analisado: `plataforma-progressao-front` + `plataforma-progressao-backend`
 

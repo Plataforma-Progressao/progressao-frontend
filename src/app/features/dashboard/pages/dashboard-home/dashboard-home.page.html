@@ -8,11 +8,11 @@
     </div>
   }
 
-  @if (hasHomeData()) {
+  @if (homeData(); as data) {
     <app-dashboard-home-hero
-      [eyebrow]="homeData().roleLabel"
-      [title]="homeData().displayName"
-      [summary]="homeData().summary"
+      [eyebrow]="data.roleLabel"
+      [title]="data.displayName"
+      [summary]="data.summary"
     />
 
     @if (isLoading()) {
@@ -25,12 +25,12 @@
     }
 
     <div class="dashboard-home__grid">
-      <app-dashboard-score-card [score]="homeData().score" />
-      <app-dashboard-career-card [career]="homeData().career" />
-      <app-dashboard-pillars-card [pillars]="homeData().pillars" />
-      <app-dashboard-biennium-card [biennium]="homeData().biennium" />
+      <app-dashboard-score-card [score]="data.score" />
+      <app-dashboard-career-card [career]="data.career" />
+      <app-dashboard-pillars-card [pillars]="data.pillars" />
+      <app-dashboard-biennium-card [biennium]="data.biennium" />
     </div>
 
-    <app-dashboard-notifications-card [notifications]="homeData().notifications" />
+    <app-dashboard-notifications-card [notifications]="data.notifications" />
   }
 </section>
