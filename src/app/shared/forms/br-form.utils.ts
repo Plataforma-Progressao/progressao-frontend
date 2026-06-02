@@ -22,6 +22,58 @@ export function formatCpfValue(value: string): string {
   return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6, 9)}-${digits.slice(9)}`;
 }
 
+export function formatDurationFromHours(totalHours: number): string {
+  if (!Number.isFinite(totalHours) || totalHours <= 0) {
+    return '';
+  }
+
+  const wholeHours = Math.floor(totalHours);
+  let minutes = Math.round((totalHours - wholeHours) * 60);
+
+  if (minutes === 60) {
+    minutes = 0;
+    return `${String(wholeHours + 1).padStart(2, '0')}:00`;
+  }
+
+  return `${String(wholeHours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+}
+
+export function parseDurationToHours(value: string): number {
+  const trimmed = value.trim();
+
+  if (!trimmed) {
+    return 0;
+  }
+
+  const [hoursPart, minutesPart = '0'] = trimmed.split(':');
+  const hours = Number.parseInt(hoursPart.replace(/\D/g, ''), 10) || 0;
+  const minutes = Number.parseInt(minutesPart.replace(/\D/g, ''), 10) || 0;
+
+  return Number((hours + minutes / 60).toFixed(2));
+}
+
+export function durationValidator(): ValidatorFn {
+  return (control: AbstractControl<string | null>): ValidationErrors | null => {
+    const value = control.value?.trim() ?? '';
+
+    if (!value) {
+      return null;
+    }
+
+    if (!/^\d{1,3}:\d{2}$/.test(value)) {
+      return { durationInvalid: true };
+    }
+
+    const [hours, minutes] = value.split(':').map((part) => Number.parseInt(part, 10));
+
+    if (minutes > 59 || hours > 999) {
+      return { durationInvalid: true };
+    }
+
+    return null;
+  };
+}
+
 export function formatPhoneValue(value: string): string {
   const digits = onlyDigits(value).slice(0, 11);
 

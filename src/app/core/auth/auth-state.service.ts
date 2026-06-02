@@ -4,6 +4,7 @@ import { AuthApiService } from './auth-api.service';
 import {
   AuthCredentials,
   AuthResponse,
+  AuthResponseUser,
   AuthSession,
   AuthSessionOptions,
   DashboardUser,
@@ -94,6 +95,39 @@ export class AuthStateService {
     }
 
     void firstValueFrom(this.authApiService.logout(session.refreshToken)).catch(() => undefined);
+  }
+
+  async syncUserFromServer(): Promise<void> {
+    const session = this.session();
+
+    if (!session) {
+      return;
+    }
+
+    const user = await firstValueFrom(this.authApiService.me());
+    this.persistSession(
+      {
+        ...session,
+        user: this.toDashboardUser(user),
+      },
+      session.persistent,
+    );
+  }
+
+  applyAuthUser(user: AuthResponseUser): void {
+    const session = this.session();
+
+    if (!session) {
+      return;
+    }
+
+    this.persistSession(
+      {
+        ...session,
+        user: this.toDashboardUser(user),
+      },
+      session.persistent,
+    );
   }
 
   async refreshSession(): Promise<boolean> {

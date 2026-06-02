@@ -22,16 +22,12 @@ export const routes: Routes = [
         loadChildren: () => import('../atividades/atividades.routes').then((m) => m.routes),
       },
       {
-        path: 'historico',
-        loadChildren: () => import('../historico/historico.routes').then((m) => m.routes),
-      },
-      {
         path: 'checklist',
         loadChildren: () => import('../checklist/checklist.routes').then((m) => m.routes),
       },
       {
         path: 'relatorios',
-        loadChildren: () => import('../relatorios/relatorios.routes').then((m) => m.routes),
+        loadChildren: () => import('../reports/reports.routes').then((m) => m.routes),
       },
       {
         path: 'configuracoes',

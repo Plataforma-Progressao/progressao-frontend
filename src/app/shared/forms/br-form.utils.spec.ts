@@ -3,7 +3,9 @@ import {
   cpfValidator,
   formatCpfValue,
   formatPhoneValue,
+  formatDurationFromHours,
   isValidCpf,
+  parseDurationToHours,
   passwordMatchValidator,
   phoneValidator,
 } from './br-form.utils';
@@ -14,6 +16,13 @@ describe('br-form.utils', () => {
     expect(formatCpfValue('1234')).toBe('123.4');
     expect(formatCpfValue('123456')).toBe('123.456');
     expect(formatCpfValue('12345678901')).toBe('123.456.789-01');
+  });
+
+  it('parses and formats duration as decimal hours', () => {
+    expect(parseDurationToHours('01:30')).toBe(1.5);
+    expect(parseDurationToHours('40:00')).toBe(40);
+    expect(formatDurationFromHours(1.5)).toBe('01:30');
+    expect(formatDurationFromHours(40)).toBe('40:00');
   });
 
   it('formats phone values progressively', () => {

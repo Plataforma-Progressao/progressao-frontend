@@ -20,10 +20,12 @@ export class ButtonComponent {
   readonly label = input('');
   readonly disabled = input(false, { transform: booleanAttribute });
   readonly fullWidth = input(false, { transform: booleanAttribute });
+  readonly compact = input(false, { transform: booleanAttribute });
   readonly type = input<ButtonType>('button');
   readonly icon = input<string | null>(null);
   readonly prefixIcon = input<string | null>(null);
   readonly loading = input(false, { transform: booleanAttribute });
+  readonly ariaCurrent = input<string | null>(null);
 
   readonly clicked = output<void>();
 
@@ -36,6 +38,7 @@ export class ButtonComponent {
   protected get buttonClass(): string {
     const classes = ['app-btn', `app-btn--${this.variant()}`, `app-btn--${this.size()}`];
     if (this.fullWidth()) classes.push('app-btn--block');
+    if (this.compact()) classes.push('app-btn--compact');
     if (this.loading()) classes.push('app-btn--loading');
     return classes.join(' ');
   }

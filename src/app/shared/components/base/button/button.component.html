@@ -6,6 +6,7 @@
     [class]="buttonClass"
     (click)="onClick()"
     [attr.aria-label]="label()"
+    [attr.aria-current]="ariaCurrent()"
   >
     <mat-icon aria-hidden="true">{{ icon() }}</mat-icon>
   </button>
@@ -17,6 +18,7 @@
     [class]="buttonClass"
     (click)="onClick()"
     [attr.aria-label]="loading() ? label() : null"
+    [attr.aria-current]="ariaCurrent()"
   >
     @if (loading()) {
       <mat-spinner diameter="16" [strokeWidth]="2"></mat-spinner>
@@ -38,6 +40,7 @@
     [class]="buttonClass"
     (click)="onClick()"
     [attr.aria-label]="loading() ? label() : null"
+    [attr.aria-current]="ariaCurrent()"
   >
     @if (loading()) {
       <mat-spinner diameter="16" [strokeWidth]="2"></mat-spinner>
@@ -56,6 +59,7 @@
     [class]="buttonClass"
     (click)="onClick()"
     [attr.aria-label]="loading() ? label() : null"
+    [attr.aria-current]="ariaCurrent()"
   >
     @if (loading()) {
       <mat-spinner diameter="16" [strokeWidth]="2"></mat-spinner>

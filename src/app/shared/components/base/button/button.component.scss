@@ -52,6 +52,12 @@
     font-size: 0.875rem;
   }
 
+  &.app-btn--compact {
+    min-width: 0;
+    padding-left: 0.875rem;
+    padding-right: 0.875rem;
+  }
+
   @media (pointer: coarse) {
     &.app-btn--small {
       min-height: 2.75rem;
@@ -92,8 +98,14 @@
   }
 
   &.app-btn--danger {
-    --mdc-filled-button-container-color: var(--color-error, #b00020);
-    --mdc-filled-button-label-text-color: #ffffff;
+    --mdc-filled-button-container-color: var(--mat-sys-error, #ba1a1a);
+    --mdc-filled-button-label-text-color: var(--mat-sys-on-error, #ffffff);
+    --mdc-filled-button-disabled-container-color: #d4d4d8;
+    --mdc-filled-button-disabled-label-text-color: #6b7280;
+    --mat-filled-button-container-color: var(--mat-sys-error, #ba1a1a);
+    --mat-filled-button-label-text-color: var(--mat-sys-on-error, #ffffff);
+    --mat-filled-button-disabled-container-color: #d4d4d8;
+    --mat-filled-button-disabled-label-text-color: #6b7280;
 
     &:active:not(:disabled) {
       transform: scale(0.98);

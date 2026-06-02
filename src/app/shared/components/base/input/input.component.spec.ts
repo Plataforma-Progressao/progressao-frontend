@@ -22,8 +22,8 @@ describe('InputComponent', () => {
 
   it('should propagate value changes via ControlValueAccessor', () => {
     let emitted = '';
-    component.registerOnChange((value: string) => {
-      emitted = value;
+    component.registerOnChange((value: string | number) => {
+      emitted = String(value);
     });
 
     const input = fixture.nativeElement.querySelector('input') as HTMLInputElement;
@@ -50,8 +50,8 @@ describe('InputComponent', () => {
     fixture.detectChanges();
 
     let emitted = '';
-    component.registerOnChange((value: string) => {
-      emitted = value;
+    component.registerOnChange((value: string | number) => {
+      emitted = String(value);
     });
 
     const input = fixture.nativeElement.querySelector('input') as HTMLInputElement;
@@ -67,8 +67,8 @@ describe('InputComponent', () => {
     fixture.detectChanges();
 
     let emitted = '';
-    component.registerOnChange((value: string) => {
-      emitted = value;
+    component.registerOnChange((value: string | number) => {
+      emitted = String(value);
     });
 
     const input = fixture.nativeElement.querySelector('input') as HTMLInputElement;
@@ -119,6 +119,39 @@ describe('InputComponent', () => {
 
     expect(iconText).toContain('mail_outline');
     expect(iconText).toContain('visibility');
+  });
+
+  it('should emit numeric values when type is number', () => {
+    fixture.componentRef.setInput('type', 'number');
+    fixture.detectChanges();
+
+    let emitted: string | number = '';
+    component.registerOnChange((value: string | number) => {
+      emitted = value;
+    });
+
+    const input = fixture.nativeElement.querySelector('input') as HTMLInputElement;
+    input.value = '40abc';
+    input.dispatchEvent(new Event('input'));
+
+    expect(input.value).toBe('40');
+    expect(emitted).toBe(40);
+  });
+
+  it('should pass through ngx-mask values as strings', () => {
+    fixture.componentRef.setInput('ngxMaskPattern', 'Hh:m0');
+    fixture.detectChanges();
+
+    let emitted = '';
+    component.registerOnChange((value: string | number) => {
+      emitted = String(value);
+    });
+
+    const input = fixture.nativeElement.querySelector('input') as HTMLInputElement;
+    input.value = '01:30';
+    input.dispatchEvent(new Event('input'));
+
+    expect(emitted).toBe('01:30');
   });
 
   it('should emit suffixClicked when suffix action button is clicked', () => {

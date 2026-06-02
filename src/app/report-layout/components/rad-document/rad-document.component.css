@@ -1,0 +1,300 @@
+:host {
+  display: block;
+}
+
+.rad-document {
+  background: #fff;
+  border-radius: 0.875rem;
+  box-shadow: 0 0.5rem 1.5rem rgb(14 24 56 / 12%);
+  color: #19213d;
+  margin: 0 auto;
+  max-width: 56rem;
+  padding: 2rem;
+}
+
+.rad-document__institution {
+  align-items: flex-start;
+  border-bottom: 1px solid #d7dceb;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: auto 1fr auto;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.25rem;
+}
+
+.rad-document__logo {
+  align-items: center;
+  background: #1f2a7a;
+  border-radius: 0.5rem;
+  color: #fff;
+  display: flex;
+  height: 2.75rem;
+  justify-content: center;
+  width: 2.75rem;
+}
+
+.rad-document__logo mat-icon {
+  font-size: 1.5rem;
+  height: 1.5rem;
+  width: 1.5rem;
+}
+
+.rad-document h1 {
+  font-size: 1.25rem;
+  line-height: 1.3;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.rad-document p {
+  margin: 0;
+}
+
+.rad-document__institution p {
+  color: #3e4969;
+  font-size: 0.8125rem;
+}
+
+.rad-document__cycle {
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  margin-top: 0.25rem;
+  text-transform: uppercase;
+}
+
+.rad-document__badge {
+  background: #94d77f;
+  border-radius: 0.25rem;
+  color: #103b1e;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 0.35rem 0.5rem;
+  text-transform: uppercase;
+}
+
+.rad-document__profile {
+  background: #f4f6fb;
+  border-radius: 0.75rem;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-bottom: 1.5rem;
+  padding: 1.25rem;
+}
+
+.rad-document__profile h2 {
+  color: #65709a;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin: 0 0 0.4rem;
+  text-transform: uppercase;
+}
+
+.rad-document__profile p {
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.rad-document__status {
+  color: #0f7e3a;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.rad-document__summary,
+.rad-document__detail {
+  margin-bottom: 1.5rem;
+}
+
+.rad-document h3 {
+  border-left: 0.2rem solid #1e2a82;
+  font-size: 0.9rem;
+  margin: 0 0 0.8rem;
+  padding-left: 0.5rem;
+  text-transform: uppercase;
+}
+
+.rad-document__table-wrap {
+  overflow-x: auto;
+}
+
+.rad-document__table-wrap table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.rad-document__table-wrap th,
+.rad-document__table-wrap td {
+  border-bottom: 1px solid #e1e6f2;
+  font-size: 0.82rem;
+  padding: 0.6rem 0.5rem;
+  text-align: left;
+}
+
+.rad-document__table-wrap thead th {
+  background: #f1f3f8;
+  color: #4f5878;
+  font-size: 0.67rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.rad-document__table-wrap tfoot th,
+.rad-document__table-wrap tfoot td {
+  background: #f7f8fc;
+  color: #1d2868;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.rad-document__activity-group h4 {
+  color: #1d2868;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  margin: 0 0 0.6rem;
+  text-transform: uppercase;
+}
+
+.rad-document__activity-group ul {
+  display: grid;
+  gap: 0.9rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.rad-document__activity-group li {
+  align-items: flex-start;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+.rad-document__activity-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.rad-document__activity-description {
+  color: #576180;
+  font-size: 0.75rem;
+  margin-top: 0.2rem;
+}
+
+.rad-document__activity-points {
+  color: #11733a;
+  font-size: 0.85rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.rad-document__footer {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 2.25rem;
+}
+
+.rad-document__sign-block hr {
+  border: 0;
+  border-top: 1px solid #5d6480;
+  margin: 0 0 0.4rem;
+}
+
+.rad-document__sign-block p {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.rad-document__sign-block small {
+  color: #5a6382;
+  font-size: 0.62rem;
+}
+
+.rad-document__legal {
+  border-top: 1px solid #e1e6f2;
+  color: #5a6382;
+  font-size: 0.62rem;
+  line-height: 1.45;
+  margin: 1.5rem 0 0;
+  padding-top: 0.75rem;
+}
+
+@media (max-width: 64rem) {
+  .rad-document {
+    padding: 1rem;
+  }
+
+  .rad-document__institution {
+    grid-template-columns: 1fr;
+  }
+
+  .rad-document__profile {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 40rem) {
+  .rad-document__profile {
+    grid-template-columns: 1fr;
+  }
+
+  .rad-document__footer {
+    grid-template-columns: 1fr;
+  }
+}
+
+@page {
+  margin: 12mm;
+  size: A4 portrait;
+}
+
+@media print {
+  /*
+   * Browsers strip backgrounds in print by default ("Save ink").
+   * Keeps PDF/print output aligned with on-screen preview.
+   */
+  :host {
+    display: block;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .rad-document,
+  .rad-document * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .rad-document {
+    border-radius: 0;
+    box-shadow: none;
+    margin: 0;
+    max-width: 100%;
+    padding: 0;
+  }
+
+  .rad-document__summary,
+  .rad-document__detail {
+    break-inside: auto;
+  }
+
+  .rad-document__activity-group {
+    break-inside: avoid;
+  }
+
+  .rad-document__footer {
+    break-inside: avoid;
+  }
+
+  .rad-document__legal {
+    break-inside: avoid;
+  }
+
+  .rad-document__sign-block {
+    break-inside: avoid;
+  }
+}

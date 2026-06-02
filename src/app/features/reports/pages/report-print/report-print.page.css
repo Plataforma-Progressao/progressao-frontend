@@ -1,0 +1,59 @@
+:host {
+  display: block;
+}
+
+.report-print {
+  background: #fff;
+  min-height: 100vh;
+  padding: 1rem;
+}
+
+.report-print__status {
+  color: #3a4260;
+  font-size: 0.95rem;
+}
+
+.report-print__error {
+  align-items: center;
+  background: #fff3f3;
+  border: 1px solid #f1c4c4;
+  border-radius: 0.75rem;
+  color: #822b2b;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.8rem 1rem;
+}
+
+.report-print__error button {
+  background: transparent;
+  border: 1px solid #822b2b;
+  border-radius: 999px;
+  color: inherit;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 0.4rem 0.8rem;
+}
+
+@page {
+  margin: 12mm;
+  size: A4 portrait;
+}
+
+@media print {
+  :host {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .report-print,
+  .report-print * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .report-print {
+    padding: 0;
+  }
+}
