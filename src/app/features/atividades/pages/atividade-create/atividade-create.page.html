@@ -110,6 +110,7 @@
               [control]="form.controls.cargaHoraria"
               errorMessage="Informe a carga no formato HH:MM (máx. 999:59)."
             ></app-input>
+
           </div>
 
           <div class="grid gap-6 md:grid-cols-2">
@@ -120,7 +121,9 @@
               appearance="outline"
               [disabledInput]="isLoadingActivity() || submitting()"
               [control]="form.controls.tipo"
-              hint="Usado nas métricas de pesquisa e orientações no dashboard."
+              
+              hint="Usado na métrica de pesquisa e dashboard." 
+              
             ></app-input>
 
             <app-input
@@ -133,6 +136,7 @@
             ></app-input>
           </div>
 
+          <!--  -->
           <app-textarea
             formControlName="descricao"
             label="Descrição e Detalhes"
@@ -141,16 +145,17 @@
             [rows]="4"
             [disabledInput]="isLoadingActivity() || submitting()"
             [control]="form.controls.descricao"
+            [hint]="descricaoHint()" 
             requiredErrorMessage="A descrição é obrigatória."
             minLengthErrorMessage="A descrição precisa ter pelo menos 4 caracteres."
             maxLengthErrorMessage="A descrição deve ter no máximo 1200 caracteres."
           ></app-textarea>
+          <!--  -->
 
           <div class="flex flex-col gap-4">
             <label class="text-sm font-semibold leading-5 text-[color:rgb(69_70_82)]"
               >Comprovantes e Arquivos (opcional)</label
             >
-
             <input
               #filePicker
               class="hidden"
