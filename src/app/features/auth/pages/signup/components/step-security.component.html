@@ -7,39 +7,44 @@
     </p>
   </div>
 
-  <div class="form-wrapper">
-    <div class="form-grid">
-      <app-input
-        formControlName="password"
-        label="Senha de acesso"
-        [type]="hidePassword() ? 'password' : 'text'"
-        placeholder="••••••••"
-        prefixIcon="lock_outline"
-        [suffixIcon]="hidePassword() ? 'visibility' : 'visibility_off'"
-        [suffixIconAriaLabel]="hidePassword() ? 'Mostrar senha' : 'Ocultar senha'"
-        [suffixAction]="true"
-        (suffixClicked)="togglePassword()"
-        [control]="form().get('password')"
-        hint="Minimo de 8 caracteres, incluindo letras e numeros."
-        errorMessage="Informe ao menos 8 caracteres."
-      />
+    <div class="form-wrapper">
+      <div class="form-grid">
+        <div class="password-wrapper">
+          <app-input
+            formControlName="password"
+            label="Senha de acesso"
+            [type]="hidePassword() ? 'password' : 'text'"
+            placeholder="••••••••"
+            prefixIcon="lock_outline"
+            [suffixIcon]="hidePassword() ? 'visibility' : 'visibility_off'"
+            [suffixIconAriaLabel]="hidePassword() ? 'Mostrar senha' : 'Ocultar senha'"
+            [suffixAction]="true"
+            (suffixClicked)="togglePassword()"
+            [control]="form().get('password')"
+            errorMessage="Informe ao menos 8 caracteres."
+          />
+          @if (form().get('password')?.invalid) {
+            <span class="custom-hint">Mínimo de 8 caracteres, incluindo letras e números.</span>
+          }
+        </div>
 
-      <app-input
-        formControlName="confirmPassword"
-        label="Confirmar senha"
-        [type]="hidePasswordConfirm() ? 'password' : 'text'"
-        placeholder="••••••••"
-        prefixIcon="lock"
-        [suffixIcon]="hidePasswordConfirm() ? 'visibility' : 'visibility_off'"
-        [suffixIconAriaLabel]="hidePasswordConfirm() ? 'Mostrar senha' : 'Ocultar senha'"
-        [suffixAction]="true"
-        (suffixClicked)="togglePasswordConfirm()"
-        [control]="form().get('confirmPassword')"
-        errorMessage="Confirme sua senha para continuar."
-      />
-
-      @if (form().hasError('passwordMismatch') && form().get('confirmPassword')?.touched) {
-        <p class="form-error" role="alert">As senhas precisam ser iguais.</p>
+        <div class="password-wrapper">
+          <app-input
+            formControlName="confirmPassword"
+            label="Confirmar senha"
+            [type]="hidePasswordConfirm() ? 'password' : 'text'"
+            placeholder="••••••••"
+            prefixIcon="lock"
+            [suffixIcon]="hidePasswordConfirm() ? 'visibility' : 'visibility_off'"
+            [suffixIconAriaLabel]="hidePasswordConfirm() ? 'Mostrar senha' : 'Ocultar senha'"
+            [suffixAction]="true"
+            (suffixClicked)="togglePasswordConfirm()"
+            [control]="form().get('confirmPassword')"
+            errorMessage="Confirme sua senha para continuar."
+          />
+      </div>
+      @if (form().hasError('passwordMismatch') && form().get('confirmPassword')?.dirty) {
+        <p class="form-error" role="alert">As senhas precisam ser iguais.</p> 
       }
     </div>
 

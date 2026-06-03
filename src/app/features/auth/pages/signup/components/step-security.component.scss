@@ -35,12 +35,24 @@
   margin-bottom: 2rem;
 }
 
+.password-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem; 
+}
+
+.custom-hint {
+  color: var(--color-text-secondary, #6b7280);
+  font-size: 0.75rem;
+  font-weight: 500;
+  margin-left: 1rem;
+}
 .form-error {
   color: #b91c1c;
   font-size: 0.8rem;
   font-weight: 600;
-  grid-column: 1 / -1;
-  margin: -0.5rem 0 0;
+  grid-column: 1 / -1; 
+  margin: -0.5rem 0 0 1rem;
 }
 
 .checkbox-group {
