@@ -53,6 +53,7 @@
       <main class="checklist__main">
         <div class="checklist__list-header">
           <h3>Documentos Obrigatórios</h3>
+          
           <button
             class="checklist__filter-btn"
             type="button"
@@ -62,18 +63,62 @@
             <mat-icon>filter_list</mat-icon>
             Filtrar
           </button>
-          <mat-menu #menuFiltros="matMenu">
-            <button mat-menu-item type="button" (click)="filtrarDocumentos('Todos')">
-              Todos
+          
+          <mat-menu #menuFiltros="matMenu" class="custom-filter-menu">
+            <button 
+              mat-menu-item 
+              type="button" 
+              (click)="filtrarDocumentos('Todos')"
+              [class.is-active]="statusFilter() === 'Todos'"
+            >
+              <div class="filter-item-layout">
+                <span>Todos</span>
+                @if (statusFilter() === 'Todos') {
+                  <mat-icon class="check-icon">done</mat-icon>
+                }
+              </div>
             </button>
-            <button mat-menu-item type="button" (click)="filtrarDocumentos('Concluído')">
-              Concluídos
+
+            <button 
+              mat-menu-item 
+              type="button" 
+              (click)="filtrarDocumentos('Concluído')"
+              [class.is-active]="statusFilter() === 'Concluído'"
+            >
+              <div class="filter-item-layout">
+                <span>Concluídos</span>
+                @if (statusFilter() === 'Concluído') {
+                  <mat-icon class="check-icon">done</mat-icon>
+                }
+              </div>
             </button>
-            <button mat-menu-item type="button" (click)="filtrarDocumentos('Pendente')">
-              Pendentes
+
+            <button 
+              mat-menu-item 
+              type="button" 
+              (click)="filtrarDocumentos('Pendente')"
+              [class.is-active]="statusFilter() === 'Pendente'"
+            >
+              <div class="filter-item-layout">
+                <span>Pendentes</span>
+                @if (statusFilter() === 'Pendente') {
+                  <mat-icon class="check-icon">done</mat-icon>
+                }
+              </div>
             </button>
-            <button mat-menu-item type="button" (click)="filtrarDocumentos('Atenção')">
-              Atenção
+
+            <button 
+              mat-menu-item 
+              type="button" 
+              (click)="filtrarDocumentos('Atenção')"
+              [class.is-active]="statusFilter() === 'Atenção'"
+            >
+              <div class="filter-item-layout">
+                <span>Atenção</span>
+                @if (statusFilter() === 'Atenção') {
+                  <mat-icon class="check-icon">done</mat-icon>
+                }
+              </div>
             </button>
           </mat-menu>
         </div>
