@@ -16,6 +16,12 @@ h2 {
   margin: 0;
 }
 
+.dashboard-card__empty {
+  color: #64748b;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
 .dashboard-card__pillar-list {
   display: grid;
   gap: 1rem;

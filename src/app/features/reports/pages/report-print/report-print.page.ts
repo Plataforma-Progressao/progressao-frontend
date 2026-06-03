@@ -33,11 +33,11 @@ const DEFAULT_BROWSER_TAB_TITLE = 'Plataforma Progressão Docente';
           <button type="button" (click)="reportResource.reload()">Tentar novamente</button>
           <button type="button" (click)="leavePrintView()">Voltar aos relatorios</button>
         </div>
-      } @else {
+      } @else if (reportData(); as report) {
         <app-rad-document
-          [userData]="data().userData"
-          [metadata]="data().metadata"
-          [activities]="data().activities"
+          [userData]="report.userData"
+          [metadata]="report.metadata"
+          [activities]="report.activities"
         />
       }
     </section>
@@ -66,27 +66,7 @@ export class ReportPrintPage {
 
   protected readonly isLoading = computed(() => this.reportResource.status() === 'loading');
   protected readonly hasError = computed(() => this.reportResource.status() === 'error');
-  protected readonly data = computed(
-    () =>
-      this.reportResource.value() ?? {
-        userData: {
-          id: 'fallback',
-          name: 'Docente nao identificado',
-          siapeId: 'N/A',
-          department: 'Departamento nao informado',
-          workRegime: 'Regime nao informado',
-        },
-        metadata: {
-          institution: 'Universidade Federal do Conhecimento',
-          graduateOfficeTitle: 'Pro-Reitoria de Graduacao e Pesquisa',
-          documentLabel: 'Documento preliminar',
-          cycleLabel: 'Ciclo nao informado',
-          issuedAtLabel: 'Data nao informada',
-          cycleStatus: 'Sem status',
-        },
-        activities: [],
-      },
-  );
+  protected readonly reportData = computed(() => this.reportResource.value());
 
   constructor() {
     effect(() => {

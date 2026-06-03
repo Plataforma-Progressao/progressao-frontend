@@ -9,8 +9,8 @@ import { AuthPageFooterComponent } from '../../components/auth-page-footer/auth-
 import { AuthPageHeaderComponent } from '../../components/auth-page-header/auth-page-header.component';
 
 const DEFAULT_LOGIN_FORM_VALUES = {
-  email: 'admin@progressao.uf.br',
-  password: 'Admin@123456',
+  email: '',
+  password: '',
   rememberMe: false,
 };
 

@@ -1,6 +1,33 @@
 export type ActivityCategoryCode = 'TEACHING' | 'RESEARCH' | 'OUTREACH' | 'MANAGEMENT';
 export type ActivityStatusCode = 'APPROVED' | 'PENDING' | 'REJECTED';
 
+export interface ActivityEvidenceDto {
+  readonly id: string;
+  readonly originalName: string;
+  readonly mimeType: string | null;
+  readonly sizeBytes: number;
+  readonly createdAt: string;
+}
+
+export interface ActivityDetailDto extends ActivityListItemDto {
+  readonly evidences: readonly ActivityEvidenceDto[];
+}
+
+export interface ActivityChangeLogEntry {
+  readonly id: string;
+  readonly field: string;
+  readonly fieldLabel: string;
+  readonly oldValue: string | null;
+  readonly newValue: string | null;
+  readonly changedAt: string;
+  readonly changedByName: string | null;
+}
+
+export interface ActivityChangeLogList {
+  readonly items: readonly ActivityChangeLogEntry[];
+  readonly total: number;
+}
+
 export interface ActivityListItemDto {
   readonly id: string;
   readonly title: string;

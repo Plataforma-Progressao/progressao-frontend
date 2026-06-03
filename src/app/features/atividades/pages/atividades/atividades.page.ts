@@ -60,8 +60,8 @@ type ActivitiesListTab = (typeof ALL_TABS)[number];
 const STATUS_OPTIONS: readonly { label: string; value: 'Todos' | UiActivityStatus }[] = [
   { label: 'Todos', value: 'Todos' },
   { label: 'Validado', value: 'Validado' },
-  { label: 'Pendente', value: 'Pendente' },
-  { label: 'Erro', value: 'Erro' },
+  { label: 'Pendente (legado)', value: 'Pendente' },
+  { label: 'Rejeitado (legado)', value: 'Erro' },
 ];
 
 const YEAR_OPTIONS = [

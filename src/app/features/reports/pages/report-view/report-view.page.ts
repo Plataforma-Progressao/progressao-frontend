@@ -38,7 +38,7 @@ import { saveReportPrintSnapshot } from '../../utils/report-print-snapshot';
           Nao foi possivel carregar o relatorio no momento.
           <button type="button" (click)="reportResource.reload()">Tentar novamente</button>
         </div>
-      } @else {
+      } @else if (reportData(); as report) {
         @if (validationMessage()) {
           <div class="report-view__notice" role="status">
             {{ validationMessage() }}
@@ -47,9 +47,9 @@ import { saveReportPrintSnapshot } from '../../utils/report-print-snapshot';
 
         <div class="report-view__document-wrap">
           <app-rad-document
-            [userData]="data().userData"
-            [metadata]="data().metadata"
-            [activities]="data().activities"
+            [userData]="report.userData"
+            [metadata]="report.metadata"
+            [activities]="report.activities"
           />
         </div>
 
@@ -91,37 +91,18 @@ export class ReportViewPage {
 
   protected readonly isLoading = computed(() => this.reportResource.status() === 'loading');
   protected readonly hasError = computed(() => this.reportResource.status() === 'error');
-  protected readonly data = computed(
-    () =>
-      this.reportResource.value() ?? {
-        userData: {
-          id: 'fallback',
-          name: 'Docente nao identificado',
-          siapeId: 'N/A',
-          department: 'Departamento nao informado',
-          workRegime: 'Regime nao informado',
-        },
-        metadata: {
-          institution: 'Universidade Federal do Conhecimento',
-          graduateOfficeTitle: 'Pro-Reitoria de Graduacao e Pesquisa',
-          documentLabel: 'Documento preliminar',
-          cycleLabel: 'Ciclo nao informado',
-          issuedAtLabel: 'Data nao informada',
-          cycleStatus: 'Sem status',
-        },
-        activities: [],
-      },
-  );
+  protected readonly reportData = computed(() => this.reportResource.value());
 
   protected readonly approvedCount = computed(
-    () => this.data().activities.filter((item) => item.status === 'APPROVED').length,
+    () => this.reportData()?.activities.filter((item) => item.status === 'APPROVED').length ?? 0,
   );
 
   protected readonly validationMessage = computed(() => {
-    if (this.isLoading() || this.hasError()) {
+    const report = this.reportData();
+    if (!report) {
       return null;
     }
-    if (this.data().activities.length === 0) {
+    if (report.activities.length === 0) {
       return 'Nenhuma atividade foi retornada. O quadro e o detalhamento podem ficar vazios ate que existam registos.';
     }
     if (this.approvedCount() === 0) {
@@ -140,7 +121,12 @@ export class ReportViewPage {
     }
 
     this.isOpeningPrint.set(true);
-    saveReportPrintSnapshot(this.data());
+    const report = this.reportData();
+    if (!report) {
+      return;
+    }
+
+    saveReportPrintSnapshot(report);
 
     void this.router.navigateByUrl(RELATORIOS_PRINT_PATH).finally(() => this.isOpeningPrint.set(false));
   }

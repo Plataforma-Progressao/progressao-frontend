@@ -21,27 +21,27 @@ import { ButtonComponent } from '../../../../shared/components/base/button/butto
 
 const DEFAULT_SIGNUP_FORM_VALUES = {
   personal: {
-    fullName: 'Dra. Ana Souza',
-    cpf: '123.456.789-09',
-    phone: '(31) 99999-0000',
-    email: 'ana.souza@universidade.br',
+    fullName: '',
+    cpf: '',
+    phone: '',
+    email: '',
   },
   institution: {
-    university: 'ufmg',
-    center: 'icex',
-    department: 'dcc',
+    university: '',
+    center: '',
+    department: '',
   },
   career: {
-    practiceAreas: ['data', 'sys'],
-    careerClass: 'adjunto',
-    currentLevel: 'III',
-    lastProgressionDate: '2024-08-15',
+    practiceAreas: [] as string[],
+    careerClass: '',
+    currentLevel: '',
+    lastProgressionDate: '',
   },
   security: {
-    password: 'Progressao@123',
-    confirmPassword: 'Progressao@123',
-    acceptTerms: true,
-    acceptLgpd: true,
+    password: '',
+    confirmPassword: '',
+    acceptTerms: false,
+    acceptLgpd: false,
   },
 };
 

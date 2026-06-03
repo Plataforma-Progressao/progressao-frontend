@@ -62,6 +62,16 @@ describe('DashboardHomePage', () => {
     httpTestingController.verify();
   });
 
+  it('shows the user name and role in the hero', () => {
+    const compiled = fixture.nativeElement as HTMLElement;
+    const hero = compiled.querySelector('.dashboard-home-hero');
+
+    expect(hero?.querySelector('h1')?.textContent).toContain('Dr. Manuel Rocha');
+    expect(hero?.querySelector('.dashboard-home-hero__eyebrow')?.textContent).toContain(
+      'Associado IV',
+    );
+  });
+
   it('renders the main dashboard sections from the design', () => {
     const compiled = fixture.nativeElement as HTMLElement;
 
@@ -150,5 +160,8 @@ describe('DashboardHomePage', () => {
 
     expect(secondFixture.nativeElement.querySelector('.dashboard-home__status--error')).toBeNull();
     expect(secondFixture.nativeElement.textContent).toContain('Dados recarregados com sucesso.');
+    expect(
+      secondFixture.nativeElement.querySelector('.dashboard-home-hero h1')?.textContent,
+    ).toContain('Dr. Manuel Rocha');
   });
 });

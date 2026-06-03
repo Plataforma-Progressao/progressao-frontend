@@ -87,10 +87,10 @@ function sanitizeCategory(value: unknown): ActivityCategory {
 
 function sanitizeStatus(value: unknown): ActivityStatus {
   if (typeof value !== 'string') {
-    return 'PENDING';
+    return 'APPROVED';
   }
 
-  return VALID_STATUSES.includes(value as ActivityStatus) ? (value as ActivityStatus) : 'PENDING';
+  return VALID_STATUSES.includes(value as ActivityStatus) ? (value as ActivityStatus) : 'APPROVED';
 }
 
 function sanitizeUserData(value: unknown): ReportTeacherProfile {
@@ -134,7 +134,7 @@ function sanitizeActivity(value: unknown, index: number): ReportActivity {
       category: 'MANAGEMENT',
       workloadHours: 0,
       score: 0,
-      status: 'PENDING',
+      status: 'APPROVED',
       term: '-',
       kind: '-',
     };

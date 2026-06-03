@@ -1,21 +1,36 @@
 <section class="dashboard-home">
-  <app-dashboard-home-hero [title]="'Visão geral do curador'" [summary]="homeData().summary" />
-
-  @if (isLoading()) {
+  @if (isLoading() && !hasHomeData()) {
     <p class="dashboard-home__status">Carregando indicadores do painel...</p>
-  } @else if (hasError()) {
+  } @else if (hasError() && !hasHomeData()) {
     <div class="dashboard-home__status dashboard-home__status--error" role="alert">
       Não foi possível carregar os dados do dashboard agora.
       <button type="button" (click)="homeResource.reload()">Tentar novamente</button>
     </div>
   }
 
-  <div class="dashboard-home__grid">
-    <app-dashboard-score-card [score]="homeData().score" />
-    <app-dashboard-career-card [career]="homeData().career" />
-    <app-dashboard-pillars-card [pillars]="homeData().pillars" />
-    <app-dashboard-biennium-card [biennium]="homeData().biennium" />
-  </div>
+  @if (homeData(); as data) {
+    <app-dashboard-home-hero
+      [eyebrow]="data.roleLabel"
+      [title]="data.displayName"
+      [summary]="data.summary"
+    />
 
-  <app-dashboard-notifications-card [notifications]="homeData().notifications" />
+    @if (isLoading()) {
+      <p class="dashboard-home__status">Atualizando indicadores...</p>
+    } @else if (hasError()) {
+      <div class="dashboard-home__status dashboard-home__status--error" role="alert">
+        Não foi possível atualizar os dados do dashboard.
+        <button type="button" (click)="homeResource.reload()">Tentar novamente</button>
+      </div>
+    }
+
+    <div class="dashboard-home__grid">
+      <app-dashboard-score-card [score]="data.score" />
+      <app-dashboard-career-card [career]="data.career" />
+      <app-dashboard-pillars-card [pillars]="data.pillars" />
+      <app-dashboard-biennium-card [biennium]="data.biennium" />
+    </div>
+
+    <app-dashboard-notifications-card [notifications]="data.notifications" />
+  }
 </section>

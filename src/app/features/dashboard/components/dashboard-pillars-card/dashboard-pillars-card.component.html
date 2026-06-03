@@ -3,6 +3,10 @@
     <h2>Distribuição por pilar</h2>
   </header>
 
+  @if (!hasApprovedScores()) {
+    <p class="dashboard-card__empty">Nenhuma atividade aprovada ainda.</p>
+  }
+
   <div class="dashboard-card__pillar-list">
     @for (pillar of pillars(); track pillar.label) {
       <div class="dashboard-card__pillar-row">

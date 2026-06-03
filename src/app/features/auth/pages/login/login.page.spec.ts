@@ -73,12 +73,12 @@ describe('LoginPage', () => {
     expect(submitButton.disabled).toBe(false);
   });
 
-  it('starts with the admin credentials from the README', () => {
+  it('starts with empty credentials', () => {
     expect(component['loginForm'].getRawValue()).toEqual({
-      email: 'admin@progressao.uf.br',
-      password: 'Admin@123456',
+      email: '',
+      password: '',
       rememberMe: false,
     });
-    expect(component['loginForm'].valid).toBe(true);
+    expect(component['loginForm'].invalid).toBe(true);
   });
 });

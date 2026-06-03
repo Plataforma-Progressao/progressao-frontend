@@ -57,45 +57,34 @@
     <div class="chart-card">
       <div class="chart-header">
         <mat-icon>trending_up</mat-icon>
-        <h4>Previsão de Progressão</h4>
+        <h4>Projeção estimada (cadastro)</h4>
       </div>
-      <div class="chart-placeholder">
-        <div class="bar-container">
-          <div class="bar bar-1"></div>
-          <span class="year">2022</span>
-        </div>
-        <div class="bar-container">
-          <div class="bar bar-2"></div>
-          <span class="year">2023</span>
-        </div>
-        <div class="bar-container">
-          <div class="bar bar-3">
-            <span class="goal-badge">Meta 2024</span>
+      <p class="chart-note">Ilustração baseada nas áreas selecionadas e na fórmula simplificada de pontuação.</p>
+      <div class="chart-projection" role="img" [attr.aria-label]="projectionSummary()">
+        @for (item of projectionYears(); track item.year) {
+          <div class="bar-container">
+            <div class="bar" [style.height]="barHeight(item)">
+              @if (item.isGoal) {
+                <span class="goal-badge">Meta {{ item.year }}</span>
+              }
+            </div>
+            <span class="year">{{ item.year }}</span>
+            <span class="score-label">{{ item.score }} pts</span>
           </div>
-          <span class="year">2024</span>
-        </div>
-        <div class="bar-container">
-          <div class="bar bar-4"></div>
-          <span class="year">2025</span>
-        </div>
+        }
       </div>
       <div class="chart-footer">
         <div class="success-icon-bg"><mat-icon class="success-icon">stars</mat-icon></div>
-        <p>
-          Você está no caminho certo para o nível <strong>Adjunto III</strong> em <br /><strong
-            >Agosto de 2024</strong
-          >
-        </p>
+        <p>{{ projectionSummary() }}</p>
       </div>
     </div>
 
     <div class="curation-card">
       <h4>Curadoria de Carreira</h4>
       <p>
-        Docentes da classe <strong>Adjunto II</strong> costumam focar em publicações em periódicos
-        Q1 para acelerar a progressão para Associado.
+        Após o cadastro, suas atividades reais alimentarão o painel e o relatório RAD com dados
+        consolidados do ciclo vigente.
       </p>
-      <a href="#" class="link-action">Ver critérios de produtividade ↗</a>
     </div>
   </div>
 </div>

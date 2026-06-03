@@ -58,3 +58,12 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 - Design services around a single responsibility
 - Use the `providedIn: 'root'` option for singleton services
 - Use the `inject()` function instead of constructor injection
+
+## Regras de dominio
+
+### Status de atividades
+
+- Nao ha fluxo de aprovacao manual por gerenciador.
+- Toda atividade criada deve nascer com status `APPROVED` (backend define isso na criacao).
+- Nao implementar telas ou endpoints de revisao/aprovacao/rejeicao de atividades, salvo pedido explicito.
+- O filtro de status na listagem pode permanecer apenas para compatibilidade com dados legados.

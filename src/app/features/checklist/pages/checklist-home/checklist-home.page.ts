@@ -1,107 +1,146 @@
-
-import { Component, OnInit } from '@angular/core';
-
-import { CommonModule } from '@angular/common';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  resource,
+  signal,
+} from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
-
 import { MatMenuModule } from '@angular/material/menu';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectModule } from '@angular/material/select';
+import { MatMenuTrigger } from '@angular/material/menu';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { firstValueFrom } from 'rxjs';
+import { ChecklistApiService } from '../../checklist-api.service';
+import {
+  ChecklistHomeItem,
+  ChecklistItemStatusCode,
+} from '../../models/checklist.models';
 
-export interface DocumentoChecklist {
-  id: number;
-  titulo: string;
-  descricao?: string;
-  status: 'Concluído' | 'Atenção' | 'Pendente';
-  dataEnvio?: string;
-  infoAdicional?: string;
-}
+type UiChecklistStatus = 'Concluído' | 'Atenção' | 'Pendente';
+
+const STATUS_TO_UI: Record<ChecklistItemStatusCode, UiChecklistStatus> = {
+  COMPLETED: 'Concluído',
+  ATTENTION: 'Atenção',
+  PENDING: 'Pendente',
+};
+
+const UI_TO_STATUS: Record<UiChecklistStatus, ChecklistItemStatusCode> = {
+  Concluído: 'COMPLETED',
+  Atenção: 'ATTENTION',
+  Pendente: 'PENDING',
+};
 
 @Component({
   selector: 'app-checklist-home',
   templateUrl: './checklist-home.page.html',
   styleUrls: ['./checklist-home.page.scss'],
-  
-  imports: [CommonModule, MatIconModule, MatMenuModule, MatFormFieldModule, MatSelectModule]
+  imports: [MatIconModule, MatMenuModule, MatMenuTrigger],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ChecklistHomePage implements OnInit {
-    totalDocs = 10;
-    concluidos = 6;
-    atencao = 2;
-    pendentes = 2;
-    get percentConcluido() { return (this.concluidos / this.totalDocs) * 100; }
-    get percentAtencao() { return (this.atencao / this.totalDocs) * 100; }
-    get percentPendente() { return (this.pendentes / this.totalDocs) * 100; }
+export class ChecklistHomePage {
+  private readonly checklistApi = inject(ChecklistApiService);
+  private readonly snackBar = inject(MatSnackBar);
 
-  documentos: DocumentoChecklist[] = [
-    {
-      id: 1,
-      titulo: 'Portaria de Nomeação',
-      descricao: 'DOCUMENTO VALIDADO',
-      status: 'Concluído',
-      dataEnvio: '12/10/23'
-    },
-    {
-      id: 2,
-      titulo: 'Relatório Anual de Atividades (RAD)',
-      descricao: 'ATENÇÃO: PRAZO EXPIRA EM 3 DIAS',
-      status: 'Atenção'
-    },
-    {
-      id: 3,
-      titulo: 'Comprovante de Publicação (A1/A2)',
-      descricao: 'ATENÇÃO: Requisito mínimo de 2 artigos no período',
-      status: 'Pendente'
-    },
-    {
-      id: 4,
-      titulo: 'Certificados de Orientação de Mestrado',
-      descricao: '3 DOCUMENTOS VALIDADOS',
-      status: 'Concluído',
+  protected readonly statusFilter = signal<'Todos' | UiChecklistStatus>('Todos');
+  protected readonly updatingItemId = signal<string | null>(null);
 
-      dataEnvio: '12/10/23',
-    },
-    {
-      id: 5,
-      titulo: 'Cópia do Currículo Lattes (PDF)',
-      descricao: 'ATENÇÃO: VERSÃO DESATUALIZADA (REF. 2022)',
-      status: 'Atenção'
-    }
-  ];
+  protected readonly checklistResource = resource({
+    loader: () => firstValueFrom(this.checklistApi.getHome()),
+  });
 
-  documentosOriginais: any[] = [];
+  protected readonly isLoading = computed(() => this.checklistResource.status() === 'loading');
+  protected readonly hasError = computed(() => this.checklistResource.status() === 'error');
+  protected readonly homeData = computed(() => this.checklistResource.value());
 
-  //
-  documentoSelecionado: DocumentoChecklist | null = null;
-  onArquivoSelecionado(event: any) {
-      const arquivo: File = event.target.files[0];
-      if (arquivo && this.documentoSelecionado) {
-          const mensagem = `Você selecionou o arquivo: "${arquivo.name}".\n\nDeseja realmente enviá-lo como o documento "${this.documentoSelecionado.titulo}"?`;
-          const confirmacao = window.confirm(mensagem);
-          if (confirmacao) {
-              console.log(`Pronto para enviar ${arquivo.name} para o backend!`);
-              alert('Upload simulado com sucesso!'); 
-          }
-          event.target.value = '';
-          this.documentoSelecionado = null;
-      }
-  }
-  //
+  protected readonly totalDocs = computed(() => this.homeData()?.total ?? 0);
+  protected readonly concluidos = computed(() => this.homeData()?.completed ?? 0);
+  protected readonly atencao = computed(() => this.homeData()?.attention ?? 0);
+  protected readonly pendentes = computed(() => this.homeData()?.pending ?? 0);
+  protected readonly percentConcluido = computed(
+    () => this.homeData()?.completionPercentage ?? 0,
+  );
+  protected readonly percentAtencao = computed(() => {
+    const total = this.totalDocs();
+    return total > 0 ? (this.atencao() / total) * 100 : 0;
+  });
+  protected readonly percentPendente = computed(() => {
+    const total = this.totalDocs();
+    return total > 0 ? (this.pendentes() / total) * 100 : 0;
+  });
 
-  
-  constructor() {}
-  ngOnInit() {
+  protected readonly documentos = computed(() => {
+    const items = this.homeData()?.items ?? [];
+    const filtro = this.statusFilter();
 
-    this.documentosOriginais = [...this.documentos];
-
-  }
-
-    filtrarDocumentos(filtro: string) {
     if (filtro === 'Todos') {
-        this.documentos = [...this.documentosOriginais];
-        return;
+      return items;
     }
-    // Filtra diretamente pela propriedade status
-    this.documentos = this.documentosOriginais.filter(doc => doc.status === filtro);
+
+    const statusCode = UI_TO_STATUS[filtro];
+    return items.filter((item) => item.status === statusCode);
+  });
+
+  protected filtrarDocumentos(filtro: 'Todos' | UiChecklistStatus): void {
+    this.statusFilter.set(filtro);
+  }
+
+  protected uiStatus(item: ChecklistHomeItem): UiChecklistStatus {
+    return STATUS_TO_UI[item.status];
+  }
+
+  protected statusClass(status: UiChecklistStatus): string {
+    return `checklist__doc-item--${status.toLowerCase().normalize('NFD').replace(/\p{M}/gu, '')}`;
+  }
+
+  protected descClass(status: UiChecklistStatus): string {
+    return `text--${status.toLowerCase().normalize('NFD').replace(/\p{M}/gu, '')}`;
+  }
+
+  protected formatSubmittedAt(iso: string | null): string {
+    if (!iso) {
+      return '';
+    }
+
+    return new Intl.DateTimeFormat('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: '2-digit',
+    }).format(new Date(iso));
+  }
+
+  protected markAsCompleted(item: ChecklistHomeItem): void {
+    void this.updateStatus(item, 'COMPLETED');
+  }
+
+  protected markAsAttention(item: ChecklistHomeItem): void {
+    void this.updateStatus(item, 'ATTENTION');
+  }
+
+  protected reload(): void {
+    this.checklistResource.reload();
+  }
+
+  private async updateStatus(
+    item: ChecklistHomeItem,
+    status: ChecklistItemStatusCode,
+  ): Promise<void> {
+    if (item.status === status) {
+      return;
+    }
+
+    this.updatingItemId.set(item.id);
+
+    try {
+      await firstValueFrom(this.checklistApi.updateItem(item.id, { status }));
+      this.checklistResource.reload();
+      this.snackBar.open('Status do documento atualizado.', 'Fechar', { duration: 3000 });
+    } catch {
+      this.snackBar.open('Não foi possível atualizar o documento.', 'Fechar', {
+        duration: 4000,
+      });
+    } finally {
+      this.updatingItemId.set(null);
+    }
   }
 }
