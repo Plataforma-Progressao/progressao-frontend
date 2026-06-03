@@ -6,7 +6,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop'; //
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -144,6 +144,20 @@ export class ActivityCreatePage {
 
   protected readonly canSubmit = computed(() => {
     return !this.submitting() && !this.isLoadingActivity() && this.formIsValid();
+  });
+
+  protected readonly descricaoTexto = toSignal(this.form.controls.descricao.valueChanges, { 
+    initialValue: this.form.controls.descricao.value 
+  });
+  protected readonly descricaoLength = computed(() => {
+    return this.descricaoTexto().length;
+  });
+  protected readonly descricaoHint = computed(() => {
+    const length = this.descricaoLength();
+    if (length < 4) {
+      return `Mínimo de 4 caracteres.`;
+    }
+    return `${length} / 1200 caracteres.`;
   });
 
   constructor() {
