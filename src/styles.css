@@ -177,3 +177,8 @@ body {
 	padding: 1.5rem 1.75rem;
 	border-radius: 1.25rem;
 }
+
+.mat-mdc-form-field-hint {
+  font-size: var(--type-size-xs) !important; /* Usa a sua variável de 0.875rem (ou 0.75rem se preferir menor ainda) */
+  line-height: 1.25rem;
+}
