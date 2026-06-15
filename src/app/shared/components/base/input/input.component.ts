@@ -35,6 +35,9 @@ type InputMask = 'none' | 'cpf' | 'phone';
 export class InputComponent implements ControlValueAccessor {
   private readonly cdr = inject(ChangeDetectorRef);
 
+  //
+  readonly floatLabel = input<'auto' | 'always'>('auto');
+  //
   readonly label = input('');
   readonly placeholder = input('');
   readonly type = input<'text' | 'email' | 'password' | 'number' | 'tel'>('text');

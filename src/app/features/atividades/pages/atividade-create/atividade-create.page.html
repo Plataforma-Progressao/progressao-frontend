@@ -70,7 +70,7 @@
         >
           <app-input
             formControlName="titulo"
-            label="Título da Atividade*"
+            label="Título da Atividade *"
             placeholder="Ex: Publicação de Artigo em Revista Qualis A1"
             appearance="outline"
             [disabledInput]="isLoadingActivity() || submitting()"
@@ -98,14 +98,27 @@
               }
             </mat-form-field>
 
-            <app-input
+            <!-- <app-input
               formControlName="cargaHoraria"
-              label="Carga horária*"
+              label="Carga horária *"
               placeholder="00:00"
               ngxMaskPattern="Hh:m0"
               appearance="outline"
               prefixIcon="schedule"
               hint="Ex.: 01:30 (hh:mm)"
+              [disabledInput]="isLoadingActivity() || submitting()"
+              [control]="form.controls.cargaHoraria"
+              errorMessage="Informe a carga no formato HH:MM (máx. 999:59)."
+            ></app-input> -->
+            <app-input
+              formControlName="cargaHoraria"
+              label="Carga horária *"
+              placeholder="00:00"
+              ngxMaskPattern="Hh:m0"
+              appearance="outline"
+              prefixIcon="schedule"
+              hint="Ex.: 01:30 (hh:mm)"
+              floatLabel="always" 
               [disabledInput]="isLoadingActivity() || submitting()"
               [control]="form.controls.cargaHoraria"
               errorMessage="Informe a carga no formato HH:MM (máx. 999:59)."
@@ -139,7 +152,7 @@
           <!--  -->
           <app-textarea
             formControlName="descricao"
-            label="Descrição e Detalhes*"
+            label="Descrição e Detalhes *"
             placeholder="Descreva brevemente a atividade e sua relevância..."
             appearance="outline"
             [rows]="4"

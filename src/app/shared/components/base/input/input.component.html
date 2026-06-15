@@ -1,4 +1,5 @@
-<mat-form-field [appearance]="appearance()" class="app-input-field">
+<!-- <mat-form-field [appearance]="appearance()" class="app-input-field"> -->
+<mat-form-field [appearance]="appearance()" [floatLabel]="floatLabel()" class="app-input-field">
   @if (label()) {
     <mat-label>{{ label() }}</mat-label>
   }
