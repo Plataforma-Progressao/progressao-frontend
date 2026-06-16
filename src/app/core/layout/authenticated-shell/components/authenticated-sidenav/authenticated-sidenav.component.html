@@ -19,7 +19,7 @@
       @if (!collapsed()) {
         <div>
           <strong>{{ user()?.name ?? 'Docente' }}</strong>
-          <span>{{ user()?.title ?? 'Perfil institucional' }}</span>
+          <span>{{ userRole() }}</span>
         </div>
       }
     </div>
