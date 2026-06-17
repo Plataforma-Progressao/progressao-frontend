@@ -158,13 +158,15 @@
             </div>
 
             <div class="config-home__actions">
-              <app-button
-                variant="tertiary"
-                type="button"
-                label="Cancelar"
-                [disabled]="saving()"
-                (clicked)="onCancel()"
-              />
+              @if (!profileForm.pristine) {
+                <app-button
+                  variant="tertiary"
+                  type="button"
+                  label="Cancelar"
+                  [disabled]="saving()"
+                  (clicked)="onCancel()"
+                />
+              }
               <app-button
                 variant="primary"
                 type="submit"

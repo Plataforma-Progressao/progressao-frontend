@@ -18,6 +18,8 @@ import { AuthApiService } from '../../../../core/auth/auth-api.service';
 import { AuthStateService } from '../../../../core/auth/auth-state.service';
 import { NotificationService } from '../../../../core/notifications/notification.service';
 import { ButtonComponent, InputComponent } from '../../../../shared';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { ConfirmationDialogService } from '../../../../shared/components/base/confirmation-dialog/confirmation-dialog.service';
 
 @Component({
   selector: 'app-configuracoes-home',
@@ -29,6 +31,7 @@ import { ButtonComponent, InputComponent } from '../../../../shared';
     MatTooltipModule,
     InputComponent,
     ButtonComponent,
+    MatDialogModule,
   ],
   templateUrl: './configuracoes-home.page.html',
   styleUrl: './configuracoes-home.page.scss',
@@ -39,6 +42,8 @@ export class ConfiguracoesHomePage {
   private readonly authApiService = inject(AuthApiService);
   private readonly authStateService = inject(AuthStateService);
   private readonly notificationService = inject(NotificationService);
+  private readonly dialog = inject(MatDialog);
+  private readonly confirmationDialog = inject(ConfirmationDialogService);
 
   protected readonly emailFieldTooltip =
     'O e-mail institucional não pode ser alterado por aqui. Em caso de mudança, contate a secretaria.';
@@ -119,6 +124,7 @@ export class ConfiguracoesHomePage {
       newPassword: '',
       confirmNewPassword: '',
     });
+    this.profileForm.markAsPristine();
   }
 
   protected async onSubmit(): Promise<void> {
@@ -180,7 +186,19 @@ export class ConfiguracoesHomePage {
       payload.currentPassword = currentPw.trim();
       payload.newPassword = newPw;
     }
-
+    const confirmed = await firstValueFrom(
+      this.confirmationDialog.open({
+        title: 'Salvar alterações?',
+        message: 'Deseja realmente aplicar as novas configurações? Elas entrarão em vigor imediatamente.',
+        confirmLabel: 'Salvar',
+        cancelLabel: 'Cancelar',
+        confirmVariant: 'primary',
+        icon: 'save',
+      })
+    );
+    if (!confirmed) {
+      return; 
+    }
     this.saving.set(true);
 
     try {
@@ -195,6 +213,7 @@ export class ConfiguracoesHomePage {
         newPassword: '',
         confirmNewPassword: '',
       });
+      this.profileForm.markAsPristine();
       await this.profileResource.reload();
       this.notificationService.success('Perfil atualizado com sucesso.');
     } catch (error: unknown) {
