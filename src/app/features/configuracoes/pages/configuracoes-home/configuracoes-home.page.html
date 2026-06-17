@@ -171,7 +171,7 @@
                 label="Salvar alterações"
                 icon="check"
                 [loading]="saving()"
-                [disabled]="saving()"
+                [disabled]="saving() || profileForm.pristine || profileForm.invalid"
               />
             </div>
           </form>
