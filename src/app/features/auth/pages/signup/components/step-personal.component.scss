@@ -25,7 +25,13 @@
   gap: 1rem;
   grid-template-columns: 1fr 1fr;
 }
-
+.form-error {
+  color: #b91c1c;
+  font-size: 0.8rem;
+  font-weight: 600;
+  grid-column: 1 / -1; 
+  margin: -0.5rem 0 0 1rem;
+}
 .col-span-full {
   grid-column: 1 / -1;
 }

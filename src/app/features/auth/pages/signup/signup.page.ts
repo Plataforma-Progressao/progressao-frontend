@@ -78,7 +78,10 @@ export class SignupPage {
         DEFAULT_SIGNUP_FORM_VALUES.personal.fullName,
         [Validators.required, Validators.minLength(2)],
       ],
-      cpf: [DEFAULT_SIGNUP_FORM_VALUES.personal.cpf, [Validators.required, cpfValidator()]],
+      cpf: this.fb.control(DEFAULT_SIGNUP_FORM_VALUES.personal.cpf, {
+        validators: [Validators.required, cpfValidator()],
+        nonNullable: true,
+      }),
       phone: [DEFAULT_SIGNUP_FORM_VALUES.personal.phone, [phoneValidator()]],
       email: [DEFAULT_SIGNUP_FORM_VALUES.personal.email, [Validators.required, Validators.email]],
     }),

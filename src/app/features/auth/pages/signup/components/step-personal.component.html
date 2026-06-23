@@ -18,16 +18,21 @@
       errorMessage="Informe ao menos 2 caracteres."
     />
 
-    <app-input
-      formControlName="cpf"
-      label="CPF"
-      type="tel"
-      placeholder="000.000.000-00"
-      mask="cpf"
-      prefixIcon="pin"
-      [control]="form().get('cpf')"
-      errorMessage="CPF inválido."
-    />
+    <div style="display: flex; flex-direction: column;">
+      <app-input
+        formControlName="cpf"
+        label="CPF"
+        type="tel"
+        placeholder="000.000.000-00"
+        mask="cpf"
+        prefixIcon="pin"
+        [control]="form().get('cpf')"
+      />
+      
+      @if (showCpfError) {
+        <p class="form-error" role="alert" style="margin-top: -16px; margin-bottom: 16px;">Insira um CPF válido.</p>
+      }
+    </div>
 
     <app-input
       formControlName="phone"
