@@ -63,7 +63,7 @@ export class ConfiguracoesHomePage {
     lattesUrl: [''],
     orcid: [''],
     currentPassword: [''],
-    newPassword: [''],
+    newPassword: ['', [Validators.minLength(8), Validators.pattern(/^(?=.*[a-zA-Z])(?=.*\d).*$/)]],
     confirmNewPassword: [''],
   });
 
@@ -94,6 +94,27 @@ export class ConfiguracoesHomePage {
         confirmNewPassword: '',
       });
     });
+  
+    this.profileForm.controls.confirmNewPassword.valueChanges.subscribe(() => this.validatePasswordMatch());
+    this.profileForm.controls.newPassword.valueChanges.subscribe(() => this.validatePasswordMatch());
+
+    this.profileForm.controls.currentPassword.valueChanges.subscribe(() => {
+      if (this.profileForm.controls.currentPassword.hasError('incorrect')) {
+        this.profileForm.controls.currentPassword.setErrors(null);
+      }
+    });
+  }
+  private validatePasswordMatch(): void {
+    const newPw = this.profileForm.controls.newPassword.value;
+    const confirmPw = this.profileForm.controls.confirmNewPassword.value;
+
+    if (confirmPw && newPw !== confirmPw) {
+      this.profileForm.controls.confirmNewPassword.setErrors({ mismatch: true });
+    } else if (this.profileForm.controls.confirmNewPassword.hasError('mismatch')) {
+      const errors = { ...this.profileForm.controls.confirmNewPassword.errors };
+      delete errors['mismatch'];
+      this.profileForm.controls.confirmNewPassword.setErrors(Object.keys(errors).length ? errors : null);
+    }
   }
 
   protected toggleNewPasswordVisibility(): void {
@@ -172,15 +193,11 @@ export class ConfiguracoesHomePage {
 
     if (lattes.length > 0) {
       payload.lattesUrl = lattes;
-    } else {
-      payload.lattesUrl = '';
-    }
+    } 
 
     if (orcid.length > 0) {
       payload.orcid = orcid;
-    } else {
-      payload.orcid = '';
-    }
+    } 
 
     if (newPw) {
       payload.currentPassword = currentPw.trim();
@@ -216,8 +233,18 @@ export class ConfiguracoesHomePage {
       this.profileForm.markAsPristine();
       await this.profileResource.reload();
       this.notificationService.success('Perfil atualizado com sucesso.');
-    } catch (error: unknown) {
-      this.notificationService.error(this.resolveSaveError(error));
+    } 
+    catch (error: unknown) {
+      const errorMsg = this.resolveSaveError(error);
+    if (error instanceof HttpErrorResponse) {
+        if (error.status === 401 || errorMsg.toLowerCase().includes('senha') || errorMsg.toLowerCase().includes('unauthorized')) {
+          this.profileForm.controls.currentPassword.setErrors({ incorrect: true });
+          this.notificationService.error('Senha atual incorreta. Não foi possível salvar.');
+          return;
+        }
+      }
+      this.notificationService.error(errorMsg);
+      
     } finally {
       this.saving.set(false);
     }
@@ -314,7 +341,6 @@ export class ConfiguracoesHomePage {
         }
       }
     }
-
     return 'Não foi possível salvar as alterações. Verifique os dados e tente novamente.';
   }
 }

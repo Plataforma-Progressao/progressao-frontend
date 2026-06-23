@@ -51,52 +51,58 @@
               <p class="config-home__section-hint">
                 Preencha apenas se quiser definir uma nova senha.
               </p>
-
-              <app-input
-                formControlName="currentPassword"
-                label="Senha atual"
-                [type]="hideCurrentPassword() ? 'password' : 'text'"
-                placeholder="••••••••"
-                prefixIcon="lock_outline"
-                [suffixIcon]="hideCurrentPassword() ? 'visibility' : 'visibility_off'"
-                [suffixIconAriaLabel]="
-                  hideCurrentPassword() ? 'Mostrar senha atual' : 'Ocultar senha atual'
-                "
-                [suffixAction]="true"
-                (suffixClicked)="toggleCurrentPasswordVisibility()"
-                [control]="profileForm.controls.currentPassword"
-              />
+              
+              <div class="config-home__input-wrapper">
+                <app-input
+                  formControlName="currentPassword"
+                  label="Senha atual"
+                  [type]="hideCurrentPassword() ? 'password' : 'text'"
+                  prefixIcon="lock_outline"
+                  [suffixIcon]="hideCurrentPassword() ? 'visibility' : 'visibility_off'"
+                  [suffixIconAriaLabel]="hideCurrentPassword() ? 'Mostrar senha atual' : 'Ocultar senha atual'"
+                  [suffixAction]="true"
+                  (suffixClicked)="toggleCurrentPasswordVisibility()"
+                  [control]="profileForm.controls.currentPassword"
+                />
+                @if (profileForm.controls.currentPassword.hasError('incorrect')) {
+                  <p class="config-home__error" role="alert">Senha não corresponde.</p>
+                }
+              </div>
 
               <div class="config-home__form-grid">
-                <app-input
-                  formControlName="newPassword"
-                  label="Nova senha"
-                  [type]="hideNewPassword() ? 'password' : 'text'"
-                  placeholder="Mínimo 8 caracteres"
-                  prefixIcon="lock_outline"
-                  [suffixIcon]="hideNewPassword() ? 'visibility' : 'visibility_off'"
-                  [suffixIconAriaLabel]="
-                    hideNewPassword() ? 'Mostrar nova senha' : 'Ocultar nova senha'
-                  "
-                  [suffixAction]="true"
-                  (suffixClicked)="toggleNewPasswordVisibility()"
-                  [control]="profileForm.controls.newPassword"
-                />
+                <div class="config-home__input-wrapper">
+                  <app-input
+                    formControlName="newPassword"
+                    label="Nova senha"
+                    [type]="hideNewPassword() ? 'password' : 'text'"
+                    prefixIcon="lock_outline"
+                    [suffixIcon]="hideNewPassword() ? 'visibility' : 'visibility_off'"
+                    [suffixIconAriaLabel]="hideNewPassword() ? 'Mostrar nova senha' : 'Ocultar nova senha'"
+                    [suffixAction]="true"
+                    (suffixClicked)="toggleNewPasswordVisibility()"
+                    [control]="profileForm.controls.newPassword"
+                  />
+                  @if (profileForm.controls.newPassword.invalid && profileForm.controls.newPassword.value) {
+                    <p class="config-home__error" role="alert">Mínimo de 8 caracteres, letras e números.</p>
+                  }
+                </div>
 
-                <app-input
-                  formControlName="confirmNewPassword"
-                  label="Confirmar nova senha"
-                  [type]="hideConfirmPassword() ? 'password' : 'text'"
-                  placeholder="Repita a nova senha"
-                  prefixIcon="lock_outline"
-                  [suffixIcon]="hideConfirmPassword() ? 'visibility' : 'visibility_off'"
-                  [suffixIconAriaLabel]="
-                    hideConfirmPassword() ? 'Mostrar confirmação' : 'Ocultar confirmação'
-                  "
-                  [suffixAction]="true"
-                  (suffixClicked)="toggleConfirmPasswordVisibility()"
-                  [control]="profileForm.controls.confirmNewPassword"
-                />
+                <div class="config-home__input-wrapper">
+                  <app-input
+                    formControlName="confirmNewPassword"
+                    label="Confirmar nova senha"
+                    [type]="hideConfirmPassword() ? 'password' : 'text'"
+                    prefixIcon="lock_outline"
+                    [suffixIcon]="hideConfirmPassword() ? 'visibility' : 'visibility_off'"
+                    [suffixIconAriaLabel]="hideConfirmPassword() ? 'Mostrar confirmação' : 'Ocultar confirmação'"
+                    [suffixAction]="true"
+                    (suffixClicked)="toggleConfirmPasswordVisibility()"
+                    [control]="profileForm.controls.confirmNewPassword"
+                  />
+                  @if (profileForm.controls.confirmNewPassword.hasError('mismatch') && profileForm.controls.confirmNewPassword.value) {
+                    <p class="config-home__error" role="alert">As senhas devem ser iguais.</p>
+                  }
+                </div>
               </div>
             </div>
 

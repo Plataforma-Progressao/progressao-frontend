@@ -185,3 +185,14 @@
     }
   }
 }
+
+.config-home__input-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+.config-home__error {
+  color: #b91c1c;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin: 0.25rem 0 0 1rem;
+}
