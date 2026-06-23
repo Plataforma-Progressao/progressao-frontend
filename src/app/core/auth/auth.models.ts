@@ -31,6 +31,10 @@ export interface AuthResponseUser {
   readonly orcid: string | null;
   readonly createdAt: string;
   readonly updatedAt: string;
+  //
+  readonly careerClass?: string | null;  // <-- ADICIONE ISTO
+  readonly currentLevel?: string | null;
+  //
 }
 
 export interface UpdateProfileRequest {

@@ -3,6 +3,9 @@
     <div
       class="confirmation-dialog__icon"
       [class.confirmation-dialog__icon--danger]="confirmVariant === 'danger'"
+
+      [class.confirmation-dialog__icon--primary]="confirmVariant === 'primary'"
+
       aria-hidden="true"
     >
       <mat-icon>{{ icon }}</mat-icon>

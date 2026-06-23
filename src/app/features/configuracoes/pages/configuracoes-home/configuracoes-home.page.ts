@@ -18,6 +18,8 @@ import { AuthApiService } from '../../../../core/auth/auth-api.service';
 import { AuthStateService } from '../../../../core/auth/auth-state.service';
 import { NotificationService } from '../../../../core/notifications/notification.service';
 import { ButtonComponent, InputComponent } from '../../../../shared';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { ConfirmationDialogService } from '../../../../shared/components/base/confirmation-dialog/confirmation-dialog.service';
 
 @Component({
   selector: 'app-configuracoes-home',
@@ -29,6 +31,7 @@ import { ButtonComponent, InputComponent } from '../../../../shared';
     MatTooltipModule,
     InputComponent,
     ButtonComponent,
+    MatDialogModule,
   ],
   templateUrl: './configuracoes-home.page.html',
   styleUrl: './configuracoes-home.page.scss',
@@ -39,6 +42,8 @@ export class ConfiguracoesHomePage {
   private readonly authApiService = inject(AuthApiService);
   private readonly authStateService = inject(AuthStateService);
   private readonly notificationService = inject(NotificationService);
+  private readonly dialog = inject(MatDialog);
+  private readonly confirmationDialog = inject(ConfirmationDialogService);
 
   protected readonly emailFieldTooltip =
     'O e-mail institucional não pode ser alterado por aqui. Em caso de mudança, contate a secretaria.';
@@ -58,7 +63,7 @@ export class ConfiguracoesHomePage {
     lattesUrl: [''],
     orcid: [''],
     currentPassword: [''],
-    newPassword: [''],
+    newPassword: ['', [Validators.minLength(8), Validators.pattern(/^(?=.*[a-zA-Z])(?=.*\d).*$/)]],
     confirmNewPassword: [''],
   });
 
@@ -89,6 +94,27 @@ export class ConfiguracoesHomePage {
         confirmNewPassword: '',
       });
     });
+  
+    this.profileForm.controls.confirmNewPassword.valueChanges.subscribe(() => this.validatePasswordMatch());
+    this.profileForm.controls.newPassword.valueChanges.subscribe(() => this.validatePasswordMatch());
+
+    this.profileForm.controls.currentPassword.valueChanges.subscribe(() => {
+      if (this.profileForm.controls.currentPassword.hasError('incorrect')) {
+        this.profileForm.controls.currentPassword.setErrors(null);
+      }
+    });
+  }
+  private validatePasswordMatch(): void {
+    const newPw = this.profileForm.controls.newPassword.value;
+    const confirmPw = this.profileForm.controls.confirmNewPassword.value;
+
+    if (confirmPw && newPw !== confirmPw) {
+      this.profileForm.controls.confirmNewPassword.setErrors({ mismatch: true });
+    } else if (this.profileForm.controls.confirmNewPassword.hasError('mismatch')) {
+      const errors = { ...this.profileForm.controls.confirmNewPassword.errors };
+      delete errors['mismatch'];
+      this.profileForm.controls.confirmNewPassword.setErrors(Object.keys(errors).length ? errors : null);
+    }
   }
 
   protected toggleNewPasswordVisibility(): void {
@@ -119,6 +145,7 @@ export class ConfiguracoesHomePage {
       newPassword: '',
       confirmNewPassword: '',
     });
+    this.profileForm.markAsPristine();
   }
 
   protected async onSubmit(): Promise<void> {
@@ -166,21 +193,29 @@ export class ConfiguracoesHomePage {
 
     if (lattes.length > 0) {
       payload.lattesUrl = lattes;
-    } else {
-      payload.lattesUrl = '';
-    }
+    } 
 
     if (orcid.length > 0) {
       payload.orcid = orcid;
-    } else {
-      payload.orcid = '';
-    }
+    } 
 
     if (newPw) {
       payload.currentPassword = currentPw.trim();
       payload.newPassword = newPw;
     }
-
+    const confirmed = await firstValueFrom(
+      this.confirmationDialog.open({
+        title: 'Salvar alterações?',
+        message: 'Deseja realmente aplicar as novas configurações? Elas entrarão em vigor imediatamente.',
+        confirmLabel: 'Salvar',
+        cancelLabel: 'Cancelar',
+        confirmVariant: 'primary',
+        icon: 'save',
+      })
+    );
+    if (!confirmed) {
+      return; 
+    }
     this.saving.set(true);
 
     try {
@@ -195,10 +230,27 @@ export class ConfiguracoesHomePage {
         newPassword: '',
         confirmNewPassword: '',
       });
+      this.profileForm.markAsPristine();
       await this.profileResource.reload();
       this.notificationService.success('Perfil atualizado com sucesso.');
-    } catch (error: unknown) {
-      this.notificationService.error(this.resolveSaveError(error));
+    } 
+
+    catch (error: unknown) {
+      const errorMsg = this.resolveSaveError(error);
+      const statusCode = error instanceof HttpErrorResponse 
+        ? error.status 
+        : (error as any)?.error?.statusCode || (error as any)?.statusCode;
+      const isUnauthorized = 
+        statusCode === 401 || 
+        errorMsg.toLowerCase().includes('unauthorized') || 
+        errorMsg.toLowerCase().includes('senha');
+
+      if (isUnauthorized) {
+        this.profileForm.controls.currentPassword.setErrors({ incorrect: true });
+        this.notificationService.error('Senha atual incorreta. Não foi possível salvar.');
+        return;
+      }
+      this.notificationService.error(errorMsg);
     } finally {
       this.saving.set(false);
     }
@@ -278,24 +330,23 @@ export class ConfiguracoesHomePage {
   }
 
   private resolveSaveError(error: unknown): string {
-    if (error instanceof HttpErrorResponse) {
-      const body = error.error;
-      if (typeof body === 'string' && body.trim()) {
-        return body;
-      }
+    const body = error instanceof HttpErrorResponse ? error.error : error;
 
-      if (body && typeof body === 'object' && 'message' in body) {
-        const msg = (body as { message?: unknown }).message;
+    if (body && typeof body === 'object') {
+      if ('error' in body && body.error && typeof body.error === 'object' && 'message' in body.error) {
+        return String((body.error as any).message);
+      }
+      if ('message' in body && body.message) {
+        const msg = (body as any).message;
         if (Array.isArray(msg) && typeof msg[0] === 'string') {
           return msg[0];
         }
-
-        if (typeof msg === 'string' && msg.trim()) {
-          return msg;
-        }
+        return String(msg);
       }
     }
-
+    if (typeof body === 'string' && body.trim()) {
+      return body;
+    }
     return 'Não foi possível salvar as alterações. Verifique os dados e tente novamente.';
   }
 }

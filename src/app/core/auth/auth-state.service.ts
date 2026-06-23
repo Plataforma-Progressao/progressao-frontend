@@ -178,10 +178,17 @@ export class AuthStateService {
   }
 
   private toDashboardUser(user: AuthResponse['user']): DashboardUser {
+    //
+    const titleReal = [user.careerClass, user.currentLevel]
+      .filter(Boolean)
+      .join(' - ');
+    //
     return {
       ...user,
-      title: user.role === 'ADMIN' ? 'Administrador' : 'Prof. Associado IV',
+      //
+      title: user.role === 'ADMIN' ? 'Administrador' : (titleReal || 'Professor'),
       avatarInitials: this.buildInitials(user.name),
+      //
     };
   }
 
