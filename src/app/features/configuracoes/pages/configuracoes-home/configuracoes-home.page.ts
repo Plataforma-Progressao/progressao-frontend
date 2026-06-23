@@ -234,17 +234,23 @@ export class ConfiguracoesHomePage {
       await this.profileResource.reload();
       this.notificationService.success('Perfil atualizado com sucesso.');
     } 
+
     catch (error: unknown) {
       const errorMsg = this.resolveSaveError(error);
-    if (error instanceof HttpErrorResponse) {
-        if (error.status === 401 || errorMsg.toLowerCase().includes('senha') || errorMsg.toLowerCase().includes('unauthorized')) {
-          this.profileForm.controls.currentPassword.setErrors({ incorrect: true });
-          this.notificationService.error('Senha atual incorreta. Não foi possível salvar.');
-          return;
-        }
+      const statusCode = error instanceof HttpErrorResponse 
+        ? error.status 
+        : (error as any)?.error?.statusCode || (error as any)?.statusCode;
+      const isUnauthorized = 
+        statusCode === 401 || 
+        errorMsg.toLowerCase().includes('unauthorized') || 
+        errorMsg.toLowerCase().includes('senha');
+
+      if (isUnauthorized) {
+        this.profileForm.controls.currentPassword.setErrors({ incorrect: true });
+        this.notificationService.error('Senha atual incorreta. Não foi possível salvar.');
+        return;
       }
       this.notificationService.error(errorMsg);
-      
     } finally {
       this.saving.set(false);
     }
@@ -324,22 +330,22 @@ export class ConfiguracoesHomePage {
   }
 
   private resolveSaveError(error: unknown): string {
-    if (error instanceof HttpErrorResponse) {
-      const body = error.error;
-      if (typeof body === 'string' && body.trim()) {
-        return body;
-      }
+    const body = error instanceof HttpErrorResponse ? error.error : error;
 
-      if (body && typeof body === 'object' && 'message' in body) {
-        const msg = (body as { message?: unknown }).message;
+    if (body && typeof body === 'object') {
+      if ('error' in body && body.error && typeof body.error === 'object' && 'message' in body.error) {
+        return String((body.error as any).message);
+      }
+      if ('message' in body && body.message) {
+        const msg = (body as any).message;
         if (Array.isArray(msg) && typeof msg[0] === 'string') {
           return msg[0];
         }
-
-        if (typeof msg === 'string' && msg.trim()) {
-          return msg;
-        }
+        return String(msg);
       }
+    }
+    if (typeof body === 'string' && body.trim()) {
+      return body;
     }
     return 'Não foi possível salvar as alterações. Verifique os dados e tente novamente.';
   }
