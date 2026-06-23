@@ -1,19 +1,17 @@
 #!/usr/bin/env bash
 # Gera ícones PWA (public/icons/*.png) e favicon.ico a partir de uma imagem quadrada ou retangular.
 # Requer ImageMagick (convert).
-# Uso: ./scripts/generate-app-icons.sh [caminho/para/fonte.png]
-# Padrão: ./screen.png na raiz do projeto front.
+# Uso: ./scripts/generate-app-icons.sh caminho/para/fonte.png
 
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-SRC="${1:-$ROOT/screen.png}"
+SRC="${1:-}"
 OUT_ICONS="$ROOT/public/icons"
 FAV="$ROOT/public/favicon.ico"
 
-if [[ ! -f "$SRC" ]]; then
-  echo "Arquivo não encontrado: $SRC"
-  echo "Salve o PNG do ícone em $ROOT/screen.png ou passe o caminho como argumento."
+if [[ -z "$SRC" || ! -f "$SRC" ]]; then
+  echo "Uso: $0 caminho/para/fonte.png"
   exit 1
 fi
 

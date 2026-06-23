@@ -4,6 +4,11 @@ Este projeto utiliza Angular 21 com arquitetura baseada em features, lazy loadin
 
 Objetivo deste README: deixar claro como contribuir com consistência de arquitetura, qualidade e manutenção.
 
+## Documentação do projeto
+
+- [Planejamento Inicial](./PLANEJAMENTO-INICIAL.md) — visão do produto, problema, objetivos e escopo do MVP.
+- [Funcionalidades do Sistema](./FUNCIONALIDADES.md) — catálogo atualizado das funcionalidades implementadas e previstas.
+
 ## Stack
 
 - Angular 21
