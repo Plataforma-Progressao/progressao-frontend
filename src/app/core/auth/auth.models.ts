@@ -1,4 +1,4 @@
-export type AuthRole = 'ADMIN' | 'USER';
+export type AuthRole = 'ADMIN' | 'USER' | 'EVALUATOR';
 
 export interface AuthCredentials {
   readonly email: string;
@@ -26,15 +26,13 @@ export interface AuthResponseUser {
   readonly id: string;
   readonly email: string;
   readonly name: string;
-  readonly role: AuthRole;
+  readonly roles: AuthRole[];
   readonly lattesUrl: string | null;
   readonly orcid: string | null;
   readonly createdAt: string;
   readonly updatedAt: string;
-  //
-  readonly careerClass?: string | null;  // <-- ADICIONE ISTO
+  readonly careerClass?: string | null;
   readonly currentLevel?: string | null;
-  //
 }
 
 export interface UpdateProfileRequest {
@@ -73,11 +71,13 @@ export interface DashboardUser {
   readonly id: string;
   readonly email: string;
   readonly name: string;
-  readonly role: AuthRole;
+  readonly roles: AuthRole[];
   readonly createdAt: string;
   readonly updatedAt: string;
   readonly title: string;
   readonly avatarInitials: string;
+  readonly careerClass?: string | null;
+  readonly currentLevel?: string | null;
 }
 
 export interface AuthSession {

@@ -1,7 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { AuthStateService } from '../../auth/auth-state.service';
-import { AUTHENTICATED_NAV_ITEMS } from './authenticated-shell.constants';
+import {
+  AuthenticatedNavSection,
+  buildNavSectionsForRoles,
+} from './authenticated-shell.constants';
 import { AuthenticatedHeaderComponent } from './components/authenticated-header/authenticated-header.component';
 import { AuthenticatedSidenavComponent } from './components/authenticated-sidenav/authenticated-sidenav.component';
 
@@ -19,7 +22,10 @@ export class AuthenticatedShellComponent {
   protected readonly mobileMenuOpened = signal(false);
   protected readonly desktopSidenavCollapsed = signal(false);
   protected readonly currentUser = computed(() => this.authStateService.currentUser());
-  protected readonly navigationItems = AUTHENTICATED_NAV_ITEMS;
+  protected readonly navigationSections = computed((): readonly AuthenticatedNavSection[] => {
+    const roles = this.currentUser()?.roles ?? [];
+    return buildNavSectionsForRoles(roles);
+  });
 
   protected toggleMobileMenu(): void {
     if (this.isMobileViewport()) {

@@ -26,13 +26,18 @@
   </div>
 
   <nav class="dashboard-sidenav__nav" aria-label="Navegação principal">
-    @for (item of navigationItems(); track item.route) {
-      <app-authenticated-nav-item
-        [item]="item"
-        [exact]="item.route === '/dashboard'"
-        [collapsed]="collapsed()"
-        (click)="onNavigate()"
-      />
+    @for (section of navigationSections(); track section.label) {
+      @if (!collapsed()) {
+        <p class="dashboard-sidenav__section-label">{{ section.label }}</p>
+      }
+      @for (item of section.items; track item.route) {
+        <app-authenticated-nav-item
+          [item]="item"
+          [exact]="item.route === '/dashboard' || item.route === '/avaliador' || item.route === '/admin/usuarios'"
+          [collapsed]="collapsed()"
+          (click)="onNavigate()"
+        />
+      }
     }
   </nav>
 

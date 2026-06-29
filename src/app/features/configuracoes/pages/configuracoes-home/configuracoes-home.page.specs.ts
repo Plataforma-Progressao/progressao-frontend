@@ -15,7 +15,7 @@ describe('ConfiguracoesHomePage', () => {
     id: 'u1',
     email: 'docente@uf.br',
     name: 'Docente Teste',
-    role: 'USER',
+    roles: ['USER'],
     lattesUrl: null,
     orcid: null,
     createdAt: new Date().toISOString(),

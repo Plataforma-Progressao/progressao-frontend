@@ -1,0 +1,103 @@
+<section class="review mx-auto w-full max-w-[72rem] space-y-8 pb-12 pt-6">
+  <a routerLink="/avaliador" class="review__back">
+    <mat-icon>arrow_back</mat-icon>
+    Voltar para fila
+  </a>
+
+  @if (loading()) {
+    <div class="review__status" role="status">Carregando atividade...</div>
+  } @else if (loadError()) {
+    <div class="review__status review__status--error" role="alert">{{ loadError() }}</div>
+  } @else if (activity(); as item) {
+    <header class="review__header">
+      <div class="space-y-2">
+        <h1 class="m-0 text-[clamp(1.6rem,3vw,2.2rem)]">{{ item.title }}</h1>
+        <app-status-indicator
+          [status]="item.status === 'APPROVED' ? 'success' : item.status === 'REJECTED' ? 'error' : 'pending'"
+          [label]="item.status === 'APPROVED' ? 'Aprovado' : item.status === 'REJECTED' ? 'Rejeitado' : 'Pendente'"
+        ></app-status-indicator>
+      </div>
+      @if (item.status === 'PENDING') {
+        <div class="review__actions">
+          <app-button
+            variant="primary"
+            label="Aprovar"
+            [loading]="saving()"
+            [disabled]="saving()"
+            (clicked)="approve()"
+          ></app-button>
+          <app-button
+            variant="danger"
+            label="Rejeitar"
+            [loading]="saving()"
+            [disabled]="saving()"
+            (clicked)="reject()"
+          ></app-button>
+        </div>
+      }
+    </header>
+
+    <div class="review__grid">
+      <article class="review__card">
+        <h2>Docente</h2>
+        <p><strong>{{ item.teacher.name }}</strong></p>
+        <p>{{ item.teacher.email }}</p>
+        <p>{{ item.teacher.department ?? 'Departamento não informado' }}</p>
+      </article>
+
+      <article class="review__card">
+        <h2>Atividade</h2>
+        <p><app-badge variant="info">{{ categoryLabel(item.category) }}</app-badge></p>
+        <p>{{ item.description }}</p>
+        <p>Carga horária: {{ item.workloadHours }}h · Pontuação: {{ item.score }}</p>
+        @if (item.term) {
+          <p>Período: {{ item.term }}</p>
+        }
+      </article>
+    </div>
+
+    <article class="review__card">
+      <h2>Comprovantes</h2>
+      @if (item.evidences.length === 0) {
+        <p class="review__muted">Nenhum comprovante anexado.</p>
+      } @else {
+        <ul class="review__evidences">
+          @for (evidence of item.evidences; track evidence.id) {
+            <li>
+              <a [href]="getEvidenceUrl(evidence.id)" target="_blank" rel="noopener">
+                {{ evidence.originalName }}
+              </a>
+            </li>
+          }
+        </ul>
+      }
+    </article>
+
+    @if (showRejectForm() && item.status === 'PENDING') {
+      <article class="review__card">
+        <h2>Motivo da rejeição</h2>
+        <app-textarea
+          [formControl]="rejectReasonControl"
+          label="Descreva o motivo"
+          placeholder="Informe o que precisa ser corrigido..."
+          [rows]="4"
+        ></app-textarea>
+        <div class="review__actions">
+          <app-button
+            variant="danger"
+            label="Confirmar rejeição"
+            [loading]="saving()"
+            (clicked)="reject()"
+          ></app-button>
+        </div>
+      </article>
+    }
+
+    @if (item.rejectionReason) {
+      <article class="review__card review__card--warning">
+        <h2>Motivo da rejeição anterior</h2>
+        <p>{{ item.rejectionReason }}</p>
+      </article>
+    }
+  }
+</section>

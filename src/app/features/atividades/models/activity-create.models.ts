@@ -38,6 +38,8 @@ export interface ActivityListItemDto {
   readonly status: ActivityStatusCode;
   readonly term: string;
   readonly kind: string;
+  readonly rejectionReason?: string | null;
+  readonly submittedAt?: string | null;
 }
 
 export interface ActivityCreatePayload {

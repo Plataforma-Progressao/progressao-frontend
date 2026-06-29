@@ -98,6 +98,20 @@
   min-height: 0;
 }
 
+.dashboard-sidenav__section-label {
+  color: var(--color-text-secondary, #6b7280);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  margin: 0.75rem 0 0.25rem;
+  padding: 0 0.75rem;
+  text-transform: uppercase;
+}
+
+.dashboard-sidenav__section-label:first-child {
+  margin-top: 0;
+}
+
 .dashboard-sidenav--collapsed .dashboard-sidenav__nav {
   justify-items: center;
 }

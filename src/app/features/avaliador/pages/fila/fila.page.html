@@ -1,0 +1,122 @@
+<section class="mx-auto w-full max-w-[80rem] space-y-8 pb-12 pt-6">
+  <header class="space-y-2 pb-2">
+    <h1 class="m-0 text-[clamp(1.8rem,3vw,2.5rem)] tracking-[-0.04em] text-[#1a1c1d]">
+      Fila de avaliação
+    </h1>
+    <p class="m-0 max-w-[44rem] leading-[1.55] text-[#6b7280]">
+      Revise atividades enviadas pelos docentes e aprove ou rejeite com justificativa.
+    </p>
+  </header>
+
+  <div class="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_14rem]">
+    <app-input
+      [formControl]="queryControl"
+      label="Buscar por docente, título ou descrição"
+      placeholder="Buscar..."
+      prefixIcon="search"
+      appearance="outline"
+    ></app-input>
+
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>Status</mat-label>
+      <mat-select [formControl]="statusControl">
+        <mat-option value="PENDING">Pendente</mat-option>
+        <mat-option value="APPROVED">Aprovado</mat-option>
+        <mat-option value="REJECTED">Rejeitado</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <section
+    class="overflow-hidden rounded-xl bg-[var(--mat-sys-surface-container)] shadow-[0_0_0_1px_rgba(198,197,212,0.1),0_1px_2px_rgba(0,0,0,0.05)]"
+    aria-label="Fila de atividades"
+  >
+    @if (loading()) {
+      <div class="flex min-h-[20rem] items-center justify-center p-12" role="status">
+        <mat-progress-spinner diameter="44" mode="indeterminate"></mat-progress-spinner>
+      </div>
+    } @else if (loadError()) {
+      <div class="flex min-h-[20rem] flex-col items-center justify-center gap-4 p-12 text-center" role="alert">
+        <mat-icon class="text-[var(--mat-sys-error)]">error_outline</mat-icon>
+        <p>{{ loadError() }}</p>
+        <app-button variant="primary" size="small" label="Tentar novamente" (clicked)="retry()"></app-button>
+      </div>
+    } @else if (isEmpty()) {
+      <div class="flex min-h-[20rem] flex-col items-center justify-center gap-2 p-12 text-center" role="status">
+        <mat-icon>inbox</mat-icon>
+        <p class="font-semibold">Nenhuma atividade nesta fila</p>
+        <p class="text-sm text-[#6b7280]">Altere o filtro de status ou aguarde novos envios.</p>
+      </div>
+    } @else {
+      <table mat-table [dataSource]="items()" class="queue-table" aria-label="Atividades pendentes">
+        <ng-container matColumnDef="teacher">
+          <th mat-header-cell *matHeaderCellDef>Docente</th>
+          <td mat-cell *matCellDef="let row">
+            <div class="queue-cell">
+              <strong>{{ row.teacher.name }}</strong>
+              <span class="queue-cell__meta">{{ row.teacher.department ?? row.teacher.email }}</span>
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="title">
+          <th mat-header-cell *matHeaderCellDef>Atividade</th>
+          <td mat-cell *matCellDef="let row">
+            <div class="queue-cell">
+              <strong>{{ row.title }}</strong>
+              <span class="queue-cell__meta">{{ row.description }}</span>
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="categoria">
+          <th mat-header-cell *matHeaderCellDef>Categoria</th>
+          <td mat-cell *matCellDef="let row">
+            <app-badge [variant]="categoryVariant(row.category)">{{ categoryLabel(row.category) }}</app-badge>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="score">
+          <th mat-header-cell *matHeaderCellDef>Pontos</th>
+          <td mat-cell *matCellDef="let row">{{ row.score }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef>Status</th>
+          <td mat-cell *matCellDef="let row">
+            <app-status-indicator
+              [status]="statusIndicator(row.status)"
+              [label]="statusLabel(row.status)"
+            ></app-status-indicator>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Ações</th>
+          <td mat-cell *matCellDef="let row">
+            <button
+              mat-icon-button
+              type="button"
+              aria-label="Revisar atividade"
+              (click)="openReview(row)"
+            >
+              <mat-icon>visibility</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      </table>
+
+      <footer class="flex flex-wrap items-center justify-between gap-4 border-t border-[rgba(198,197,212,0.2)] px-6 py-4">
+        <p class="m-0 text-sm text-[#6b7280]">{{ total() }} atividade(s)</p>
+        <app-pagination
+          [currentPage]="page()"
+          [totalPages]="totalPages()"
+          (pageChanged)="onPageChange($event)"
+        ></app-pagination>
+      </footer>
+    }
+  </section>
+</section>

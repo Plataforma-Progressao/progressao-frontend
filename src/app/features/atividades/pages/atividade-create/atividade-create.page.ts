@@ -297,7 +297,13 @@ export class ActivityCreatePage {
           { duration: 4500 },
         );
       } else {
-        this.snackBar.open('Atividade registrada com sucesso.', 'Fechar', { duration: 3000 });
+        this.snackBar.open(
+          this.isEditing()
+            ? 'Alterações enviadas para nova avaliação.'
+            : 'Atividade enviada para avaliação.',
+          'Fechar',
+          { duration: 3000 },
+        );
       }
 
       if (this.isEditing()) {

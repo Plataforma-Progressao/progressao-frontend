@@ -1,0 +1,107 @@
+<section class="mx-auto w-full max-w-[80rem] space-y-8 pb-12 pt-6">
+  <header class="flex flex-wrap items-start justify-between gap-4">
+    <div class="space-y-2">
+      <h1 class="m-0 text-[clamp(1.8rem,3vw,2.5rem)] tracking-[-0.04em] text-[#1a1c1d]">
+        Usuários
+      </h1>
+      <p class="m-0 max-w-[44rem] leading-[1.55] text-[#6b7280]">
+        Gerencie docentes, revisores e seus papéis na plataforma.
+      </p>
+    </div>
+    <app-button variant="primary" label="Novo usuário" (clicked)="openCreateUser()"></app-button>
+  </header>
+
+  <div class="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_14rem]">
+    <app-input
+      [formControl]="queryControl"
+      label="Buscar por nome ou e-mail"
+      placeholder="Buscar..."
+      prefixIcon="search"
+      appearance="outline"
+    ></app-input>
+
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>Papel</mat-label>
+      <mat-select [formControl]="roleControl">
+        <mat-option value="">Todos</mat-option>
+        <mat-option value="USER">Docente</mat-option>
+        <mat-option value="EVALUATOR">Revisor</mat-option>
+        <mat-option value="ADMIN">Administrador</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <section
+    class="overflow-hidden rounded-xl bg-[var(--mat-sys-surface-container)] shadow-[0_0_0_1px_rgba(198,197,212,0.1),0_1px_2px_rgba(0,0,0,0.05)]"
+    aria-label="Lista de usuários"
+  >
+    @if (loading()) {
+      <div class="flex min-h-[20rem] items-center justify-center p-12" role="status">
+        <mat-progress-spinner diameter="44" mode="indeterminate"></mat-progress-spinner>
+      </div>
+    } @else if (loadError()) {
+      <div class="flex min-h-[20rem] flex-col items-center justify-center gap-4 p-12 text-center" role="alert">
+        <p>{{ loadError() }}</p>
+        <app-button variant="primary" size="small" label="Tentar novamente" (clicked)="retry()"></app-button>
+      </div>
+    } @else if (isEmpty()) {
+      <div class="flex min-h-[20rem] items-center justify-center p-12 text-center" role="status">
+        <p>Nenhum usuário encontrado.</p>
+      </div>
+    } @else {
+      <table mat-table [dataSource]="items()" class="users-table" aria-label="Usuários cadastrados">
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef>Nome</th>
+          <td mat-cell *matCellDef="let row">{{ row.name }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="email">
+          <th mat-header-cell *matHeaderCellDef>E-mail</th>
+          <td mat-cell *matCellDef="let row">{{ row.email }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="roles">
+          <th mat-header-cell *matHeaderCellDef>Papéis</th>
+          <td mat-cell *matCellDef="let row">
+            <div class="users-table__badges">
+              @for (role of row.roles; track role) {
+                <app-badge [variant]="roleBadgeVariant(role)">{{ roleLabel(role) }}</app-badge>
+              }
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="department">
+          <th mat-header-cell *matHeaderCellDef>Departamento</th>
+          <td mat-cell *matCellDef="let row">{{ row.department ?? '—' }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Ações</th>
+          <td mat-cell *matCellDef="let row">
+            <button
+              mat-icon-button
+              type="button"
+              aria-label="Editar papéis"
+              (click)="editRoles(row)"
+            >
+              <mat-icon>manage_accounts</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      </table>
+
+      <footer class="flex flex-wrap items-center justify-between gap-4 border-t border-[rgba(198,197,212,0.2)] px-6 py-4">
+        <p class="m-0 text-sm text-[#6b7280]">{{ total() }} usuário(s)</p>
+        <app-pagination
+          [currentPage]="page()"
+          [totalPages]="totalPages()"
+          (pageChanged)="onPageChange($event)"
+        ></app-pagination>
+      </footer>
+    }
+  </section>
+</section>

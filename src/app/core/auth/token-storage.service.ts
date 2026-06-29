@@ -41,9 +41,11 @@ export class TokenStorageService {
         return null;
       }
 
+      const normalized = this.normalizeSession(parsedSession);
+
       return {
-        ...parsedSession,
-        persistent: parsedSession.persistent ?? persistent,
+        ...normalized,
+        persistent: normalized.persistent ?? persistent,
       } as AuthSession;
     } catch {
       storage.removeItem(SESSION_STORAGE_KEY);
@@ -56,13 +58,40 @@ export class TokenStorageService {
       return false;
     }
 
+    const user = session.user as
+      | (Partial<AuthSession['user']> & { role?: string })
+      | undefined;
+
     return Boolean(
       session.accessToken &&
       session.refreshToken &&
       session.issuedAt &&
-      session.user?.id &&
-      session.user?.email &&
-      session.user?.name,
+      user?.id &&
+      user?.email &&
+      user?.name &&
+      (user.roles?.length || user.role),
     );
+  }
+
+  private normalizeSession(session: Partial<AuthSession>): Partial<AuthSession> {
+    const user = session.user as
+      | (Partial<AuthSession['user']> & { role?: string })
+      | undefined;
+
+    if (!user) {
+      return session;
+    }
+
+    const roles =
+      user.roles ??
+      (user.role ? [user.role as AuthSession['user']['roles'][number]] : ['USER']);
+
+    return {
+      ...session,
+      user: {
+        ...user,
+        roles,
+      } as AuthSession['user'],
+    };
   }
 }

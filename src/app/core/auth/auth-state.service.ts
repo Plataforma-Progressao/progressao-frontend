@@ -13,6 +13,8 @@ import {
   TokenPair,
 } from './auth.models';
 import { TokenStorageService } from './token-storage.service';
+import { AuthRole } from './auth.models';
+import { getDefaultRouteForRoles, getRoleLabels } from './auth-routing.utils';
 
 @Injectable({ providedIn: 'root' })
 export class AuthStateService {
@@ -30,6 +32,22 @@ export class AuthStateService {
   readonly session = this.sessionState.asReadonly();
   readonly currentUser = computed(() => this.session()?.user ?? null);
   readonly isAuthenticated = computed(() => this.session() !== null);
+  readonly roles = computed(() => this.currentUser()?.roles ?? []);
+  readonly isDocente = computed(() => this.hasRole('USER'));
+  readonly isEvaluator = computed(() => this.hasRole('EVALUATOR'));
+  readonly isAdmin = computed(() => this.hasRole('ADMIN'));
+
+  hasRole(role: AuthRole): boolean {
+    return this.roles().includes(role);
+  }
+
+  hasAnyRole(requiredRoles: readonly AuthRole[]): boolean {
+    return requiredRoles.some((role) => this.hasRole(role));
+  }
+
+  getDefaultRoute(): string {
+    return getDefaultRouteForRoles(this.roles());
+  }
 
   async login(
     credentials: AuthCredentials,
@@ -178,17 +196,23 @@ export class AuthStateService {
   }
 
   private toDashboardUser(user: AuthResponse['user']): DashboardUser {
-    //
     const titleReal = [user.careerClass, user.currentLevel]
       .filter(Boolean)
       .join(' - ');
-    //
+
+    const roleLabels = getRoleLabels(user.roles);
+    let title = titleReal || 'Professor';
+
+    if (roleLabels.length > 0 && !user.roles.includes('USER')) {
+      title = roleLabels.join(' · ');
+    } else if (user.roles.includes('ADMIN') && user.roles.length > 1) {
+      title = `${titleReal || 'Professor'} · ${roleLabels.filter((l) => l !== 'Docente').join(' · ')}`;
+    }
+
     return {
       ...user,
-      //
-      title: user.role === 'ADMIN' ? 'Administrador' : (titleReal || 'Professor'),
+      title,
       avatarInitials: this.buildInitials(user.name),
-      //
     };
   }
 

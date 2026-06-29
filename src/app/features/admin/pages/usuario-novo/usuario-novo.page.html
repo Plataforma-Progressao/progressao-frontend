@@ -1,0 +1,57 @@
+<section class="admin-create">
+  <a routerLink="/admin/usuarios" class="admin-create__back">
+    <mat-icon>arrow_back</mat-icon>
+    Voltar para usuários
+  </a>
+
+  <header class="admin-create__header">
+    <h1>Novo usuário</h1>
+    <p>Cadastre docentes e/ou revisores para a plataforma.</p>
+  </header>
+
+  <form class="admin-create__card" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <div class="admin-create__grid">
+      <app-input
+        formControlName="name"
+        [control]="form.controls.name"
+        label="Nome completo"
+        appearance="outline"
+      ></app-input>
+      <app-input
+        formControlName="email"
+        [control]="form.controls.email"
+        label="E-mail"
+        type="email"
+        appearance="outline"
+      ></app-input>
+      <app-input
+        formControlName="password"
+        [control]="form.controls.password"
+        label="Senha temporária"
+        type="password"
+        appearance="outline"
+      ></app-input>
+    </div>
+
+    <fieldset class="admin-create__roles">
+      <legend>Papéis</legend>
+      <app-checkbox formControlName="roleUser" label="Docente (USER)"></app-checkbox>
+      <app-checkbox formControlName="roleEvaluator" label="Revisor (EVALUATOR)"></app-checkbox>
+    </fieldset>
+
+    @if (form.controls.roleUser.value) {
+      <div class="admin-create__grid">
+        <app-input formControlName="university" [control]="form.controls.university" label="Universidade" appearance="outline"></app-input>
+        <app-input formControlName="department" [control]="form.controls.department" label="Departamento" appearance="outline"></app-input>
+        <app-input formControlName="careerClass" [control]="form.controls.careerClass" label="Classe" appearance="outline"></app-input>
+        <app-input formControlName="currentLevel" [control]="form.controls.currentLevel" label="Nível" appearance="outline"></app-input>
+        <app-input formControlName="lastProgressionDate" [control]="form.controls.lastProgressionDate" label="Última progressão (AAAA-MM-DD)" appearance="outline"></app-input>
+      </div>
+    }
+
+    <div class="admin-create__actions">
+      <app-button variant="tertiary" label="Cancelar" (clicked)="cancel()"></app-button>
+      <app-button variant="primary" label="Criar usuário" type="submit" [loading]="saving()"></app-button>
+    </div>
+  </form>
+</section>

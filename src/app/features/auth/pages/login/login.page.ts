@@ -4,6 +4,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { ButtonComponent, CheckboxComponent, InputComponent } from '../../../../shared';
+import { getDefaultRouteForRoles } from '../../../../core/auth/auth-routing.utils';
 import { AuthStateService } from '../../../../core/auth/auth-state.service';
 import { AuthPageFooterComponent } from '../../components/auth-page-footer/auth-page-footer.component';
 import { AuthPageHeaderComponent } from '../../components/auth-page-header/auth-page-header.component';
@@ -92,6 +93,16 @@ export class LoginPage {
   }
 
   private getReturnUrl(): string {
-    return this.route.snapshot.queryParamMap.get('returnUrl') ?? '/dashboard';
+    const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+    if (returnUrl) {
+      return returnUrl;
+    }
+
+    const user = this.authStateService.currentUser();
+    if (user) {
+      return getDefaultRouteForRoles(user.roles);
+    }
+
+    return '/dashboard';
   }
 }

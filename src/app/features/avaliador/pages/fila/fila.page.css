@@ -1,0 +1,32 @@
+:host {
+  display: block;
+}
+
+.queue-table {
+  width: 100%;
+}
+
+.queue-table .mat-mdc-header-row {
+  background: rgb(243 243 245);
+}
+
+.queue-table .mat-mdc-header-cell {
+  color: rgb(69 70 82);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.queue-table .mat-mdc-cell {
+  padding: 1rem 1.5rem;
+}
+
+.queue-cell {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.queue-cell__meta {
+  color: #6b7280;
+  font-size: 0.8125rem;
+}

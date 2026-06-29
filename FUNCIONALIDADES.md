@@ -23,6 +23,8 @@ A plataforma está organizada em áreas funcionais acessíveis após autenticaç
 | Checklist | `/checklist` | Acompanhamento de documentação obrigatória |
 | Relatórios | `/relatorios` | Visualização e exportação do RAD |
 | Configurações | `/configuracoes` | Perfil do docente e alteração de senha |
+| Avaliador | `/avaliador` | Fila de avaliação de atividades pendentes |
+| Administração | `/admin/usuarios` | Gestão de usuários e papéis |
 
 Área pública (sem autenticação): login, cadastro e recuperação de senha.
 
@@ -37,7 +39,7 @@ A plataforma está organizada em áreas funcionais acessíveis após autenticaç
 | Renovação automática de sessão | **Implementado** | Interceptor de refresh no front-end |
 | Logout | **Implementado** | Invalidação do refresh token no back-end |
 | Recuperação de senha | **Implementado** | Solicitação por e-mail e redefinição com token |
-| Controle de acesso por papéis (RBAC) | **Implementado** | Papéis `USER` e `ADMIN` com guards no back-end |
+| Controle de acesso por papéis (RBAC) | **Implementado** | Papéis `USER`, `EVALUATOR` e `ADMIN` com suporte a múltiplos papéis por usuário |
 | Proteção de rotas autenticadas | **Implementado** | Guards no front-end para áreas públicas e autenticadas |
 | Rate limiting | **Implementado** | Throttling global na API |
 
@@ -60,17 +62,18 @@ A plataforma está organizada em áreas funcionais acessíveis após autenticaç
 
 ## 4. Gestão de atividades
 
-Atividades são o núcleo do RAD e da pontuação. Toda atividade criada nasce com status **APPROVED** (sem fluxo de aprovação manual por gerenciador).
+Atividades são o núcleo do RAD e da pontuação. Toda atividade criada nasce com status **PENDING** e aguarda aprovação de um revisor.
 
 | Funcionalidade | Status | Descrição |
 | -------------- | ------ | --------- |
 | Cadastro de atividades | **Implementado** | Título, descrição, categoria, carga horária, tipo, período e pontuação |
-| Edição de atividades | **Implementado** | Mesmo formulário do cadastro, rota `/atividades/editar/:id` |
+| Edição de atividades | **Implementado** | Mesmo formulário do cadastro; edição reenvia para avaliação se já aprovada/rejeitada |
 | Exclusão de atividades | **Implementado** | Remoção com confirmação na listagem |
 | Classificação por categoria | **Implementado** | Ensino, Pesquisa, Extensão e Gestão |
 | Listagem paginada | **Implementado** | Tabela com busca textual e paginação |
 | Filtro por abas de categoria | **Implementado** | Pesquisa, Ensino, Extensão, Gestão e Todas |
-| Filtro por status | **Parcial** | Mantido para compatibilidade com dados legados; novas atividades já nascem aprovadas |
+| Filtro por status | **Implementado** | Pendente, Validado e Rejeitado |
+| Fluxo de aprovação por revisor | **Implementado** | Fila em `/avaliador`; aprovar/rejeitar com motivo |
 | Histórico de alterações por campo | **Implementado** | Log de auditoria (`ActivityChangeLog`) exibido na edição |
 | Histórico de status | **Implementado** | Modelo e API de `ActivityStatusHistory` (uso legado) |
 | Associação a ciclo de progressão | **Implementado** | Atividades vinculadas ao ciclo ativo do docente |
@@ -176,12 +179,24 @@ Atividades são o núcleo do RAD e da pontuação. Toda atividade criada nasce c
 | Funcionalidade | Status | Descrição |
 | -------------- | ------ | --------- |
 | Usuário administrador (seed) | **Implementado** | Criado via variáveis de ambiente e `prisma:seed` |
-| Listagem de usuários (admin) | **Implementado** | Endpoint `GET /users` restrito a `ADMIN` |
-| Painel administrativo no front-end | **Planejado** | Sem interface dedicada para gestão de usuários e templates |
+| Painel administrativo no front-end | **Implementado** | Listagem, criação de usuários e edição de papéis em `/admin/usuarios` |
+| API admin de usuários | **Implementado** | `GET/POST /admin/users`, `PATCH /admin/users/:id/roles` |
+| Seed de demonstração | **Implementado** | Admin, docentes, revisor e docente+revisor com atividades de exemplo |
 
 ---
 
-## 13. Infraestrutura e integrações
+## 13. Avaliador funcional
+
+| Funcionalidade | Status | Descrição |
+| -------------- | ------ | --------- |
+| Fila de atividades pendentes | **Implementado** | `/avaliador` com filtros e paginação |
+| Revisão de atividade | **Implementado** | Detalhe, comprovantes, aprovar/rejeitar |
+| Notificação ao docente | **Implementado** | Ao aprovar ou rejeitar |
+| Bloqueio de auto-avaliação | **Implementado** | Revisor não avalia próprias atividades |
+
+---
+
+## 14. Infraestrutura e integrações
 
 | Funcionalidade | Status | Descrição |
 | -------------- | ------ | --------- |
@@ -239,9 +254,10 @@ Atividades são o núcleo do RAD e da pontuação. Toda atividade criada nasce c
 
 ## 16. Regras de domínio relevantes
 
-- **Não há fluxo de aprovação manual por gerenciador.** Toda atividade criada nasce com status `APPROVED`.
-- **Não implementar telas ou endpoints de revisão/aprovação/rejeição de atividades**, salvo pedido explícito.
-- O **filtro de status** na listagem de atividades permanece apenas para compatibilidade com dados legados.
+- **Novas atividades nascem `PENDING`** e só contam na pontuação/RAD após aprovação.
+- **Revisores** (`EVALUATOR`) avaliam atividades em `/avaliador`; não podem auto-avaliar.
+- **Administradores** gerenciam usuários e papéis em `/admin`.
+- Usuários podem ter **múltiplos papéis** (ex.: docente + revisor).
 
 ---
 

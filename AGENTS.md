@@ -58,7 +58,14 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 
 ### Status de atividades
 
-- Nao ha fluxo de aprovacao manual por gerenciador.
-- Toda atividade criada deve nascer com status `APPROVED` (backend define isso na criacao).
-- Nao implementar telas ou endpoints de revisao/aprovacao/rejeicao de atividades, salvo pedido explicito.
-- O filtro de status na listagem pode permanecer apenas para compatibilidade com dados legados.
+- Toda atividade criada nasce com status `PENDING` e aguarda aprovação de um revisor (`EVALUATOR`).
+- Apenas atividades `APPROVED` entram na pontuação do dashboard e no RAD.
+- Revisores não podem aprovar/rejeitar as próprias atividades.
+- Edição de atividade `APPROVED` ou `REJECTED` reenvia para `PENDING`.
+
+### Papéis (RBAC)
+
+- `USER`: docente — área de progresso (dashboard, atividades, checklist, relatórios).
+- `EVALUATOR`: revisor — fila de avaliação em `/avaliador`.
+- `ADMIN`: administrador — gestão de usuários em `/admin/usuarios`.
+- Um usuário pode ter múltiplos papéis (ex.: `USER` + `EVALUATOR`).
