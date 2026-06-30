@@ -21,11 +21,14 @@ export const DOCENTE_NAV_ITEMS: readonly AuthenticatedNavItem[] = [
 ] as const;
 
 export const EVALUATOR_NAV_ITEMS: readonly AuthenticatedNavItem[] = [
-  { label: 'Fila de avaliação', icon: 'rate_review', route: '/avaliador' },
+  { label: 'Dashboard', icon: 'dashboard', route: '/avaliador' },
+  { label: 'Fila de avaliação', icon: 'rate_review', route: '/avaliador/fila' },
 ] as const;
 
 export const ADMIN_NAV_ITEMS: readonly AuthenticatedNavItem[] = [
+  { label: 'Dashboard', icon: 'dashboard', route: '/admin' },
   { label: 'Usuários', icon: 'group', route: '/admin/usuarios' },
+  { label: 'Atribuições', icon: 'link', route: '/admin/atribuicoes' },
 ] as const;
 
 export const AUTHENTICATED_NAV_SECTIONS: readonly AuthenticatedNavSection[] = [

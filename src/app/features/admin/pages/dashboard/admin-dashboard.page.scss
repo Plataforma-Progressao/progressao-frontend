@@ -1,0 +1,116 @@
+.admin-dashboard__status {
+  margin: 0;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  background: var(--mat-sys-surface-container);
+}
+
+.admin-dashboard__status--error {
+  color: var(--mat-sys-error);
+}
+
+.admin-dashboard__alert {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  padding: 1rem 1.25rem;
+  border-radius: 0.75rem;
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+}
+
+.admin-dashboard__alert mat-icon {
+  color: #c2410c;
+}
+
+.admin-dashboard__alert p {
+  margin: 0.25rem 0;
+  color: #6b7280;
+}
+
+.admin-dashboard__alert a {
+  color: #c2410c;
+  font-weight: 600;
+}
+
+.admin-dashboard__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: 1rem;
+}
+
+.admin-dashboard__card {
+  padding: 1.25rem;
+  border-radius: 0.75rem;
+  background: var(--mat-sys-surface-container);
+  box-shadow: 0 0 0 1px rgba(198, 197, 212, 0.1);
+}
+
+.admin-dashboard__card--warning strong {
+  color: #c2410c;
+}
+
+.admin-dashboard__card-label {
+  margin: 0 0 0.5rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.admin-dashboard__card strong {
+  font-size: 1.75rem;
+}
+
+.admin-dashboard__panel {
+  padding: 1.25rem;
+  border-radius: 0.75rem;
+  background: var(--mat-sys-surface-container);
+}
+
+.admin-dashboard__panel h2 {
+  margin: 0 0 1rem;
+  font-size: 1.125rem;
+}
+
+.admin-dashboard__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-dashboard__table th,
+.admin-dashboard__table td {
+  padding: 0.75rem 0.5rem;
+  text-align: left;
+  border-bottom: 1px solid rgba(198, 197, 212, 0.2);
+}
+
+.admin-dashboard__table td span {
+  display: block;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.admin-dashboard__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.admin-dashboard__list li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: baseline;
+}
+
+.admin-dashboard__list span {
+  margin-left: auto;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.admin-dashboard__empty {
+  margin: 0;
+  color: #6b7280;
+}

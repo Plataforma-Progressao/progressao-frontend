@@ -1,0 +1,103 @@
+<section class="admin-dashboard mx-auto w-full max-w-[80rem] space-y-8 pb-12 pt-6">
+  @if (isLoading() && !homeData()) {
+    <p class="admin-dashboard__status" role="status">Carregando painel administrativo...</p>
+  } @else if (hasError() && !homeData()) {
+    <div class="admin-dashboard__status admin-dashboard__status--error" role="alert">
+      Não foi possível carregar o painel agora.
+      <button type="button" (click)="homeResource.reload()">Tentar novamente</button>
+    </div>
+  }
+
+  @if (homeData(); as data) {
+    <app-dashboard-home-hero
+      eyebrow="Administração"
+      [title]="data.displayName"
+      [summary]="data.summary"
+    />
+
+    @if (data.unassignedTeacherCount > 0 || data.orphanPendingActivityCount > 0) {
+      <article class="admin-dashboard__alert" role="alert">
+        <mat-icon>warning</mat-icon>
+        <div>
+          <strong>Atenção: docentes sem revisor</strong>
+          <p>
+            {{ data.unassignedTeacherCount }} docente(s) sem revisor atribuído e
+            {{ data.orphanPendingActivityCount }} atividade(s) pendente(s) fora da fila de revisão.
+          </p>
+          <a routerLink="/admin/atribuicoes" [queryParams]="{ unassigned: true }">
+            Gerenciar atribuições
+          </a>
+        </div>
+      </article>
+    }
+
+    <div class="admin-dashboard__grid">
+      <article class="admin-dashboard__card">
+        <p class="admin-dashboard__card-label">Docentes</p>
+        <strong>{{ data.userCounts.teachers }}</strong>
+      </article>
+      <article class="admin-dashboard__card">
+        <p class="admin-dashboard__card-label">Revisores</p>
+        <strong>{{ data.userCounts.evaluators }}</strong>
+      </article>
+      <article class="admin-dashboard__card">
+        <p class="admin-dashboard__card-label">Administradores</p>
+        <strong>{{ data.userCounts.admins }}</strong>
+      </article>
+      <article class="admin-dashboard__card admin-dashboard__card--warning">
+        <p class="admin-dashboard__card-label">Sem revisor</p>
+        <strong>{{ data.unassignedTeacherCount }}</strong>
+      </article>
+    </div>
+
+    <section class="admin-dashboard__panel">
+      <header>
+        <h2>Carga por revisor</h2>
+      </header>
+      @if (data.evaluatorLoads.length === 0) {
+        <p class="admin-dashboard__empty">Nenhuma atribuição cadastrada.</p>
+      } @else {
+        <table class="admin-dashboard__table">
+          <thead>
+            <tr>
+              <th>Revisor</th>
+              <th>Docentes</th>
+              <th>Pendentes</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (load of data.evaluatorLoads; track load.evaluatorId) {
+              <tr>
+                <td>
+                  <strong>{{ load.evaluatorName }}</strong>
+                  <span>{{ load.evaluatorEmail }}</span>
+                </td>
+                <td>{{ load.teacherCount }}</td>
+                <td>{{ load.pendingCount }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </section>
+
+    <section class="admin-dashboard__panel">
+      <header>
+        <h2>Atribuições recentes</h2>
+      </header>
+      @if (data.recentAssignments.length === 0) {
+        <p class="admin-dashboard__empty">Nenhuma atribuição recente.</p>
+      } @else {
+        <ul class="admin-dashboard__list">
+          @for (item of data.recentAssignments; track item.teacherEmail + item.assignedAt) {
+            <li>
+              <strong>{{ item.teacherName }}</strong>
+              → {{ item.evaluatorName }}
+              <span>{{ item.assignedAt | date: 'dd/MM/yyyy HH:mm' }}</span>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  }
+</section>

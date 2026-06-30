@@ -1,0 +1,105 @@
+<section class="evaluator-dashboard mx-auto w-full max-w-[80rem] space-y-8 pb-12 pt-6">
+  @if (isLoading() && !homeData()) {
+    <p class="evaluator-dashboard__status" role="status">Carregando painel do revisor...</p>
+  } @else if (hasError() && !homeData()) {
+    <div class="evaluator-dashboard__status evaluator-dashboard__status--error" role="alert">
+      Não foi possível carregar o painel agora.
+      <button type="button" (click)="homeResource.reload()">Tentar novamente</button>
+    </div>
+  }
+
+  @if (homeData(); as data) {
+    <app-dashboard-home-hero
+      eyebrow="Avaliação"
+      [title]="data.displayName"
+      [summary]="data.summary"
+    />
+
+    <div class="evaluator-dashboard__grid">
+      <article class="evaluator-dashboard__card">
+        <p>Docentes atribuídos</p>
+        <strong>{{ data.summaryStats.assignedTeacherCount }}</strong>
+      </article>
+      <article class="evaluator-dashboard__card evaluator-dashboard__card--highlight">
+        <p>Pendentes na fila</p>
+        <strong>{{ data.summaryStats.pendingCount }}</strong>
+      </article>
+      <article class="evaluator-dashboard__card">
+        <p>Aprovadas (30 dias)</p>
+        <strong>{{ data.summaryStats.approvedLast30Days }}</strong>
+      </article>
+      <article class="evaluator-dashboard__card">
+        <p>Rejeitadas (30 dias)</p>
+        <strong>{{ data.summaryStats.rejectedLast30Days }}</strong>
+      </article>
+    </div>
+
+    <div class="evaluator-dashboard__columns">
+      <section class="evaluator-dashboard__panel">
+        <header>
+          <h2>Próximas revisões</h2>
+          <a routerLink="/avaliador/fila">Ver fila completa</a>
+        </header>
+        @if (data.pendingActivities.length === 0) {
+          <p class="evaluator-dashboard__empty">Nenhuma atividade pendente nos docentes atribuídos.</p>
+        } @else {
+          <ul class="evaluator-dashboard__list">
+            @for (activity of data.pendingActivities; track activity.id) {
+              <li>
+                <a [routerLink]="['/avaliador/atividades', activity.id]">
+                  <strong>{{ activity.title }}</strong>
+                  <span>{{ activity.teacherName }}</span>
+                </a>
+              </li>
+            }
+          </ul>
+        }
+      </section>
+
+      <section class="evaluator-dashboard__panel">
+        <header>
+          <h2>Pendentes por categoria</h2>
+        </header>
+        <ul class="evaluator-dashboard__categories">
+          @for (item of data.categoryBreakdown; track item.category) {
+            <li>
+              <span>{{ item.label }}</span>
+              <strong>{{ item.pendingCount }}</strong>
+            </li>
+          }
+        </ul>
+      </section>
+    </div>
+
+    <section class="evaluator-dashboard__panel">
+      <header>
+        <h2>Docentes vinculados</h2>
+      </header>
+      @if (data.teachers.length === 0) {
+        <p class="evaluator-dashboard__empty">Nenhum docente atribuído a você ainda.</p>
+      } @else {
+        <table class="evaluator-dashboard__table">
+          <thead>
+            <tr>
+              <th>Docente</th>
+              <th>Departamento</th>
+              <th>Pendentes</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (teacher of data.teachers; track teacher.id) {
+              <tr>
+                <td>
+                  <strong>{{ teacher.name }}</strong>
+                  <span>{{ teacher.email }}</span>
+                </td>
+                <td>{{ teacher.department ?? '—' }}</td>
+                <td>{{ teacher.pendingCount }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </section>
+  }
+</section>

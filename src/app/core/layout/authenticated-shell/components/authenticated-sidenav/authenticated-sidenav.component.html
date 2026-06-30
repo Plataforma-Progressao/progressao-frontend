@@ -33,7 +33,7 @@
       @for (item of section.items; track item.route) {
         <app-authenticated-nav-item
           [item]="item"
-          [exact]="item.route === '/dashboard' || item.route === '/avaliador' || item.route === '/admin/usuarios'"
+          [exact]="item.route === '/dashboard' || item.route === '/avaliador' || item.route === '/avaliador/fila' || item.route === '/admin' || item.route === '/admin/usuarios'"
           [collapsed]="collapsed()"
           (click)="onNavigate()"
         />

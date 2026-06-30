@@ -62,10 +62,17 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 - Apenas atividades `APPROVED` entram na pontuação do dashboard e no RAD.
 - Revisores não podem aprovar/rejeitar as próprias atividades.
 - Edição de atividade `APPROVED` ou `REJECTED` reenvia para `PENDING`.
+- Docente sem revisor atribuído: atividades ficam `PENDING`, mas **não entram na fila** de nenhum revisor.
+
+### Atribuição revisor-docente
+
+- Relação **1 revisor → N docentes**; cada docente tem no máximo um revisor.
+- Admin gerencia vínculos em `/admin/atribuicoes`.
+- Revisor só vê/atua em atividades de docentes atribuídos a ele.
 
 ### Papéis (RBAC)
 
 - `USER`: docente — área de progresso (dashboard, atividades, checklist, relatórios).
-- `EVALUATOR`: revisor — fila de avaliação em `/avaliador`.
-- `ADMIN`: administrador — gestão de usuários em `/admin/usuarios`.
+- `EVALUATOR`: revisor — dashboard e fila em `/avaliador` e `/avaliador/fila`.
+- `ADMIN`: administrador — dashboard, usuários e atribuições em `/admin`.
 - Um usuário pode ter múltiplos papéis (ex.: `USER` + `EVALUATOR`).

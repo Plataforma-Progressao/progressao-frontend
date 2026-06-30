@@ -5,10 +5,15 @@ import { ApiSuccessResponse } from '../../core/http/api-envelope.types';
 import { getApiUrl } from '../../core/config/runtime-config';
 import { AuthResponseUser } from '../../core/auth/auth.models';
 import {
+  AdminDashboardHomeData,
   AdminUserListItem,
   AdminUsersQuery,
+  AssignEvaluatorPayload,
   CreateAdminUserPayload,
+  EvaluatorAssignmentListItem,
+  EvaluatorAssignmentsQuery,
   PaginatedAdminUsersResponse,
+  PaginatedEvaluatorAssignmentsResponse,
   UpdateAdminUserRolesPayload,
 } from './models/admin.models';
 
@@ -55,6 +60,60 @@ export class AdminApiService {
       .patch<ApiSuccessResponse<AdminUserListItem> | AdminUserListItem>(
         `${this.apiBaseUrl}/admin/users/${userId}/roles`,
         payload,
+      )
+      .pipe(map((response) => this.unwrapData(response)));
+  }
+
+  getDashboardHome(): Observable<AdminDashboardHomeData> {
+    return this.http
+      .get<ApiSuccessResponse<AdminDashboardHomeData> | AdminDashboardHomeData>(
+        `${this.apiBaseUrl}/admin/dashboard/home`,
+      )
+      .pipe(map((response) => this.unwrapData(response)));
+  }
+
+  listAssignments(
+    query: EvaluatorAssignmentsQuery,
+  ): Observable<PaginatedEvaluatorAssignmentsResponse> {
+    let params = new HttpParams()
+      .set('page', String(query.page))
+      .set('pageSize', String(query.pageSize));
+
+    if (query.search?.trim()) {
+      params = params.set('search', query.search.trim());
+    }
+
+    if (query.unassignedOnly) {
+      params = params.set('unassignedOnly', 'true');
+    }
+
+    if (query.evaluatorId) {
+      params = params.set('evaluatorId', query.evaluatorId);
+    }
+
+    return this.http
+      .get<
+        ApiSuccessResponse<PaginatedEvaluatorAssignmentsResponse> | PaginatedEvaluatorAssignmentsResponse
+      >(`${this.apiBaseUrl}/admin/evaluator-assignments`, { params })
+      .pipe(map((response) => this.unwrapData(response)));
+  }
+
+  assignEvaluator(
+    teacherId: string,
+    payload: AssignEvaluatorPayload,
+  ): Observable<EvaluatorAssignmentListItem> {
+    return this.http
+      .put<ApiSuccessResponse<EvaluatorAssignmentListItem> | EvaluatorAssignmentListItem>(
+        `${this.apiBaseUrl}/admin/evaluator-assignments/${teacherId}`,
+        payload,
+      )
+      .pipe(map((response) => this.unwrapData(response)));
+  }
+
+  unassignEvaluator(teacherId: string): Observable<EvaluatorAssignmentListItem> {
+    return this.http
+      .delete<ApiSuccessResponse<EvaluatorAssignmentListItem> | EvaluatorAssignmentListItem>(
+        `${this.apiBaseUrl}/admin/evaluator-assignments/${teacherId}`,
       )
       .pipe(map((response) => this.unwrapData(response)));
   }

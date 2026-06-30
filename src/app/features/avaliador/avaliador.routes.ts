@@ -4,6 +4,11 @@ export const routes: Routes = [
   {
     path: '',
     loadComponent: () =>
+      import('./pages/dashboard/evaluator-dashboard.page').then((m) => m.EvaluatorDashboardPage),
+  },
+  {
+    path: 'fila',
+    loadComponent: () =>
       import('./pages/fila/fila.page').then((m) => m.EvaluatorQueuePage),
   },
   {

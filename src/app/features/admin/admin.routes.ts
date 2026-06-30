@@ -3,8 +3,8 @@ import { Routes } from '@angular/router';
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'usuarios',
-    pathMatch: 'full',
+    loadComponent: () =>
+      import('./pages/dashboard/admin-dashboard.page').then((m) => m.AdminDashboardPage),
   },
   {
     path: 'usuarios',
@@ -15,5 +15,10 @@ export const routes: Routes = [
     path: 'usuarios/novo',
     loadComponent: () =>
       import('./pages/usuario-novo/usuario-novo.page').then((m) => m.AdminUserCreatePage),
+  },
+  {
+    path: 'atribuicoes',
+    loadComponent: () =>
+      import('./pages/atribuicoes/atribuicoes.page').then((m) => m.AdminAssignmentsPage),
   },
 ];

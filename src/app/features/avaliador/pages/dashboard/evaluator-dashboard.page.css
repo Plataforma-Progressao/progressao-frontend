@@ -1,0 +1,111 @@
+.evaluator-dashboard__status {
+  margin: 0;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  background: var(--mat-sys-surface-container);
+}
+
+.evaluator-dashboard__status--error {
+  color: var(--mat-sys-error);
+}
+
+.evaluator-dashboard__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: 1rem;
+}
+
+.evaluator-dashboard__card {
+  padding: 1.25rem;
+  border-radius: 0.75rem;
+  background: var(--mat-sys-surface-container);
+}
+
+.evaluator-dashboard__card p {
+  margin: 0 0 0.5rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.evaluator-dashboard__card strong {
+  font-size: 1.75rem;
+}
+
+.evaluator-dashboard__card--highlight strong {
+  color: #c2410c;
+}
+
+.evaluator-dashboard__columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  gap: 1rem;
+}
+
+.evaluator-dashboard__panel {
+  padding: 1.25rem;
+  border-radius: 0.75rem;
+  background: var(--mat-sys-surface-container);
+}
+
+.evaluator-dashboard__panel header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.evaluator-dashboard__panel h2 {
+  margin: 0;
+  font-size: 1.125rem;
+}
+
+.evaluator-dashboard__panel header a {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.evaluator-dashboard__list,
+.evaluator-dashboard__categories {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.evaluator-dashboard__list a {
+  display: grid;
+  gap: 0.25rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.evaluator-dashboard__list span,
+.evaluator-dashboard__table td span {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.evaluator-dashboard__categories li {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.evaluator-dashboard__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.evaluator-dashboard__table th,
+.evaluator-dashboard__table td {
+  padding: 0.75rem 0.5rem;
+  text-align: left;
+  border-bottom: 1px solid rgba(198, 197, 212, 0.2);
+}
+
+.evaluator-dashboard__empty {
+  margin: 0;
+  color: #6b7280;
+}

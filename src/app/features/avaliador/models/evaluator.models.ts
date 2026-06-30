@@ -69,3 +69,41 @@ export interface EvaluatorActivityDetail extends EvaluatorActivityQueueItem {
 export interface RejectActivityPayload {
   readonly rejectionReason: string;
 }
+
+export interface EvaluatorDashboardSummary {
+  readonly assignedTeacherCount: number;
+  readonly pendingCount: number;
+  readonly approvedLast30Days: number;
+  readonly rejectedLast30Days: number;
+}
+
+export interface EvaluatorDashboardTeacher {
+  readonly id: string;
+  readonly name: string;
+  readonly email: string;
+  readonly department: string | null;
+  readonly pendingCount: number;
+}
+
+export interface EvaluatorDashboardPendingActivity {
+  readonly id: string;
+  readonly title: string;
+  readonly teacherName: string;
+  readonly category: string;
+  readonly submittedAt: string | null;
+}
+
+export interface EvaluatorDashboardCategoryBreakdown {
+  readonly category: string;
+  readonly label: string;
+  readonly pendingCount: number;
+}
+
+export interface EvaluatorDashboardHomeData {
+  readonly displayName: string;
+  readonly summary: string;
+  readonly summaryStats: EvaluatorDashboardSummary;
+  readonly teachers: readonly EvaluatorDashboardTeacher[];
+  readonly pendingActivities: readonly EvaluatorDashboardPendingActivity[];
+  readonly categoryBreakdown: readonly EvaluatorDashboardCategoryBreakdown[];
+}

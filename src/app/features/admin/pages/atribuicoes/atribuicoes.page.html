@@ -1,0 +1,106 @@
+<section class="mx-auto w-full max-w-[80rem] space-y-8 pb-12 pt-6">
+  <header class="space-y-2">
+    <h1 class="m-0 text-[clamp(1.8rem,3vw,2.5rem)] tracking-[-0.04em] text-[#1a1c1d]">
+      Atribuições revisor-docente
+    </h1>
+    <p class="m-0 max-w-[44rem] leading-[1.55] text-[#6b7280]">
+      Vincule cada docente a um revisor. Atividades de docentes sem revisor não entram na fila de avaliação.
+    </p>
+  </header>
+
+  <div class="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_14rem]">
+    <app-input
+      [formControl]="queryControl"
+      label="Buscar docente"
+      placeholder="Nome ou e-mail..."
+      prefixIcon="search"
+      appearance="outline"
+    ></app-input>
+
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>Filtro</mat-label>
+      <mat-select [formControl]="unassignedControl">
+        <mat-option [value]="false">Todos os docentes</mat-option>
+        <mat-option [value]="true">Somente sem revisor</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <section class="assignments-table" aria-label="Atribuições revisor-docente">
+    @if (loading()) {
+      <div class="assignments-table__status" role="status">
+        <mat-progress-spinner diameter="44" mode="indeterminate"></mat-progress-spinner>
+      </div>
+    } @else if (loadError()) {
+      <div class="assignments-table__status assignments-table__status--error" role="alert">
+        <p>{{ loadError() }}</p>
+        <app-button variant="primary" size="small" label="Tentar novamente" (clicked)="retry()"></app-button>
+      </div>
+    } @else if (items().length === 0) {
+      <div class="assignments-table__status" role="status">
+        <p>Nenhum docente encontrado.</p>
+      </div>
+    } @else {
+      <table mat-table [dataSource]="items()" class="w-full">
+        <ng-container matColumnDef="teacher">
+          <th mat-header-cell *matHeaderCellDef>Docente</th>
+          <td mat-cell *matCellDef="let row">
+            <strong>{{ row.teacher.name }}</strong>
+            <span class="assignments-table__meta">{{ row.teacher.email }}</span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="department">
+          <th mat-header-cell *matHeaderCellDef>Departamento</th>
+          <td mat-cell *matCellDef="let row">{{ row.teacher.department ?? '—' }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="evaluator">
+          <th mat-header-cell *matHeaderCellDef>Revisor</th>
+          <td mat-cell *matCellDef="let row">
+            <mat-form-field appearance="outline" class="assignments-table__select">
+              <mat-label>Revisor</mat-label>
+              <mat-select
+                [value]="row.evaluator?.id ?? ''"
+                [disabled]="isSaving(row.teacher.id)"
+                (selectionChange)="onEvaluatorChange(row.teacher.id, $event.value)"
+              >
+                <mat-option value="">Sem revisor</mat-option>
+                @for (evaluator of evaluators(); track evaluator.id) {
+                  <mat-option [value]="evaluator.id">{{ evaluator.name }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Ações</th>
+          <td mat-cell *matCellDef="let row">
+            @if (row.evaluator) {
+              <app-button
+                variant="tertiary"
+                size="small"
+                label="Remover"
+                [disabled]="isSaving(row.teacher.id)"
+                (clicked)="unassign(row.teacher.id)"
+              ></app-button>
+            }
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      </table>
+
+      <footer class="assignments-table__footer">
+        <p>{{ total() }} docente(s)</p>
+        <app-pagination
+          [currentPage]="page()"
+          [totalPages]="totalPages()"
+          (pageChanged)="onPageChange($event)"
+        ></app-pagination>
+      </footer>
+    }
+  </section>
+</section>

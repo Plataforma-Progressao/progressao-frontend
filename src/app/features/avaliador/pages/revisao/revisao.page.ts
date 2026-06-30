@@ -106,7 +106,7 @@ export class EvaluatorReviewPage {
       .pipe(
         tap(() => {
           this.notificationService.success('Atividade aprovada com sucesso.');
-          void this.router.navigate(['/avaliador']);
+          void this.router.navigate(['/avaliador/fila']);
         }),
         catchError((error: unknown) => {
           this.notificationService.error(this.resolveError(error));
@@ -141,7 +141,7 @@ export class EvaluatorReviewPage {
       .pipe(
         tap(() => {
           this.notificationService.success('Atividade rejeitada.');
-          void this.router.navigate(['/avaliador']);
+          void this.router.navigate(['/avaliador/fila']);
         }),
         catchError((error: unknown) => {
           this.notificationService.error(this.resolveError(error));

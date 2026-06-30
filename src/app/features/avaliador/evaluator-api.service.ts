@@ -8,6 +8,7 @@ import {
   EvaluatorActivityDetail,
   PaginatedEvaluatorActivitiesResponse,
   RejectActivityPayload,
+  EvaluatorDashboardHomeData,
 } from './models/evaluator.models';
 import { ActivityDetailDto } from '../atividades/models/activity-create.models';
 
@@ -73,6 +74,14 @@ export class EvaluatorApiService {
 
   getEvidenceFileUrl(evidenceId: string): string {
     return `${this.apiBaseUrl}/evaluator/activities/evidences/${evidenceId}/file`;
+  }
+
+  getDashboardHome(): Observable<EvaluatorDashboardHomeData> {
+    return this.http
+      .get<ApiSuccessResponse<EvaluatorDashboardHomeData> | EvaluatorDashboardHomeData>(
+        `${this.apiBaseUrl}/evaluator/dashboard/home`,
+      )
+      .pipe(map((response) => this.unwrapData(response)));
   }
 
   private unwrapData<T>(response: ApiSuccessResponse<T> | T): T {

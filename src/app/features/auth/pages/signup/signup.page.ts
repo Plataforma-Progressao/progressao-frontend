@@ -205,7 +205,7 @@ export class SignupPage {
 
       try {
         await this.authStateService.register(registerPayload, { persist: true });
-        await this.router.navigate(['/dashboard']);
+        await this.router.navigateByUrl(this.authStateService.getDefaultRoute());
       } catch {
         this.submitError.set(
           'Não foi possível concluir o cadastro agora. Verifique os dados e tente novamente.',

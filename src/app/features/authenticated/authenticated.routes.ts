@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from '../../core/auth/auth.guard';
+import { defaultRouteGuard } from '../../core/auth/default-route.guard';
 import { roleGuard } from '../../core/auth/role.guard';
 
 export const routes: Routes = [
@@ -12,8 +13,9 @@ export const routes: Routes = [
     children: [
       {
         path: '',
-        redirectTo: 'dashboard',
-        pathMatch: 'full',
+        canMatch: [defaultRouteGuard],
+        loadComponent: () =>
+          import('../../core/auth/empty-route.component').then((m) => m.EmptyRouteComponent),
       },
       {
         path: 'dashboard',
