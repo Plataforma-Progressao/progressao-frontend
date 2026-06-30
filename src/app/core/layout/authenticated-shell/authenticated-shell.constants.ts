@@ -28,8 +28,8 @@ export const EVALUATOR_NAV_ITEMS: readonly AuthenticatedNavItem[] = [
 
 export const ADMIN_NAV_ITEMS: readonly AuthenticatedNavItem[] = [
   { label: 'Dashboard', icon: 'dashboard', route: '/admin' },
-  { label: 'Usuários', icon: 'group', route: '/admin/usuarios' },
   { label: 'Atribuições', icon: 'link', route: '/admin/atribuicoes' },
+  { label: 'Usuários', icon: 'group', route: '/admin/usuarios' },
   { label: 'Barema', icon: 'tune', route: '/admin/barema' },
 ] as const;
 

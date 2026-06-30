@@ -49,10 +49,6 @@ export class LoginPage {
     rememberMe: [DEFAULT_LOGIN_FORM_VALUES.rememberMe],
   });
 
-  constructor() {
-    void this.redirectAuthenticatedUser();
-  }
-
   protected async onSubmit(): Promise<void> {
     this.submitted.set(true);
     this.loginError.set(null);
@@ -75,6 +71,7 @@ export class LoginPage {
         },
       );
 
+      this.loading.set(false);
       await this.router.navigateByUrl(this.getReturnUrl());
     } catch {
       this.loginError.set('Credenciais inválidas. Verifique seu email e senha.');
@@ -84,12 +81,6 @@ export class LoginPage {
 
   protected togglePasswordVisibility(): void {
     this.hidePassword.update((current) => !current);
-  }
-
-  private async redirectAuthenticatedUser(): Promise<void> {
-    if (await this.authStateService.ensureSessionValid()) {
-      await this.router.navigateByUrl(this.getReturnUrl());
-    }
   }
 
   private getReturnUrl(): string {

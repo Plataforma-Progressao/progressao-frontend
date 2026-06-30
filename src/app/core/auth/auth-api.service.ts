@@ -20,7 +20,9 @@ import { getApiUrl } from '../config/runtime-config';
 export class AuthApiService {
   private readonly http = inject(HttpClient);
   private readonly apiBaseUrl = `${getApiUrl().replace(/\/+$/, '')}/api`;
-  private readonly authlessContext = new HttpContext().set(SKIP_AUTH, true);
+  private readonly authlessContext = new HttpContext()
+    .set(SKIP_AUTH, true)
+    .set(SKIP_ERROR_TOAST, true);
 
   login(credentials: AuthCredentials): Observable<AuthResponse> {
     return this.http

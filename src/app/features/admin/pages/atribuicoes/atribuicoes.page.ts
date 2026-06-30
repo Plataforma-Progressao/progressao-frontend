@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
@@ -20,7 +20,6 @@ import {
   selector: 'app-admin-assignments-page',
   imports: [
     ReactiveFormsModule,
-    RouterLink,
     MatFormFieldModule,
     MatSelectModule,
     MatTableModule,
@@ -50,12 +49,14 @@ export class AdminAssignmentsPage {
   protected readonly totalPages = signal(0);
 
   protected readonly queryControl = new FormControl('', { nonNullable: true });
-  protected readonly unassignedControl = new FormControl(false, { nonNullable: true });
+  protected readonly unassignedControl = new FormControl<'all' | 'unassigned'>('all', {
+    nonNullable: true,
+  });
 
   constructor() {
     const unassigned = this.route.snapshot.queryParamMap.get('unassigned') === 'true';
     if (unassigned) {
-      this.unassignedControl.setValue(true);
+      this.unassignedControl.setValue('unassigned');
     }
 
     this.queryControl.valueChanges
@@ -137,7 +138,7 @@ export class AdminAssignmentsPage {
         page: this.page(),
         pageSize: this.pageSize(),
         search: this.queryControl.value,
-        unassignedOnly: this.unassignedControl.value,
+        unassignedOnly: this.unassignedControl.value === 'unassigned',
       })
       .pipe(finalize(() => this.loading.set(false)))
       .subscribe({

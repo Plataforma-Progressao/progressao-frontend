@@ -28,6 +28,7 @@ export class AuthStateService {
   );
   private sessionValidationPromise: Promise<boolean> | null = null;
   private refreshSessionPromise: Promise<boolean> | null = null;
+  private sessionEpoch = 0;
 
   readonly session = this.sessionState.asReadonly();
   readonly currentUser = computed(() => this.session()?.user ?? null);
@@ -174,15 +175,20 @@ export class AuthStateService {
   }
 
   clearSession(): void {
+    this.sessionEpoch += 1;
     this.sessionState.set(null);
     this.tokenStorageService.clearSession();
     this.sessionValidationStatus.set('invalid');
+    this.sessionValidationPromise = null;
+    this.refreshSessionPromise = null;
   }
 
   private persistSession(session: AuthSession, persist: boolean): void {
+    this.sessionEpoch += 1;
     this.sessionState.set(session);
     this.tokenStorageService.saveSession(session, persist);
     this.sessionValidationStatus.set('valid');
+    this.sessionValidationPromise = null;
   }
 
   private createSession(response: AuthResponse, persistent: boolean): AuthSession {
@@ -226,12 +232,20 @@ export class AuthStateService {
   }
 
   private async validateStoredSession(): Promise<boolean> {
+    const epoch = this.sessionEpoch;
+    const accessToken = this.session()?.accessToken;
+
     try {
       const user = await firstValueFrom(this.authApiService.me());
+
+      if (this.sessionEpoch !== epoch) {
+        return this.sessionValidationStatus() === 'valid';
+      }
+
       const currentSession = this.session();
 
-      if (!currentSession) {
-        return false;
+      if (!currentSession || currentSession.accessToken !== accessToken) {
+        return this.sessionValidationStatus() === 'valid';
       }
 
       this.persistSession(
@@ -244,22 +258,37 @@ export class AuthStateService {
 
       return true;
     } catch {
+      if (this.sessionEpoch !== epoch) {
+        return false;
+      }
+
       this.clearSession();
       return false;
     }
   }
 
   private async refreshSessionInternal(currentSession: AuthSession): Promise<boolean> {
+    const epoch = this.sessionEpoch;
+
     try {
       const refreshedTokens = await firstValueFrom(
         this.authApiService.refresh(currentSession.refreshToken),
       );
+
+      if (this.sessionEpoch !== epoch) {
+        return this.sessionValidationStatus() === 'valid';
+      }
+
       this.persistSession(
         this.mergeSessionWithTokenPair(currentSession, refreshedTokens),
         currentSession.persistent,
       );
       return true;
     } catch {
+      if (this.sessionEpoch !== epoch) {
+        return false;
+      }
+
       this.clearSession();
       return false;
     }

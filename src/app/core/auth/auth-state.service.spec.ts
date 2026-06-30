@@ -53,6 +53,63 @@ describe('AuthStateService', () => {
     expect(localStorage.getItem('plataforma-progressao.auth.session')).toContain('access-token');
   });
 
+  it('keeps a fresh login when stale session validation fails afterwards', async () => {
+    localStorage.setItem(
+      'plataforma-progressao.auth.session',
+      JSON.stringify({
+        accessToken: 'stale-token',
+        refreshToken: 'stale-refresh-token',
+        user: {
+          id: '1',
+          email: 'manuel.rocha@universidade.br',
+          name: 'Dr. Manuel Rocha',
+          roles: ['USER'],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          title: 'Prof. Associado IV',
+          avatarInitials: 'MR',
+        },
+        issuedAt: new Date().toISOString(),
+        persistent: true,
+      }),
+    );
+
+    const staleService = TestBed.inject(AuthStateService);
+    const validationPromise = staleService.ensureSessionValid();
+
+    const loginPromise = staleService.login({
+      email: 'admin@progressao.uf.br',
+      password: 'Admin@123456',
+    });
+
+    const loginRequest = httpTestingController.expectOne('http://localhost:3000/api/auth/login');
+    loginRequest.flush({
+      success: true,
+      data: {
+        accessToken: 'new-access-token',
+        refreshToken: 'new-refresh-token',
+        user: {
+          id: '2',
+          email: 'admin@progressao.uf.br',
+          name: 'Admin',
+          roles: ['ADMIN'],
+          lattesUrl: null,
+          orcid: null,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+      },
+    });
+    await loginPromise;
+
+    const validationRequest = httpTestingController.expectOne('http://localhost:3000/api/users/me');
+    validationRequest.flush({}, { status: 401, statusText: 'Unauthorized' });
+
+    expect(await validationPromise).toBe(false);
+    expect(staleService.isAuthenticated()).toBe(true);
+    expect(staleService.getAccessToken()).toBe('new-access-token');
+  });
+
   it('clears invalid stored sessions during validation', async () => {
     localStorage.setItem(
       'plataforma-progressao.auth.session',

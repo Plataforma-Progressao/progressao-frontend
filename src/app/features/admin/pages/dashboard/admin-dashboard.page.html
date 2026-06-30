@@ -15,6 +15,21 @@
       [summary]="data.summary"
     />
 
+    <nav class="admin-dashboard__quick-links" aria-label="Ações administrativas">
+      <a routerLink="/admin/atribuicoes" class="admin-dashboard__quick-link">
+        <mat-icon>link</mat-icon>
+        <span>Atribuições revisor-docente</span>
+      </a>
+      <a routerLink="/admin/usuarios" class="admin-dashboard__quick-link">
+        <mat-icon>group</mat-icon>
+        <span>Usuários</span>
+      </a>
+      <a routerLink="/admin/barema" class="admin-dashboard__quick-link">
+        <mat-icon>tune</mat-icon>
+        <span>Barema</span>
+      </a>
+    </nav>
+
     @if (data.unassignedTeacherCount > 0 || data.orphanPendingActivityCount > 0) {
       <article class="admin-dashboard__alert" role="alert">
         <mat-icon>warning</mat-icon>

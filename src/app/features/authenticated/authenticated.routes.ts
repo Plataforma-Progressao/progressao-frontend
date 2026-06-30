@@ -13,6 +13,7 @@ export const routes: Routes = [
     children: [
       {
         path: '',
+        pathMatch: 'full',
         canMatch: [defaultRouteGuard],
         loadComponent: () =>
           import('../../core/auth/empty-route.component').then((m) => m.EmptyRouteComponent),
