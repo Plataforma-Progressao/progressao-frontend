@@ -8,19 +8,56 @@
   }
 
   <div class="dashboard-card__pillar-list">
-    @for (pillar of pillars(); track pillar.label) {
-      <div class="dashboard-card__pillar-row">
+    @for (pillar of pillarViews(); track pillar.label) {
+      <div
+        class="dashboard-card__pillar-row"
+        [class.dashboard-card__pillar-row--warning]="pillar.alertLevel === 'warning'"
+        [class.dashboard-card__pillar-row--danger]="pillar.alertLevel === 'danger'"
+      >
         <div class="dashboard-card__pillar-meta">
           <strong>{{ pillar.label }}</strong>
-          <span>{{ pillar.score }} pts ({{ pillar.percentage }}%)</span>
+          <span>
+            {{ pillar.score }} pts
+            @if (pillar.ceiling > 0) {
+              / {{ pillar.ceiling }} teto
+            }
+            ({{ pillar.percentage }}%)
+          </span>
         </div>
-        <div class="dashboard-card__pillar-track">
+
+        <div class="dashboard-card__pillar-track" aria-hidden="true">
           <span
             class="dashboard-card__pillar-value"
             [style.background]="pillar.accent"
             [style.width.%]="pillar.percentage"
           ></span>
         </div>
+
+        @if (pillar.ceiling > 0) {
+          <div class="dashboard-card__ceiling">
+            <div class="dashboard-card__ceiling-meta">
+              <span>Uso do teto</span>
+              <span>{{ pillar.ceilingPercentage }}%</span>
+            </div>
+            <div class="dashboard-card__ceiling-track">
+              <span
+                class="dashboard-card__ceiling-value"
+                [class.dashboard-card__ceiling-value--warning]="pillar.alertLevel === 'warning'"
+                [class.dashboard-card__ceiling-value--danger]="pillar.alertLevel === 'danger'"
+                [style.width.%]="pillar.ceilingPercentage"
+              ></span>
+            </div>
+            @if (pillar.atCeiling) {
+              <p class="dashboard-card__ceiling-alert dashboard-card__ceiling-alert--danger">
+                Teto do pilar atingido.
+              </p>
+            } @else if (pillar.alertLevel === 'warning') {
+              <p class="dashboard-card__ceiling-alert dashboard-card__ceiling-alert--warning">
+                Próximo do teto ({{ pillar.remaining }} pts restantes).
+              </p>
+            }
+          </div>
+        }
       </div>
     }
   </div>

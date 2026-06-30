@@ -11,11 +11,72 @@
     </div>
   </div>
 
-  <div class="dashboard-header__profile" aria-label="Perfil atual">
-    <div class="dashboard-header__avatar">{{ user()?.avatarInitials ?? 'PD' }}</div>
-    <div>
-      <strong>{{ userShortName() }}</strong>
-      <span>{{ userRole() }}</span>
-    </div>
+  <div class="dashboard-header__actions">
+    <button
+      type="button"
+      mat-icon-button
+      class="dashboard-header__notification-button"
+      [matMenuTriggerFor]="notificationsMenu"
+      aria-label="Notificações"
+      [matBadge]="badgeContent()"
+      [matBadgeHidden]="!showBadge()"
+      matBadgeColor="warn"
+      matBadgeSize="small"
+    >
+      <mat-icon>notifications</mat-icon>
+    </button>
+
+    <mat-menu #notificationsMenu="matMenu" class="dashboard-header__notifications-menu">
+      <div class="dashboard-header__notifications-header" role="presentation">
+        <strong>Notificações</strong>
+      </div>
+      @if (notifications().length === 0) {
+        <button mat-menu-item disabled type="button">Nenhuma notificação recente</button>
+      } @else {
+        @for (notification of notifications(); track notification.id) {
+          <button
+            mat-menu-item
+            type="button"
+            class="dashboard-header__notification-item"
+            [class]="notificationToneClass(notification.tone)"
+            [class.dashboard-header__notification-item--unread]="!notification.isRead"
+            (click)="onNotificationClick(notification)"
+          >
+            <mat-icon>{{ notification.icon ?? 'notifications' }}</mat-icon>
+            <span class="dashboard-header__notification-copy">
+              <strong>{{ notification.title }}</strong>
+              <span>{{ notification.message }}</span>
+            </span>
+          </button>
+        }
+      }
+    </mat-menu>
+
+    <button
+      type="button"
+      class="dashboard-header__profile"
+      [matMenuTriggerFor]="profileMenu"
+      aria-label="Menu do perfil"
+      aria-haspopup="menu"
+    >
+      <div class="dashboard-header__avatar">{{ user()?.avatarInitials ?? 'PD' }}</div>
+      <div class="dashboard-header__profile-text">
+        <strong>{{ userShortName() }}</strong>
+        <span>{{ userRole() }}</span>
+      </div>
+      <mat-icon class="dashboard-header__profile-chevron">expand_more</mat-icon>
+    </button>
+
+    <mat-menu #profileMenu="matMenu">
+      <a mat-menu-item routerLink="/configuracoes">
+        <mat-icon>settings</mat-icon>
+        <span>Configurações</span>
+      </a>
+      <mat-divider></mat-divider>
+      <button mat-menu-item type="button" (click)="onLogout()">
+        <mat-icon>logout</mat-icon>
+        <span>Sair</span>
+      </button>
+    </mat-menu>
   </div>
 </header>

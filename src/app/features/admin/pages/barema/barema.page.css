@@ -1,0 +1,72 @@
+.barema-summary {
+  align-items: baseline;
+  background: #ffffff;
+  border: 1px solid rgb(226 232 240 / 76%);
+  border-radius: 1rem;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+}
+
+.barema-summary p {
+  color: #6b7280;
+  margin: 0;
+}
+
+.barema-summary strong {
+  color: #1a237e;
+  font-size: 1.25rem;
+}
+
+.barema-panel {
+  background: #ffffff;
+  border: 1px solid rgb(226 232 240 / 76%);
+  border-radius: 1rem;
+  display: grid;
+  gap: 1rem;
+  padding: 1.25rem;
+}
+
+.barema-panel__header h2,
+.barema-table__header h2 {
+  color: #1a1c1d;
+  font-size: 1.125rem;
+  margin: 0;
+}
+
+.barema-panel__header p,
+.barema-table__header p,
+.barema-panel__hint {
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin: 0.25rem 0 0;
+}
+
+.barema-ceiling-form {
+  align-items: end;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+}
+
+.barema-table__header {
+  border-bottom: 1px solid rgb(226 232 240 / 76%);
+  padding: 1rem 1.25rem;
+}
+
+.barema-table {
+  width: 100%;
+}
+
+.barema-table th {
+  color: #6b7280;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.barema-table td {
+  color: #1a1c1d;
+  font-size: 0.875rem;
+}

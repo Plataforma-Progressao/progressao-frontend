@@ -1,0 +1,125 @@
+<section class="mx-auto w-full max-w-[80rem] space-y-8 pb-12 pt-6">
+  <header class="space-y-2">
+    <h1 class="m-0 text-[clamp(1.8rem,3vw,2.5rem)] tracking-[-0.04em] text-[#1a1c1d]">
+      Barema
+    </h1>
+    <p class="m-0 max-w-[44rem] leading-[1.55] text-[#6b7280]">
+      Consulte regras de atividades e ajuste tetos por pilar da configuração ativa.
+    </p>
+  </header>
+
+  @if (loading()) {
+    <div class="flex min-h-[20rem] items-center justify-center" role="status">
+      <mat-progress-spinner diameter="44" mode="indeterminate"></mat-progress-spinner>
+    </div>
+  } @else if (loadError()) {
+    <div class="flex min-h-[20rem] flex-col items-center justify-center gap-4 text-center" role="alert">
+      <p>{{ loadError() }}</p>
+      <app-button variant="primary" size="small" label="Tentar novamente" (clicked)="retry()"></app-button>
+    </div>
+  } @else {
+    <section class="barema-summary" aria-label="Meta de pontuação">
+      <p>Meta global de pontuação</p>
+      <strong>{{ scoreTarget() }} pts</strong>
+    </section>
+
+    <section class="barema-panel" aria-label="Tetos por pilar">
+      <header class="barema-panel__header">
+        <h2>Tetos por pilar</h2>
+        <p>Ajuste o teto e a meta mínima de cada categoria.</p>
+      </header>
+
+      <form class="barema-ceiling-form" [formGroup]="ceilingForm" (ngSubmit)="saveCategoryCeiling()">
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Pilar</mat-label>
+          <mat-select formControlName="category">
+            @for (category of categoryOptions; track category) {
+              <mat-option [value]="category">{{ categoryLabel(category) }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Teto (pts)</mat-label>
+          <input matInput type="number" min="0" formControlName="ceilingScore" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Meta mínima (pts)</mat-label>
+          <input matInput type="number" min="0" formControlName="minimumTarget" />
+        </mat-form-field>
+
+        <app-button
+          variant="primary"
+          label="Salvar tetos"
+          type="submit"
+          [loading]="savingCategory()"
+          [disabled]="savingCategory()"
+        ></app-button>
+      </form>
+
+      @if (selectedCategoryRule(); as rule) {
+        <p class="barema-panel__hint">
+          Base atual: {{ rule.baseScore }} pts · Multiplicador de carga: {{ rule.workloadMultiplier }}
+        </p>
+      }
+    </section>
+
+    <section
+      class="overflow-hidden rounded-xl bg-[var(--mat-sys-surface-container)] shadow-[0_0_0_1px_rgba(198,197,212,0.1),0_1px_2px_rgba(0,0,0,0.05)]"
+      aria-label="Regras de atividades"
+    >
+      <header class="barema-table__header">
+        <h2>Regras de atividades</h2>
+        <p>{{ activityRules().length }} regra(s) cadastrada(s)</p>
+      </header>
+
+      @if (activityRules().length === 0) {
+        <div class="flex min-h-[12rem] items-center justify-center p-8 text-center" role="status">
+          <p>Nenhuma regra de atividade cadastrada.</p>
+        </div>
+      } @else {
+        <table mat-table [dataSource]="activityRules()" class="barema-table" aria-label="Regras de atividades">
+          <ng-container matColumnDef="category">
+            <th mat-header-cell *matHeaderCellDef>Categoria</th>
+            <td mat-cell *matCellDef="let row">
+              <app-badge variant="info">{{ categoryLabel(row.category) }}</app-badge>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="kind">
+            <th mat-header-cell *matHeaderCellDef>Tipo</th>
+            <td mat-cell *matCellDef="let row">{{ row.kind }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="keywords">
+            <th mat-header-cell *matHeaderCellDef>Palavras-chave</th>
+            <td mat-cell *matCellDef="let row">{{ keywordsLabel(row) }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="fixedScore">
+            <th mat-header-cell *matHeaderCellDef>Pontuação fixa</th>
+            <td mat-cell *matCellDef="let row">{{ row.fixedScore ?? '—' }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="priority">
+            <th mat-header-cell *matHeaderCellDef>Prioridade</th>
+            <td mat-cell *matCellDef="let row">{{ row.priority }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="isActive">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let row">
+              <app-badge [variant]="row.isActive ? 'success' : 'secondary'">
+                {{ row.isActive ? 'Ativa' : 'Inativa' }}
+              </app-badge>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+        </table>
+      }
+    </section>
+  }
+</section>

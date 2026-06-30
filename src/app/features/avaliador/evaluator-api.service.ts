@@ -6,8 +6,12 @@ import { getApiUrl } from '../../core/config/runtime-config';
 import {
   EvaluatorActivitiesQuery,
   EvaluatorActivityDetail,
+  EvaluatorChecklistDetail,
+  EvaluatorChecklistListItem,
+  EvaluatorChecklistQuery,
   PaginatedEvaluatorActivitiesResponse,
   RejectActivityPayload,
+  RejectChecklistItemPayload,
   EvaluatorDashboardHomeData,
 } from './models/evaluator.models';
 import { ActivityDetailDto } from '../atividades/models/activity-create.models';
@@ -81,6 +85,53 @@ export class EvaluatorApiService {
       .get<ApiSuccessResponse<EvaluatorDashboardHomeData> | EvaluatorDashboardHomeData>(
         `${this.apiBaseUrl}/evaluator/dashboard/home`,
       )
+      .pipe(map((response) => this.unwrapData(response)));
+  }
+
+  listChecklist(query: EvaluatorChecklistQuery = {}): Observable<readonly EvaluatorChecklistListItem[]> {
+    let params = new HttpParams();
+
+    if (query.teacherId) {
+      params = params.set('teacherId', query.teacherId);
+    }
+
+    if (query.status) {
+      params = params.set('status', query.status);
+    }
+
+    return this.http
+      .get<
+        ApiSuccessResponse<readonly EvaluatorChecklistListItem[]> | readonly EvaluatorChecklistListItem[]
+      >(`${this.apiBaseUrl}/evaluator/checklist`, { params })
+      .pipe(map((response) => this.unwrapData(response)));
+  }
+
+  getChecklistItem(itemId: string): Observable<EvaluatorChecklistDetail> {
+    return this.http
+      .get<ApiSuccessResponse<EvaluatorChecklistDetail> | EvaluatorChecklistDetail>(
+        `${this.apiBaseUrl}/evaluator/checklist/${itemId}`,
+      )
+      .pipe(map((response) => this.unwrapData(response)));
+  }
+
+  approveChecklistItem(itemId: string): Observable<{ id: string; status: string }> {
+    return this.http
+      .post<ApiSuccessResponse<{ id: string; status: string }> | { id: string; status: string }>(
+        `${this.apiBaseUrl}/evaluator/checklist/${itemId}/approve`,
+        {},
+      )
+      .pipe(map((response) => this.unwrapData(response)));
+  }
+
+  rejectChecklistItem(
+    itemId: string,
+    payload: RejectChecklistItemPayload,
+  ): Observable<{ id: string; status: string; note: string | null }> {
+    return this.http
+      .post<
+        | ApiSuccessResponse<{ id: string; status: string; note: string | null }>
+        | { id: string; status: string; note: string | null }
+      >(`${this.apiBaseUrl}/evaluator/checklist/${itemId}/reject`, payload)
       .pipe(map((response) => this.unwrapData(response)));
   }
 

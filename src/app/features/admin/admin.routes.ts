@@ -21,4 +21,9 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./pages/atribuicoes/atribuicoes.page').then((m) => m.AdminAssignmentsPage),
   },
+  {
+    path: 'barema',
+    loadComponent: () =>
+      import('./pages/barema/barema.page').then((m) => m.AdminBaremaPage),
+  },
 ];

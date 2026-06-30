@@ -18,7 +18,11 @@
     <app-authenticated-header
       [user]="currentUser()"
       [mobileMenuOpened]="mobileMenuOpened()"
+      [unreadCount]="unreadCount()"
+      [notifications]="recentNotifications()"
       (menuToggle)="toggleMobileMenu()"
+      (logoutRequested)="logout()"
+      (notificationRead)="markNotificationRead($event)"
     />
 
     <main class="dashboard-shell__main">

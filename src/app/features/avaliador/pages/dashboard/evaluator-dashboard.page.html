@@ -24,6 +24,11 @@
         <p>Pendentes na fila</p>
         <strong>{{ data.summaryStats.pendingCount }}</strong>
       </article>
+      <article class="evaluator-dashboard__card evaluator-dashboard__card--checklist">
+        <p>Checklist pendente</p>
+        <strong>{{ data.summaryStats.pendingChecklistCount }}</strong>
+        <a routerLink="/avaliador/checklist">Revisar checklist</a>
+      </article>
       <article class="evaluator-dashboard__card">
         <p>Aprovadas (30 dias)</p>
         <strong>{{ data.summaryStats.approvedLast30Days }}</strong>

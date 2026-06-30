@@ -60,6 +60,64 @@ h2 {
   height: 100%;
 }
 
+.dashboard-card__ceiling {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.dashboard-card__ceiling-meta {
+  align-items: center;
+  color: #6b7280;
+  display: flex;
+  font-size: 0.75rem;
+  justify-content: space-between;
+}
+
+.dashboard-card__ceiling-track {
+  background: #f1f5f9;
+  border-radius: 999px;
+  height: 0.45rem;
+  overflow: hidden;
+}
+
+.dashboard-card__ceiling-value {
+  background: #64748b;
+  border-radius: inherit;
+  display: block;
+  height: 100%;
+}
+
+.dashboard-card__ceiling-value--warning {
+  background: #d97706;
+}
+
+.dashboard-card__ceiling-value--danger {
+  background: #dc2626;
+}
+
+.dashboard-card__ceiling-alert {
+  font-size: 0.75rem;
+  margin: 0;
+}
+
+.dashboard-card__ceiling-alert--warning {
+  color: #b45309;
+}
+
+.dashboard-card__ceiling-alert--danger {
+  color: #b91c1c;
+}
+
+.dashboard-card__pillar-row--warning {
+  border-left: 3px solid #f59e0b;
+  padding-left: 0.75rem;
+}
+
+.dashboard-card__pillar-row--danger {
+  border-left: 3px solid #ef4444;
+  padding-left: 0.75rem;
+}
+
 @media (max-width: 47.99rem) {
   .dashboard-card__pillar-meta {
     align-items: start;

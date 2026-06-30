@@ -1,0 +1,87 @@
+<section class="review mx-auto w-full max-w-[72rem] space-y-8 pb-12 pt-6">
+  <a routerLink="/avaliador/checklist" class="review__back">
+    <mat-icon>arrow_back</mat-icon>
+    Voltar para checklist
+  </a>
+
+  @if (loading()) {
+    <div class="review__status" role="status">Carregando item...</div>
+  } @else if (loadError()) {
+    <div class="review__status review__status--error" role="alert">{{ loadError() }}</div>
+  } @else if (item(); as current) {
+    <header class="review__header">
+      <div class="space-y-2">
+        <h1 class="m-0 text-[clamp(1.6rem,3vw,2.2rem)]">{{ current.template.title }}</h1>
+        <app-status-indicator
+          [status]="statusIndicator(current.status)"
+          [label]="statusLabel(current.status)"
+        ></app-status-indicator>
+      </div>
+      @if (canReview()) {
+        <div class="review__actions">
+          <app-button
+            variant="primary"
+            label="Aprovar"
+            [loading]="saving()"
+            [disabled]="saving()"
+            (clicked)="approve()"
+          ></app-button>
+          <app-button
+            variant="danger"
+            label="Rejeitar"
+            [loading]="saving()"
+            [disabled]="saving()"
+            (clicked)="reject()"
+          ></app-button>
+        </div>
+      }
+    </header>
+
+    <div class="review__grid">
+      <article class="review__card">
+        <h2>Docente</h2>
+        <p><strong>{{ current.teacher.name }}</strong></p>
+        <p>{{ current.teacher.email }}</p>
+        <p>{{ current.teacher.department ?? 'Departamento não informado' }}</p>
+      </article>
+
+      <article class="review__card">
+        <h2>Item do checklist</h2>
+        <p>{{ current.template.description }}</p>
+        <p>Categoria: {{ current.template.category }}</p>
+        @if (current.submittedAt) {
+          <p>Enviado em: {{ current.submittedAt | date: 'dd/MM/yyyy HH:mm' }}</p>
+        }
+      </article>
+    </div>
+
+    @if (current.note) {
+      <article class="review__card">
+        <h2>Observação anterior</h2>
+        <p>{{ current.note }}</p>
+      </article>
+    }
+
+    @if (showRejectForm() && canReview()) {
+      <article class="review__card">
+        <h2>Motivo da rejeição</h2>
+        <app-textarea
+          [formControl]="rejectReasonControl"
+          label="Descreva o que precisa ser ajustado"
+          [rows]="4"
+          requiredErrorMessage="Informe o motivo da rejeição."
+          minLengthErrorMessage="O motivo precisa ter pelo menos 4 caracteres."
+        ></app-textarea>
+        <div class="review__actions">
+          <app-button
+            variant="danger"
+            label="Confirmar rejeição"
+            [loading]="saving()"
+            [disabled]="saving()"
+            (clicked)="confirmReject()"
+          ></app-button>
+        </div>
+      </article>
+    }
+  }
+</section>

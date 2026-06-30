@@ -12,6 +12,16 @@ export const routes: Routes = [
       import('./pages/fila/fila.page').then((m) => m.EvaluatorQueuePage),
   },
   {
+    path: 'checklist',
+    loadComponent: () =>
+      import('./pages/checklist-lista/checklist-lista.page').then((m) => m.EvaluatorChecklistListPage),
+  },
+  {
+    path: 'checklist/:id',
+    loadComponent: () =>
+      import('./pages/checklist-revisao/checklist-revisao.page').then((m) => m.EvaluatorChecklistReviewPage),
+  },
+  {
     path: 'atividades/:id',
     loadComponent: () =>
       import('./pages/revisao/revisao.page').then((m) => m.EvaluatorReviewPage),

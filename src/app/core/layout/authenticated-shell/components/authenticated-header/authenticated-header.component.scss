@@ -7,9 +7,9 @@
   background: rgb(255 255 255 / 82%);
   backdrop-filter: blur(20px);
   border-bottom: 1px solid rgb(226 232 240 / 80%);
-  display: grid;
+  display: flex;
   gap: 1rem;
-  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  justify-content: space-between;
   padding-top: max(1rem, env(safe-area-inset-top));
   padding-bottom: 1rem;
   padding-left: max(clamp(1rem, 2vw, 1.5rem), env(safe-area-inset-left));
@@ -117,9 +117,40 @@
 
 .dashboard-header__profile {
   align-items: center;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
   display: flex;
   gap: 0.75rem;
-  margin-left: auto; 
+  padding: 0.25rem 0.5rem 0.25rem 0.25rem;
+  border-radius: 999px;
+  text-align: left;
+
+  &:hover {
+    background: rgb(26 35 126 / 6%);
+  }
+}
+
+.dashboard-header__profile-text strong,
+.dashboard-header__profile-text span {
+  display: block;
+}
+
+.dashboard-header__profile-text strong {
+  color: #1a1c1d;
+  font-size: 0.92rem;
+}
+
+.dashboard-header__profile-text span {
+  color: #6b7280;
+  font-size: 0.78rem;
+}
+
+.dashboard-header__profile-chevron {
+  color: #6b7280;
+  font-size: 1.25rem;
+  height: 1.25rem;
+  width: 1.25rem;
 }
 
 .dashboard-header__avatar {
@@ -151,13 +182,61 @@
   font-size: 0.78rem;
 }
 
+.dashboard-header__notifications-header {
+  color: #1a1c1d;
+  font-size: 0.875rem;
+  padding: 0.5rem 1rem;
+}
+
+.dashboard-header__notification-item {
+  align-items: flex-start;
+  max-width: 20rem;
+  white-space: normal;
+}
+
+.dashboard-header__notification-copy {
+  display: grid;
+  gap: 0.125rem;
+  text-align: left;
+}
+
+.dashboard-header__notification-copy strong {
+  color: #1a1c1d;
+  font-size: 0.8125rem;
+}
+
+.dashboard-header__notification-copy span {
+  color: #6b7280;
+  font-size: 0.75rem;
+  line-height: 1.35;
+}
+
+.dashboard-header__notification-item--unread {
+  background: rgb(26 35 126 / 4%);
+}
+
+.dashboard-header__notification-item--success mat-icon {
+  color: #15803d;
+}
+
+.dashboard-header__notification-item--warning mat-icon {
+  color: #b45309;
+}
+
+.dashboard-header__notification-item--error mat-icon {
+  color: #b91c1c;
+}
+
+.dashboard-header__notification-item--info mat-icon {
+  color: #1a237e;
+}
+
 @media (max-width: 63.99rem) {
-  .dashboard-header {
-    grid-template-columns: auto minmax(0, 1fr) auto;
+  .dashboard-header__profile-text {
+    display: none;
   }
 
-  .dashboard-header__search-wrapper,
-  .dashboard-header__profile {
+  .dashboard-header__profile-chevron {
     display: none;
   }
 }

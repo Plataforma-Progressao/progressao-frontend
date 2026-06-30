@@ -2,7 +2,9 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { provideRouter } from '@angular/router';
 import { vi } from 'vitest';
+import { of } from 'rxjs';
 import { AuthStateService } from '../../auth/auth-state.service';
+import { UserNotificationsApiService } from '../../notifications/user-notifications-api.service';
 import { AuthenticatedShellComponent } from './authenticated-shell.component';
 
 describe('AuthenticatedShellComponent', () => {
@@ -23,6 +25,13 @@ describe('AuthenticatedShellComponent', () => {
     logout: vi.fn(() => new Promise<void>(() => undefined)),
   };
 
+  const notificationsApiMock = {
+    list: vi.fn(() => of({ items: [], total: 0, page: 1, pageSize: 5, totalPages: 0 })),
+    unreadCount: vi.fn(() => of({ count: 0 })),
+    markRead: vi.fn(() => of({})),
+    markAllRead: vi.fn(() => of({ updated: 0 })),
+  };
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [AuthenticatedShellComponent],
@@ -31,6 +40,10 @@ describe('AuthenticatedShellComponent', () => {
         {
           provide: AuthStateService,
           useValue: authStateServiceMock,
+        },
+        {
+          provide: UserNotificationsApiService,
+          useValue: notificationsApiMock,
         },
       ],
     }).compileComponents();

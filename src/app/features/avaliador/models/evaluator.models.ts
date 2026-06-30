@@ -70,11 +70,54 @@ export interface RejectActivityPayload {
   readonly rejectionReason: string;
 }
 
+export type ChecklistItemStatus = 'PENDING' | 'ATTENTION' | 'COMPLETED';
+
 export interface EvaluatorDashboardSummary {
   readonly assignedTeacherCount: number;
   readonly pendingCount: number;
+  readonly pendingChecklistCount: number;
   readonly approvedLast30Days: number;
   readonly rejectedLast30Days: number;
+}
+
+export interface EvaluatorChecklistTeacher {
+  readonly id: string;
+  readonly name: string;
+  readonly email: string;
+  readonly department: string | null;
+}
+
+export interface EvaluatorChecklistTemplate {
+  readonly id: string;
+  readonly title: string;
+  readonly description: string;
+  readonly category: string;
+}
+
+export interface EvaluatorChecklistListItem {
+  readonly id: string;
+  readonly status: ChecklistItemStatus;
+  readonly note: string | null;
+  readonly submittedAt: string | null;
+  readonly teacher: EvaluatorChecklistTeacher;
+  readonly template: EvaluatorChecklistTemplate;
+}
+
+export interface EvaluatorChecklistDetail extends EvaluatorChecklistListItem {
+  readonly reviewedAt: string | null;
+  readonly template: EvaluatorChecklistTemplate & {
+    readonly createdAt?: string;
+    readonly updatedAt?: string;
+  };
+}
+
+export interface EvaluatorChecklistQuery {
+  readonly teacherId?: string;
+  readonly status?: ChecklistItemStatus;
+}
+
+export interface RejectChecklistItemPayload {
+  readonly note: string;
 }
 
 export interface EvaluatorDashboardTeacher {

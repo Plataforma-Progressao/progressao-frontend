@@ -16,6 +16,15 @@ import {
   PaginatedEvaluatorAssignmentsResponse,
   UpdateAdminUserRolesPayload,
 } from './models/admin.models';
+import {
+  BaremaActivityRule,
+  BaremaCategoryRule,
+  BaremaConfig,
+  CreateBaremaActivityRulePayload,
+  UpdateBaremaActivityRulePayload,
+  UpdateBaremaCategoryRulePayload,
+  UpdateBaremaConfigPayload,
+} from './models/barema.models';
 
 @Injectable({ providedIn: 'root' })
 export class AdminApiService {
@@ -114,6 +123,74 @@ export class AdminApiService {
     return this.http
       .delete<ApiSuccessResponse<EvaluatorAssignmentListItem> | EvaluatorAssignmentListItem>(
         `${this.apiBaseUrl}/admin/evaluator-assignments/${teacherId}`,
+      )
+      .pipe(map((response) => this.unwrapData(response)));
+  }
+
+  getBaremaConfig(): Observable<BaremaConfig> {
+    return this.http
+      .get<ApiSuccessResponse<BaremaConfig> | BaremaConfig>(
+        `${this.apiBaseUrl}/admin/barema/config`,
+      )
+      .pipe(map((response) => this.unwrapData(response)));
+  }
+
+  updateBaremaConfig(payload: UpdateBaremaConfigPayload): Observable<BaremaConfig> {
+    return this.http
+      .patch<ApiSuccessResponse<BaremaConfig> | BaremaConfig>(
+        `${this.apiBaseUrl}/admin/barema/config`,
+        payload,
+      )
+      .pipe(map((response) => this.unwrapData(response)));
+  }
+
+  updateBaremaCategoryRule(
+    category: string,
+    payload: UpdateBaremaCategoryRulePayload,
+  ): Observable<BaremaCategoryRule> {
+    return this.http
+      .patch<ApiSuccessResponse<BaremaCategoryRule> | BaremaCategoryRule>(
+        `${this.apiBaseUrl}/admin/barema/category-rules/${category}`,
+        payload,
+      )
+      .pipe(map((response) => this.unwrapData(response)));
+  }
+
+  listBaremaActivityRules(): Observable<readonly BaremaActivityRule[]> {
+    return this.http
+      .get<ApiSuccessResponse<readonly BaremaActivityRule[]> | readonly BaremaActivityRule[]>(
+        `${this.apiBaseUrl}/admin/barema/activity-rules`,
+      )
+      .pipe(map((response) => this.unwrapData(response)));
+  }
+
+  createBaremaActivityRule(
+    payload: CreateBaremaActivityRulePayload,
+  ): Observable<BaremaActivityRule> {
+    return this.http
+      .post<ApiSuccessResponse<BaremaActivityRule> | BaremaActivityRule>(
+        `${this.apiBaseUrl}/admin/barema/activity-rules`,
+        payload,
+      )
+      .pipe(map((response) => this.unwrapData(response)));
+  }
+
+  updateBaremaActivityRule(
+    id: string,
+    payload: UpdateBaremaActivityRulePayload,
+  ): Observable<BaremaActivityRule> {
+    return this.http
+      .patch<ApiSuccessResponse<BaremaActivityRule> | BaremaActivityRule>(
+        `${this.apiBaseUrl}/admin/barema/activity-rules/${id}`,
+        payload,
+      )
+      .pipe(map((response) => this.unwrapData(response)));
+  }
+
+  deleteBaremaActivityRule(id: string): Observable<{ id: string }> {
+    return this.http
+      .delete<ApiSuccessResponse<{ id: string }> | { id: string }>(
+        `${this.apiBaseUrl}/admin/barema/activity-rules/${id}`,
       )
       .pipe(map((response) => this.unwrapData(response)));
   }

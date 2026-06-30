@@ -35,6 +35,22 @@
   color: #c2410c;
 }
 
+.evaluator-dashboard__card--checklist {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.evaluator-dashboard__card--checklist strong {
+  color: #1a237e;
+}
+
+.evaluator-dashboard__card--checklist a {
+  color: #1a237e;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
 .evaluator-dashboard__columns {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));

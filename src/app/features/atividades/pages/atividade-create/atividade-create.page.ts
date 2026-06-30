@@ -34,10 +34,13 @@ import { ActivitiesApiService } from '../../activities-api.service';
 import { ActivityChangeLogComponent } from '../../components/activity-change-log/activity-change-log.component';
 import {
   ActivityCategoryCode,
+  ActivityClassificationResult,
   ActivityCreatePayload,
   ActivityChangeLogEntry,
   ActivityDetailDto,
   ActivityScoreEstimate,
+  ClassificationConfidence,
+  OptimizeClassificationCandidate,
 } from '../../models/activity-create.models';
 import { ButtonComponent } from '../../../../shared/components/base/button/button.component';
 import { InputComponent } from '../../../../shared/components/base/input/input.component';
@@ -84,6 +87,14 @@ export class ActivityCreatePage {
   private readonly activitiesApi = inject(ActivitiesApiService);
   private readonly dashboardApi = inject(DashboardApiService);
   private readonly estimateRequestToken = signal(0);
+  private readonly classificationRequestToken = signal(0);
+
+  protected readonly matchedRuleId = signal<string | null>(null);
+  protected readonly suggestionDismissed = signal(false);
+  protected readonly showAlternatives = signal(false);
+  protected readonly isClassifying = signal(false);
+  protected readonly classification = signal<ActivityClassificationResult | null>(null);
+  protected readonly optimizeCandidates = signal<readonly OptimizeClassificationCandidate[]>([]);
 
   protected readonly categoriaOptions: readonly CategoryOption[] = [
     { label: 'Ensino', value: 'TEACHING' },
@@ -119,10 +130,20 @@ export class ActivityCreatePage {
     level: string;
   } | null>(null);
   protected readonly scoreEstimate = signal<ActivityScoreEstimate>({
-    baseCategory: 15,
-    workloadFactor: 2.5,
-    totalImpact: 17.5,
-    progressPercentage: 12,
+    baseCategory: 0,
+    workloadFactor: 0,
+    totalImpact: 0,
+    progressPercentage: 0,
+  });
+
+  protected readonly showSuggestionPanel = computed(() => {
+    const result = this.classification();
+    return !this.suggestionDismissed() && result !== null && !this.isEditing();
+  });
+
+  protected readonly confidenceLabel = computed(() => {
+    const confidence = this.classification()?.confidence;
+    return confidence ? this.confidenceText(confidence) : '';
   });
 
   protected readonly isEditing = computed(() => this.activityId() !== null);
@@ -167,7 +188,10 @@ export class ActivityCreatePage {
 
     this.form.valueChanges
       .pipe(debounceTime(350), takeUntilDestroyed())
-      .subscribe(() => this.recomputeEstimate());
+      .subscribe(() => {
+        this.recomputeEstimate();
+        this.recomputeClassification();
+      });
 
     this.route.paramMap
       .pipe(
@@ -200,6 +224,11 @@ export class ActivityCreatePage {
         this.changeLogError.set(null);
         this.changeLogEntries.set([]);
         this.careerSummary.set(null);
+        this.matchedRuleId.set(null);
+        this.classification.set(null);
+        this.optimizeCandidates.set([]);
+        this.suggestionDismissed.set(false);
+        this.showAlternatives.set(false);
         this.recomputeEstimate();
       });
   }
@@ -279,6 +308,7 @@ export class ActivityCreatePage {
       score: this.scoreEstimate().totalImpact,
       kind: raw.tipo.trim() || undefined,
       term: raw.periodo.trim() || undefined,
+      ...(this.matchedRuleId() ? { matchedRuleId: this.matchedRuleId() as string } : {}),
     };
 
     this.submitting.set(true);
@@ -319,6 +349,62 @@ export class ActivityCreatePage {
       this.snackBar.open(message, 'Fechar', { duration: 4500 });
     } finally {
       this.submitting.set(false);
+    }
+  }
+
+  protected acceptSuggestion(): void {
+    const result = this.classification();
+    if (!result) {
+      return;
+    }
+
+    this.form.patchValue(
+      {
+        categoria: result.suggestedCategory,
+        tipo: result.suggestedKind,
+      },
+      { emitEvent: false },
+    );
+    this.matchedRuleId.set(result.matchedRuleId);
+    this.suggestionDismissed.set(true);
+    this.recomputeEstimate();
+  }
+
+  protected dismissSuggestion(): void {
+    this.suggestionDismissed.set(true);
+  }
+
+  protected toggleAlternatives(): void {
+    this.showAlternatives.update((current) => !current);
+  }
+
+  protected selectAlternative(candidate: OptimizeClassificationCandidate): void {
+    this.form.patchValue(
+      {
+        categoria: candidate.category,
+        tipo: candidate.kind,
+      },
+      { emitEvent: false },
+    );
+    this.matchedRuleId.set(candidate.ruleId);
+    this.suggestionDismissed.set(true);
+    this.showAlternatives.set(false);
+    this.recomputeEstimate();
+  }
+
+  protected categoryLabel(category: ActivityCategoryCode): string {
+    const option = this.categoriaOptions.find((item) => item.value === category);
+    return option?.label ?? category;
+  }
+
+  protected confidenceClass(confidence: ClassificationConfidence): string {
+    switch (confidence) {
+      case 'HIGH':
+        return 'text-[#15803d]';
+      case 'MEDIUM':
+        return 'text-[#b45309]';
+      default:
+        return 'text-[#6b7280]';
     }
   }
 
@@ -457,9 +543,9 @@ export class ActivityCreatePage {
     if (!category || cargaHoraria <= 0) {
       this.isEstimating.set(false);
       this.scoreEstimate.set({
-        baseCategory: this.baseScoreForCategory(category as ActivityCategoryCode | ''),
+        baseCategory: 0,
         workloadFactor: 0,
-        totalImpact: this.baseScoreForCategory(category as ActivityCategoryCode | ''),
+        totalImpact: 0,
         progressPercentage: 0,
       });
       return;
@@ -469,13 +555,24 @@ export class ActivityCreatePage {
     const currentToken = this.estimateRequestToken();
     this.isEstimating.set(true);
 
+    const matchedRuleId = this.matchedRuleId();
+    const estimatePayload = {
+      category: category as ActivityCategoryCode,
+      workloadHours: cargaHoraria,
+      ...(matchedRuleId ? { matchedRuleId } : {}),
+    };
+
     this.activitiesApi
-      .estimateScore({ category, workloadHours: cargaHoraria })
+      .estimateScore(estimatePayload)
       .pipe(
         catchError(() => {
-          const fallback = this.calculateFallbackEstimate(category, cargaHoraria);
           if (this.estimateRequestToken() === currentToken) {
-            this.scoreEstimate.set(fallback);
+            this.scoreEstimate.set({
+              baseCategory: 0,
+              workloadFactor: 0,
+              totalImpact: 0,
+              progressPercentage: 0,
+            });
             this.isEstimating.set(false);
           }
           return EMPTY;
@@ -487,8 +584,89 @@ export class ActivityCreatePage {
         }
 
         this.scoreEstimate.set(estimate);
+        if (estimate.matchedRuleId) {
+          this.matchedRuleId.set(estimate.matchedRuleId);
+        }
         this.isEstimating.set(false);
       });
+  }
+
+  private recomputeClassification(): void {
+    if (this.isEditing()) {
+      return;
+    }
+
+    const title = this.form.controls.titulo.value.trim();
+    const workloadHours = parseDurationToHours(this.form.controls.cargaHoraria.value);
+
+    if (title.length < 4 || workloadHours <= 0) {
+      this.classification.set(null);
+      this.optimizeCandidates.set([]);
+      this.showAlternatives.set(false);
+      return;
+    }
+
+    const payload = {
+      title,
+      description: this.form.controls.descricao.value.trim() || undefined,
+      kind: this.form.controls.tipo.value.trim() || undefined,
+      workloadHours,
+    };
+
+    this.classificationRequestToken.update((token) => token + 1);
+    const currentToken = this.classificationRequestToken();
+    this.isClassifying.set(true);
+
+    this.activitiesApi
+      .classify(payload)
+      .pipe(
+        catchError(() => {
+          if (this.classificationRequestToken() === currentToken) {
+            this.classification.set(null);
+            this.optimizeCandidates.set([]);
+            this.isClassifying.set(false);
+          }
+          return EMPTY;
+        }),
+      )
+      .subscribe((result) => {
+        if (this.classificationRequestToken() !== currentToken) {
+          return;
+        }
+
+        this.classification.set(result);
+        this.isClassifying.set(false);
+
+        this.activitiesApi.optimizeClassification(payload).pipe(
+          catchError(() => {
+            this.optimizeCandidates.set([]);
+            this.showAlternatives.set(false);
+            return EMPTY;
+          }),
+        ).subscribe((optimized) => {
+          if (this.classificationRequestToken() !== currentToken) {
+            return;
+          }
+
+          if (optimized.isAmbiguous) {
+            this.optimizeCandidates.set(optimized.candidates);
+          } else {
+            this.optimizeCandidates.set([]);
+            this.showAlternatives.set(false);
+          }
+        });
+      });
+  }
+
+  private confidenceText(confidence: ClassificationConfidence): string {
+    switch (confidence) {
+      case 'HIGH':
+        return 'Alta confiança';
+      case 'MEDIUM':
+        return 'Confiança média';
+      default:
+        return 'Baixa confiança';
+    }
   }
 
   private loadActivity(activityId: string): void {
@@ -567,8 +745,8 @@ export class ActivityCreatePage {
     );
 
     this.scoreEstimate.set({
-      baseCategory: this.baseScoreForCategory(activity.category),
-      workloadFactor: Math.max(0, Number((activity.workloadHours * 0.0625).toFixed(1))),
+      baseCategory: 0,
+      workloadFactor: 0,
       totalImpact: Number(activity.score.toFixed(1)),
       progressPercentage: Math.min(100, Math.round((activity.score / 150) * 100)),
     });
@@ -580,38 +758,6 @@ export class ActivityCreatePage {
     const message = this.resolveHttpError(error, 'Falha ao remover comprovante no servidor.');
     this.snackBar.open(message, 'Fechar', { duration: 4000 });
     return EMPTY;
-  }
-
-  private calculateFallbackEstimate(
-    categoria: ActivityCategoryCode,
-    cargaHoraria: number,
-  ): ActivityScoreEstimate {
-    const baseCategory = this.baseScoreForCategory(categoria);
-    const workloadFactor = Math.max(0, Number((cargaHoraria * 0.0625).toFixed(1)));
-    const totalImpact = Number((baseCategory + workloadFactor).toFixed(1));
-    const progressPercentage = Math.min(100, Math.round((totalImpact / 150) * 100));
-
-    return {
-      baseCategory,
-      workloadFactor,
-      totalImpact,
-      progressPercentage,
-    };
-  }
-
-  private baseScoreForCategory(categoria: ActivityCategoryCode | ''): number {
-    switch (categoria) {
-      case 'TEACHING':
-        return 10;
-      case 'RESEARCH':
-        return 15;
-      case 'OUTREACH':
-        return 12;
-      case 'MANAGEMENT':
-        return 8;
-      default:
-        return 0;
-    }
   }
 
   private isAllowedFile(file: File): boolean {

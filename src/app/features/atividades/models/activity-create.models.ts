@@ -50,6 +50,50 @@ export interface ActivityCreatePayload {
   readonly score: number;
   readonly term?: string;
   readonly kind?: string;
+  readonly matchedRuleId?: string;
+}
+
+export type ClassificationConfidence = 'HIGH' | 'MEDIUM' | 'LOW';
+
+export interface ClassificationCandidate {
+  readonly ruleId: string;
+  readonly category: ActivityCategoryCode;
+  readonly kind: string;
+  readonly score: number;
+  readonly confidence: ClassificationConfidence;
+  readonly matchedKeywords: readonly string[];
+}
+
+export interface ActivityClassificationResult {
+  readonly suggestedCategory: ActivityCategoryCode;
+  readonly suggestedKind: string;
+  readonly suggestedScore: number;
+  readonly matchedRuleId: string | null;
+  readonly confidence: ClassificationConfidence;
+  readonly alternatives: readonly ClassificationCandidate[];
+}
+
+export interface ClassifyActivityRequest {
+  readonly title: string;
+  readonly description?: string;
+  readonly kind?: string;
+  readonly workloadHours: number;
+}
+
+export interface OptimizeClassificationCandidate {
+  readonly ruleId: string;
+  readonly category: ActivityCategoryCode;
+  readonly kind: string;
+  readonly score: number;
+  readonly pillarImpact: number;
+  readonly headroom: number;
+  readonly totalImpact: number;
+  readonly rationale: string;
+}
+
+export interface OptimizeClassificationResult {
+  readonly isAmbiguous: boolean;
+  readonly candidates: readonly OptimizeClassificationCandidate[];
 }
 
 export interface ActivityCreateResponse extends ActivityListItemDto {}
@@ -67,11 +111,13 @@ export interface ActivityScoreEstimate {
   readonly workloadFactor: number;
   readonly totalImpact: number;
   readonly progressPercentage: number;
+  readonly matchedRuleId?: string | null;
 }
 
 export interface ActivityScoreEstimateRequest {
   readonly category: ActivityCategoryCode;
   readonly workloadHours: number;
+  readonly matchedRuleId?: string;
 }
 
 export interface ActivityListItemUi {

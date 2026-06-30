@@ -1,0 +1,20 @@
+.checklist-table {
+  width: 100%;
+}
+
+.checklist-cell {
+  display: grid;
+  gap: 0.125rem;
+}
+
+.checklist-cell__meta {
+  color: #6b7280;
+  font-size: 0.8125rem;
+}
+
+.checklist-table th {
+  color: #6b7280;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}

@@ -73,6 +73,15 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 ### Papéis (RBAC)
 
 - `USER`: docente — área de progresso (dashboard, atividades, checklist, relatórios).
-- `EVALUATOR`: revisor — dashboard e fila em `/avaliador` e `/avaliador/fila`.
-- `ADMIN`: administrador — dashboard, usuários e atribuições em `/admin`.
+- `EVALUATOR`: revisor — dashboard, fila e checklist em `/avaliador`.
+- `ADMIN`: administrador — dashboard, usuários, atribuições e barema em `/admin`.
 - Um usuário pode ter múltiplos papéis (ex.: `USER` + `EVALUATOR`).
+
+### Barema e pontuação
+
+- Configuração ativa em `BaremaConfig` (meta global, ex.: 2000 pts).
+- Regras por pilar em `BaremaCategoryRule`: `baseScore`, `workloadMultiplier`, `ceilingScore`, `minimumTarget`.
+- Regras de classificação em `BaremaActivityRule`: `kind`, `keywords[]`, `fixedScore`, `priority`.
+- Classificação automática (RF004) via keywords em título/descrição/tipo.
+- Otimizador (RF008) quando ≥2 categorias distintas fazem match com confiança média/alta.
+- Alertas de teto (RF007): notificação idempotente por `(userId, category, cycleId)` enquanto não lida.

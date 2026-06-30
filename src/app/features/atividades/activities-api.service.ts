@@ -5,6 +5,7 @@ import { ApiSuccessResponse } from '../../core/http/api-envelope.types';
 import { getApiUrl } from '../../core/config/runtime-config';
 import {
   ActivityChangeLogList,
+  ActivityClassificationResult,
   ActivityCreatePayload,
   ActivityCreateResponse,
   ActivityDetailDto,
@@ -13,6 +14,8 @@ import {
   ActivityListItemDto,
   ActivityScoreEstimate,
   ActivityScoreEstimateRequest,
+  ClassifyActivityRequest,
+  OptimizeClassificationResult,
   PaginatedActivitiesResponse,
 } from './models/activity-create.models';
 
@@ -110,9 +113,27 @@ export class ActivitiesApiService {
   estimateScore(payload: ActivityScoreEstimateRequest): Observable<ActivityScoreEstimate> {
     return this.http
       .post<
-        ApiSuccessResponse<ActivityScoreEstimate>
+        ApiSuccessResponse<ActivityScoreEstimate> | ActivityScoreEstimate
       >(`${this.apiBaseUrl}/activities/estimate`, payload)
-      .pipe(map((response) => response.data));
+      .pipe(map((response) => this.unwrapData(response)));
+  }
+
+  classify(payload: ClassifyActivityRequest): Observable<ActivityClassificationResult> {
+    return this.http
+      .post<
+        ApiSuccessResponse<ActivityClassificationResult> | ActivityClassificationResult
+      >(`${this.apiBaseUrl}/activities/classify`, payload)
+      .pipe(map((response) => this.unwrapData(response)));
+  }
+
+  optimizeClassification(
+    payload: ClassifyActivityRequest,
+  ): Observable<OptimizeClassificationResult> {
+    return this.http
+      .post<
+        ApiSuccessResponse<OptimizeClassificationResult> | OptimizeClassificationResult
+      >(`${this.apiBaseUrl}/activities/optimize-classification`, payload)
+      .pipe(map((response) => this.unwrapData(response)));
   }
 
   private unwrapData<T>(response: ApiSuccessResponse<T> | T): T {

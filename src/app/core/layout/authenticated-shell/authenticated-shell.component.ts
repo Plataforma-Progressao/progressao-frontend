@@ -1,6 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterOutlet } from '@angular/router';
+import { catchError, EMPTY, interval, startWith, switchMap, tap } from 'rxjs';
 import { AuthStateService } from '../../auth/auth-state.service';
+import { UserNotificationsApiService } from '../../notifications/user-notifications-api.service';
+import { UserNotification } from '../../notifications/user-notifications.models';
 import {
   AuthenticatedNavSection,
   buildNavSectionsForRoles,
@@ -18,14 +22,27 @@ import { AuthenticatedSidenavComponent } from './components/authenticated-sidena
 export class AuthenticatedShellComponent {
   private readonly authStateService = inject(AuthStateService);
   private readonly router = inject(Router);
+  private readonly notificationsApi = inject(UserNotificationsApiService);
 
   protected readonly mobileMenuOpened = signal(false);
   protected readonly desktopSidenavCollapsed = signal(false);
+  protected readonly unreadCount = signal(0);
+  protected readonly recentNotifications = signal<readonly UserNotification[]>([]);
   protected readonly currentUser = computed(() => this.authStateService.currentUser());
   protected readonly navigationSections = computed((): readonly AuthenticatedNavSection[] => {
     const roles = this.currentUser()?.roles ?? [];
     return buildNavSectionsForRoles(roles);
   });
+
+  constructor() {
+    interval(60_000)
+      .pipe(
+        startWith(0),
+        switchMap(() => this.refreshNotifications()),
+        takeUntilDestroyed(),
+      )
+      .subscribe();
+  }
 
   protected toggleMobileMenu(): void {
     if (this.isMobileViewport()) {
@@ -42,6 +59,38 @@ export class AuthenticatedShellComponent {
 
   protected logout(): void {
     void this.performLogout();
+  }
+
+  protected markNotificationRead(notificationId: string): void {
+    this.notificationsApi
+      .markRead(notificationId)
+      .pipe(
+        tap(() => this.refreshNotifications().subscribe()),
+        catchError(() => EMPTY),
+      )
+      .subscribe();
+  }
+
+  private refreshNotifications() {
+    return this.notificationsApi.list({ page: 1, pageSize: 5 }).pipe(
+      tap((response) => {
+        this.recentNotifications.set(response.items);
+      }),
+      switchMap(() =>
+        this.notificationsApi.unreadCount().pipe(
+          tap((result) => this.unreadCount.set(result.count)),
+          catchError(() => {
+            this.unreadCount.set(0);
+            return EMPTY;
+          }),
+        ),
+      ),
+      catchError(() => {
+        this.recentNotifications.set([]);
+        this.unreadCount.set(0);
+        return EMPTY;
+      }),
+    );
   }
 
   private async performLogout(): Promise<void> {
